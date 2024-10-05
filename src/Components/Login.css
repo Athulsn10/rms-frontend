@@ -1,0 +1,15 @@
+.btn.login-button:hover{
+    background: #fff !important;
+    color: #319f75 !important;
+    border: 1px solid #319f75;
+}
+.btn.login-button{
+    background: #319f75 !important;
+    color: #fff !important;
+}
+
+.gradient-bg{
+    height: 100%;
+    background-size: cover;
+    background-image: url('https://images.pexels.com/photos/8879386/pexels-photo-8879386.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1');
+}
