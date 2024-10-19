@@ -1,5 +1,5 @@
 import './App.css'
-import Login from './Auth/Login';
+import Authentication from './Auth/authentication';
 import Home from './Components/home';
 import { Route, Routes } from 'react-router-dom';
 
@@ -8,7 +8,7 @@ const App =()=> {
   return (
     <>
       <Routes>
-      <Route path='/' element={<Login/>}/>
+      <Route path='/' element={<Authentication/>}/>
       <Route path='/Home' element={<Home/>}/>
      </Routes>
     </>
