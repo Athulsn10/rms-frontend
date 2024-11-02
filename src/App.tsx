@@ -1,6 +1,6 @@
 import './App.css'
-import Authentication from './Auth/authentication';
-import Home from './Components/home';
+import Authentication from './app/auth/authentication';
+import Home from './app/home/home';
 import { Route, Routes } from 'react-router-dom';
 
 const App =()=> {

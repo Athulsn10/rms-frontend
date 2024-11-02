@@ -17,3 +17,7 @@
 .signup-link{
     cursor: pointer;
 }
+
+.input-error-color {
+    border-color: #ef4444 !important;
+}
