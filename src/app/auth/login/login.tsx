@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { FormEvent, useState } from 'react';
 import { Mail, Lock } from 'lucide-react';
 import { useAlert } from '@/hooks/useAlert';
 import CustomAlert from '../../alert/alert';
@@ -10,14 +10,18 @@ import "../auth.css";
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const passwordMinLength = 8;
 
-const Login = ({ onSwitchToRegister }) => {
+interface RegistrationProps {
+  onSwitchToRegister: () => void; 
+}
+
+const Login:  React.FC<RegistrationProps> = ({ onSwitchToRegister }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState({ email: '', password: '' }); 
 
   const { alert, showAlert, hideAlert } = useAlert();
 
-  const handleSignIn = async (e : Event) => {
+  const handleSignIn = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     const newErrors = { email: '', password: '' }; 
@@ -50,7 +54,7 @@ const Login = ({ onSwitchToRegister }) => {
   return (
     <>
       <div className="h-screen flex items-center justify-center bg-gradient-to-r from-blue-600 to-indigo-600">
-        <Card className="w-[400px] shadow-xl">
+        <Card className="w-[500px] shadow-xl">
           <CardHeader className="space-y-1">
             <CardTitle className="text-2xl font-bold tracking-tight">Welcome back </CardTitle>
             <CardDescription>
