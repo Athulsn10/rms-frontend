@@ -1,9 +1,9 @@
-import React from 'react';
+import { useState } from 'react';
 import Login from './login/login';
 import Registration from './registration/registration';
 
 const Authentication = () => {
-  const [isLogin, setIsLogin] = React.useState(true);
+  const [isLogin, setIsLogin] = useState(true);
 
   const handleSwitchToRegister = () => setIsLogin(false);
   const handleSwitchToLogin = () => setIsLogin(true);
