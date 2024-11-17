@@ -2,8 +2,8 @@ import { useState } from 'react';
 import BrandLogo from '@/assets/brandlogo';
 import { Input } from "@/components/ui/input"
 import { useNavigate } from "react-router-dom";
-import { Search, LifeBuoy, User, ChevronDown, Menu, X, MapPin } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { Search, LifeBuoy, User, ChevronDown, Menu, X, MapPin, ScanQrCode } from 'lucide-react';
 
 const Navbar = () => {
     const navigate = useNavigate();
@@ -13,7 +13,7 @@ const Navbar = () => {
         setIsMenuOpen(!isMenuOpen);
     };
 
-    const pushToPath =(path:string)=>{
+    const pushToPath = (path: string) => {
         navigate(`/${path}`)
     }
 
@@ -24,7 +24,7 @@ const Navbar = () => {
                     <div className="flex items-center justify-between">
                         <div className="flex items-center gap-4 md:gap-6">
                             <div onClick={() => pushToPath("")} className="flex-shrink-0 cursor-pointer">
-                                <BrandLogo/>
+                                <BrandLogo />
                             </div>
                             <div className="hidden md:flex items-center">
                                 <Popover>
@@ -47,6 +47,10 @@ const Navbar = () => {
                             </div>
                         </div>
                         <div className="hidden md:flex items-center gap-8">
+                            <div onClick={() => pushToPath("qrscanner")} className="flex items-center gap-2 cursor-pointer hover:text-swiggyOrange">
+                                <ScanQrCode className="w-5 h-5" />
+                                <span>Scan Qr</span>
+                            </div>
                             <div onClick={() => pushToPath("search")} className="flex items-center gap-2 cursor-pointer hover:text-swiggyOrange">
                                 <Search className="w-5 h-5" />
                                 <span>Search</span>
@@ -77,8 +81,12 @@ const Navbar = () => {
                 {isMenuOpen && (
                     <div className="md:hidden border-t border-gray-200">
                         <div className="px-4 py-3 space-y-3">
+                            <div onClick={() => pushToPath("qrscanner")} className="flex items-center gap-2 cursor-pointer hover:text-swiggyOrange">
+                                <ScanQrCode className="w-4 h-4" />
+                                <span>Scan Qr</span>
+                            </div>
                             <div className="flex items-center gap-2 cursor-pointer hover:text-swiggyOrange">
-                                <ChevronDown className="w-4 h-4" />
+                                <MapPin  className="w-4 h-4" />
                                 <span>Location</span>
                             </div>
                             <div className="flex items-center gap-2 cursor-pointer hover:text-swiggyOrange">
