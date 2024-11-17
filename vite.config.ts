@@ -10,4 +10,10 @@ export default defineConfig({
       "@": path.resolve("./src"),
     },
   },
+ server: {
+    https: {
+      key: path.resolve('./certs/cert.key'),
+      cert: path.resolve('./certs/cert.crt'),
+    },
+  },
 })
