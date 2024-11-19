@@ -83,9 +83,6 @@ const QRScanner: React.FC<ScannerProps> = ({ onResult, className = '' }) => {
         initializeScanner();
 
         return () => {
-            if (scanner) {
-                scanner.stop();
-            }
             Html5Qrcode.getCameras()
                 .then(() => { })
                 .catch(console.error);

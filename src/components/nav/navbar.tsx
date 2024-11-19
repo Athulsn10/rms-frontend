@@ -1,12 +1,15 @@
 import { useState } from 'react';
+import { useContext } from 'react';
 import BrandLogo from '@/assets/brandlogo';
 import { Input } from "@/components/ui/input"
+import MyContext from "@/app/context/context";
 import { useNavigate } from "react-router-dom";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Search, LifeBuoy, User, ChevronDown, Menu, X, MapPin, ScanQrCode } from 'lucide-react';
 
 const Navbar = () => {
     const navigate = useNavigate();
+    const { showQr, setshowQr } = useContext(MyContext);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
 
     const toggleMenu = () => {
@@ -47,7 +50,7 @@ const Navbar = () => {
                             </div>
                         </div>
                         <div className="hidden md:flex items-center gap-8">
-                            <div onClick={() => pushToPath("qrscanner")} className="flex items-center gap-2 cursor-pointer hover:text-swiggyOrange">
+                            <div onClick={() => setshowQr(!showQr)} className="flex items-center gap-2 cursor-pointer hover:text-swiggyOrange">
                                 <ScanQrCode className="w-5 h-5" />
                                 <span>Scan Qr</span>
                             </div>
