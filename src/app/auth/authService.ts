@@ -18,7 +18,7 @@ export const handleLogIn = async (email: string, password: string,  navigate: (p
 
       localStorage.setItem('token', response.data.data.token);
       localStorage.setItem('user', response.data.data.name);
-      navigate('/home');
+      navigate('/');
     } catch (error) {
       console.error('Error logging in', error);
     }
@@ -34,7 +34,7 @@ export const handleRegister = async (formData:any, navigate: (path: string) => v
   
         localStorage.setItem('token', response.data.data.token);
         localStorage.setItem('user', response.data.data.name);
-        navigate('/home');
+        navigate('/');
       } catch (error) {
         console.error('Error logging in', error);
       }
