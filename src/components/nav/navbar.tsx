@@ -22,20 +22,14 @@ const Navbar = () => {
 
     const pushToPath = (path: string) => {
         navigate(`/${path}`)
+        setIsMenuOpen(false);
     }
-
-    const handleProfileClick = (e: React.MouseEvent<HTMLDivElement>) => {
-        console.log('clicked:', userName);
-        e.preventDefault();
-        localStorage.clear();
-        window.location.reload();
-      };
 
     return (
         <>
-            <nav className="bg-stone-50 shadow-sm sticky top-0">
-                <div className="px-4 md:px-9 py-3">
-                    <div className="flex items-center justify-between mx-14">
+            <nav className="bg-stone-50 shadow-sm sticky top-0 ">
+                <div className="mx-0 md:px-16 py-3">
+                    <div className="flex items-center justify-between mx-3">
                         <div className="flex items-center gap-4 md:gap-6">
                             <div onClick={() => pushToPath("")} className="flex-shrink-0 cursor-pointer">
                                 <BrandLogo />
@@ -75,13 +69,13 @@ const Navbar = () => {
                             </div>
                             {userName ? (
                                 <>
-                                   <div onClick={handleProfileClick} className='flex items-center gap-2 cursor-pointer'>
+                                    <div onClick={() => pushToPath("Profile")} className='flex items-center gap-2 cursor-pointer'>
                                         <Avatar>
                                             <AvatarImage src="https://github.com/shadcn.png" />
                                             <AvatarFallback>CN</AvatarFallback>
                                         </Avatar>
                                         <p className='font-bold'>{userName}</p>
-                                   </div>
+                                    </div>
                                 </>
                             ) : (
                                 <Sheet>
@@ -112,17 +106,30 @@ const Navbar = () => {
                     </div>
                 </div>
                 {isMenuOpen && (
-                    <div className="md:hidden border-t border-gray-200">
-                        <div className="px-4 py-3 space-y-3">
+                    <div className="md:hidden border-t border-gray-200 h-[700px]" >
+                        <div className="px-4 py-3 space-y-6 text-xl font-semibold ">
                             <div onClick={() => pushToPath("qrscanner")} className="flex items-center gap-2 cursor-pointer hover:text-swiggyOrange">
                                 <ScanQrCode className="w-4 h-4" />
                                 <span>Scan Qr</span>
                             </div>
-                            <div className="flex items-center gap-2 cursor-pointer hover:text-swiggyOrange">
-                                <MapPin className="w-4 h-4" />
-                                <span>Location</span>
-                            </div>
-                            <div className="flex items-center gap-2 cursor-pointer hover:text-swiggyOrange">
+                            <Popover>
+                                <PopoverTrigger className='flex items-center gap-2 cursor-pointer hover:text-swiggyOrange'>
+                                    <MapPin className="w-4 h-4" />
+                                    <span>Location</span>
+                                </PopoverTrigger>
+                                <PopoverContent className='mx-9 w-80'>
+                                    {/* search Bar */}
+                                    <div className='relative'>
+                                        <MapPin className='absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500' />
+                                        <Input className='p-8 pt-0 pb-0 pr-0 font-medium' placeholder='Search Location' />
+                                    </div>
+                                    {/* Search Result */}
+                                    <div className='h-64 flex items-center justify-center'>
+                                        <p>Nothing yet.. under dev..</p>
+                                    </div>
+                                </PopoverContent>
+                            </Popover>
+                            <div onClick={() => pushToPath("search")} className="flex items-center gap-2 cursor-pointer hover:text-swiggyOrange">
                                 <Search className="w-5 h-5" />
                                 <span>Search</span>
                             </div>
@@ -130,17 +137,31 @@ const Navbar = () => {
                                 <LifeBuoy className="w-5 h-5" />
                                 <span>Help</span>
                             </div>
-                            <Sheet>
-                                <SheetTrigger>
-                                    <div className="flex items-center gap-2 cursor-pointer hover:text-swiggyOrange">
-                                        <User className="w-5 h-5" />
-                                        <span>Sign In</span>
+                            {userName ? (
+                                <>
+                                    <div className='fixed bottom-0 left-0 m-4 pb-3'>
+                                        <div onClick={() => pushToPath("Profile")} className='flex items-center gap-2 cursor-pointer'>
+                                            <Avatar>
+                                                <AvatarImage src="https://github.com/shadcn.png" />
+                                                <AvatarFallback>CN</AvatarFallback>
+                                            </Avatar>
+                                            <p className='font-bold'>{userName}</p>
+                                        </div>
                                     </div>
-                                </SheetTrigger>
-                                <SheetContent>
-                                    <Login />
-                                </SheetContent>
-                            </Sheet>
+                                </>
+                            ) : (
+                                <Sheet>
+                                    <SheetTrigger>
+                                        <div className="flex items-center gap-2 cursor-pointer hover:text-swiggyOrange">
+                                            <User className="w-5 h-5" />
+                                            <span>Sign In</span>
+                                        </div>
+                                    </SheetTrigger>
+                                    <SheetContent>
+                                        <Login />
+                                    </SheetContent>
+                                </Sheet>
+                            )}
                         </div>
                     </div>
                 )}

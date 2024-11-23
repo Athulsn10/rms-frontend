@@ -1,11 +1,12 @@
 import "../auth.css";
 import { FormEvent, useState } from 'react';
-import { Mail, Lock } from 'lucide-react';
+import { Mail, Lock, CircleAlert } from 'lucide-react';
 import { handleLogIn } from '../authService';
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
+import toast, { Toaster } from 'react-hot-toast';
 
 const Login = () => {
   const navigate = useNavigate();
@@ -15,6 +16,18 @@ const Login = () => {
 
   const passwordMinLength = 8;
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  const notify = (message:string, type:string) => {
+    if(type) {
+      (toast as any)[type](message,{
+        icon: <CircleAlert />,
+      });
+    } else {
+      toast(message,{
+        icon: <CircleAlert />,
+      });
+    }
+  }
 
   const handleSignIn = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -41,7 +54,13 @@ const Login = () => {
     setErrors(newErrors);
 
     if (isValid) {
-      handleLogIn(email, password, navigate)
+      const errors = await handleLogIn(email, password, navigate);
+      if (errors) {
+        notify(errors, 'error');
+        setTimeout(()=>{
+          navigate("/register");
+        },2000)
+      }
     }
   };
 
@@ -55,7 +74,7 @@ const Login = () => {
             <div className="space-y-2">
               <Label htmlFor="email" className="text-sm">Email</Label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
+                <Mail className="absolute left-3 top-5 -translate-y-1/2 h-4 w-4 text-gray-500" />
                 <Input
                   id="email"
                   type="email"
@@ -77,7 +96,7 @@ const Login = () => {
             <div className="space-y-2">
               <Label htmlFor="password" className="text-sm">Password</Label>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
+                <Lock className="absolute left-3 top-5 -translate-y-1/2 h-4 w-4 text-gray-500" />
                 <Input
                   id="password"
                   type="password"
@@ -102,6 +121,7 @@ const Login = () => {
           </form>
         </div>
       </div>
+      <Toaster />
     </>
   );
 };
