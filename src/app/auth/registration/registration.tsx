@@ -1,47 +1,91 @@
-import { FormEvent, useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import { Mail, Lock, User, MapPin, Building } from 'lucide-react';
 import "../auth.css";
+import { cn } from "@/lib/utils"
+import { FormEvent, useState } from 'react';
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useNavigate } from 'react-router-dom';
+import { Button } from "@/components/ui/button";
+import { handleRegister } from '../authService';
+import { format as dateFnsFormat } from "date-fns";
+import { Calendar } from "@/components/ui/calendar";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { Mail, Lock, User, MapPin, Building, Home, NutOff, Phone, Cake } from 'lucide-react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 interface RegistrationProps {
   onSwitchToLogin: () => void;
 }
 
+interface AddressData {
+  addressLine1: string;
+  addressLine2: string;
+  city: string;
+  state: string;
+  country: string;
+  pincode: string;
+}
+
+interface FormData {
+  name: string;
+  email: string;
+  password: string;
+  phone: string,
+  dob: string,
+  address: AddressData;
+  allergies: string[];
+}
+
 const Registration: React.FC<RegistrationProps> = ({ onSwitchToLogin }) => {
+  const navigate = useNavigate();
+  const [confirmPassword, setConfirmPassword] = useState('')
   const [currentStep, setCurrentStep] = useState(0);
-  const [formData, setFormData] = useState<Record<string, string>>({
-    firstName: '',
-    lastName: '',
+  const [formData, setFormData] = useState<FormData>({
+    name: '',
     email: '',
-    zipCode: '',
     password: '',
-    confirmPassword: '',
-    city: '',
-    district: ''
+    phone: '',
+    dob: '',
+    address: {
+      addressLine1: '',
+      addressLine2: '',
+      city: '',
+      state: '',
+      country: '',
+      pincode: '',
+    },
+    allergies: [],
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  const commonAllergies = [
+    "Peanuts",
+    "Tree Nuts",
+    "Milk",
+    "Egg",
+    "Wheat",
+    "Soy",
+    "Fish",
+    "Shellfish",
+    "Sesame",
+    "Mustard",
+    "Celery",
+    "Lupin",
+    "Sulphites",
+    "Gluten",
+    "Lactose",
+  ];
 
   const formFields = [
     // Step 1: Personal Information
     [
       {
-        id: 'firstName',
-        label: 'First Name',
+        id: 'name',
+        label: 'Full Name',
         type: 'text',
-        placeholder: 'John',
+        placeholder: 'John Doe',
         icon: User,
-        validation: (value: string) => !value ? 'First name is required' : ''
-      },
-      {
-        id: 'lastName',
-        label: 'Last Name',
-        type: 'text',
-        placeholder: 'Doe',
-        icon: User,
-        validation: (value: string) => !value ? 'Last name is required' : ''
+        validation: (value: string) => !value ? 'Full name is required' : ''
       },
       {
         id: 'email',
@@ -54,10 +98,7 @@ const Registration: React.FC<RegistrationProps> = ({ onSwitchToLogin }) => {
           if (!/\S+@\S+\.\S+/.test(value)) return 'Invalid email format';
           return '';
         }
-      }
-    ],
-    // Step 2: Security Information
-    [
+      },
       {
         id: 'password',
         label: 'Password',
@@ -76,48 +117,123 @@ const Registration: React.FC<RegistrationProps> = ({ onSwitchToLogin }) => {
         type: 'password',
         placeholder: '••••••••',
         icon: Lock,
-        validation: (value: string) => {
-          if (!value) return 'Please confirm your password';
-          if (value !== formData.password) return 'Passwords do not match';
+        validation: () => {
+          if (!confirmPassword) return 'Please confirm your password';
+          if (confirmPassword !== formData.password) return 'Passwords do not match';
           return '';
         }
       },
       {
-        id: 'city',
+        id: 'phone',
+        label: 'Phone',
+        type: 'text',
+        placeholder: '87333021863',
+        icon: Phone,
+        validation: (value: string) => {
+          if (!value) return 'Phone number is required';
+          if (!/^\d{10}$/.test(value)) return 'Phone number must be exactly 10 digits';
+          return '';
+        }
+      },
+      {
+        id: 'dob',
+        label: 'Date Of Birth',
+        type: 'date',
+        placeholder: '17-05-2002',
+        icon: Cake,
+        validation: () => { }
+      }
+    ],
+    // Step 3: Address Information
+    [
+      {
+        id: 'address.addressLine1',
+        label: 'Address Line 1',
+        type: 'text',
+        placeholder: 'Street address',
+        icon: Home,
+        validation: (value: string) => !value ? 'Address line 2 is required' : ''
+      },
+      {
+        id: 'address.addressLine2',
+        label: 'Address Line 2',
+        type: 'text',
+        placeholder: 'Apartment, suite, etc. (optional)',
+        icon: Home,
+        validation: (value: string) => !value ? 'Address line 2 is required' : ''
+      },
+      {
+        id: 'address.city',
         label: 'City',
         type: 'text',
-        placeholder: 'Chelakkara',
+        placeholder: 'City',
         icon: Building,
         validation: (value: string) => !value ? 'City is required' : ''
       },
       {
-        id: 'district',
-        label: 'District',
+        id: 'address.state',
+        label: 'State',
         type: 'text',
-        placeholder: 'Thrissur',
+        placeholder: 'State',
         icon: Building,
-        validation: (value: string) => !value ? 'District is required' : ''
+        validation: (value: string) => !value ? 'State is required' : ''
       },
       {
-        id: 'zipCode',
-        label: 'Zip Code',
+        id: 'address.country',
+        label: 'Country',
+        type: 'text',
+        placeholder: 'Country',
+        icon: Building,
+        validation: (value: string) => !value ? 'Country is required' : ''
+      },
+      {
+        id: 'address.pincode',
+        label: 'PIN Code',
         type: 'text',
         placeholder: '123456',
         icon: MapPin,
         validation: (value: string) => {
-          if (!value) return 'Zip code is required';
-          if (!/^\d{6}$/.test(value)) return 'Invalid zip code format';
+          if (!value) return 'PIN code is required';
+          if (!/^\d{6}$/.test(value)) return 'Invalid PIN code format';
           return '';
         }
+      }
+    ],
+    // Step 4: Allergies
+    [
+      {
+        id: 'allergies',
+        label: 'Allergies',
+        type: 'text',
+        placeholder: 'Add allergies',
+        icon: NutOff,
+        validation: () => ''
       }
     ]
   ];
 
-  const handleInputChange = (id: any, value: string) => {
-    setFormData(prev => ({
-      ...prev,
-      [id]: value
-    }));
+  const handleInputChange = (id: string, value: string) => {
+    setFormData(prev => {
+      if (id.startsWith('address.')) {
+        const addressField = id.split('.')[1];
+        return {
+          ...prev,
+          address: {
+            ...prev.address,
+            [addressField]: value
+          }
+        };
+      }
+      if (id === "confirmPassword") {
+        setConfirmPassword(value);
+        return prev;
+      }
+      return {
+        ...prev,
+        [id]: value
+      };
+    });
+
     if (errors[id]) {
       setErrors(prev => ({
         ...prev,
@@ -126,13 +242,32 @@ const Registration: React.FC<RegistrationProps> = ({ onSwitchToLogin }) => {
     }
   };
 
+  const handleAllergyToggle = (allergy: string) => {
+    setFormData(prev => {
+      const updatedAllergies = prev.allergies.includes(allergy)
+        ? prev.allergies.filter(a => a !== allergy)
+        : [...prev.allergies, allergy];
+
+      return {
+        ...prev,
+        allergies: updatedAllergies
+      };
+    });
+  };
+
   const validateStep = (step: number) => {
     const currentFields = formFields[step];
-    const newErrors = {} as any;
+    const newErrors = {} as Record<string, string>;
     let isValid = true;
 
     currentFields.forEach(field => {
-      const error = field.validation(formData[field.id]);
+      const value = field.id.includes('.')
+        ? formData.address[field.id.split('.')[1] as keyof AddressData]
+        : formData[field.id as keyof FormData];
+      if (field.id === "confirmPassword") {
+        console.log(field.validation(value as string))
+      }
+      const error = field.validation(value as string);
       if (error) {
         newErrors[field.id] = error;
         isValid = false;
@@ -158,57 +293,136 @@ const Registration: React.FC<RegistrationProps> = ({ onSwitchToLogin }) => {
     e.preventDefault();
     if (validateStep(currentStep)) {
       console.log('Form submitted:', formData);
+      handleRegister(formData, navigate);
     }
   };
 
   const currentFields = formFields[currentStep];
 
+  const renderAllergiesStep = () => (
+    <div className="space-y-4">
+      <div className="flex items-center space-x-2">
+        <NutOff className="h-5 w-5 text-gray-500" />
+        <p className="text-lg font-medium">Select Your Allergies</p>
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {commonAllergies.map((allergy) => (
+          <div key={allergy} className="flex items-center space-x-2">
+            <Checkbox
+              id={allergy}
+              checked={formData.allergies.includes(allergy)}
+              onCheckedChange={() => handleAllergyToggle(allergy)}
+            />
+            <Label
+              htmlFor={allergy}
+              className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+            >
+              {allergy}
+            </Label>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-blue-600 to-indigo-600 p-4">
-      <Card className="w-full max-w-lg shadow-xl">
-        <CardHeader className="space-y-1 p-4 sm:p-6">
-          <CardTitle className="text-xl sm:text-2xl font-bold tracking-tight">
+      <Card className="w-full max-w-5xl shadow-xl">
+        <CardHeader className="space-y-1 p-6 sm:p-8">
+          <CardTitle className="text-2xl sm:text-3xl font-bold tracking-tight">
             Create an account 👋
-            <p className="text-sm mt-1">{`[ Step ${currentStep + 1} of ${formFields.length} ]`}</p>
+            <p className="text-sm mt-2">{`[ Step ${currentStep + 1} of ${formFields.length} ]`}</p>
           </CardTitle>
           <CardDescription className="text-sm">
             Enter your information to get started
           </CardDescription>
         </CardHeader>
-        <CardContent className="p-4 sm:p-6">
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-3 custom-scroll-bar">
-              {currentFields.map((field, index) => (
-                <div key={index} className="space-y-2">
-                  <Label htmlFor={field.id} className="text-sm">
-                    {field.label}
-                  </Label>
-                  <div className="relative">
-                    <field.icon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
-                    <Input
-                      id={field.id}
-                      type={field.type}
-                      placeholder={field.placeholder}
-                      className="p-8 pt-0 pb-0 pr-0 w-full"
-                      value={formData[field.id]}
-                      onChange={(e) => handleInputChange(field.id, e.target.value)}
-                    />
-                    {errors[field.id] && (
-                      <p className="text-red-500 text-xs mt-1">
-                        {errors[field.id]}
-                      </p>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
+        <CardContent className="p-6 sm:p-8">
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div className={`${currentFields.some(field => field.id === "allergies") ? "" : "grid grid-cols-1 md:grid-cols-2"} gap-2`}>
+              {currentFields.map((field, index) => {
+                if (field.id === "allergies") {
+                  return renderAllergiesStep();
+                }
 
-            <div className="flex flex-col sm:flex-row justify-between gap-2 sm:gap-4 mt-6">
+                return (
+                  <div key={index} className="space-y-2">
+                    <Label htmlFor={field.id} className="text-sm font-medium block">
+                      {field.label}
+                    </Label>
+                    {field.type === "date" ? (
+                      <>
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <Button
+                              variant={"outline"}
+                              className={cn(
+                                "w-100 justify-start text-left py-4 font-normal",
+                                !formData[field.id as keyof FormData] && "text-muted-foreground"
+                              )}
+                            >
+                              <Cake className="mr-2 h-4 w-4" />
+                              {formData[field.id as keyof FormData] ?
+                                dateFnsFormat(new Date(formData[field.id as keyof FormData] as string), "PPP") :
+                                <span>Pick Your Date Of Birth</span>
+                              }
+                            </Button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-auto p-0">
+                            <Calendar
+                              mode="single"
+                              selected={formData[field.id as keyof FormData] ?
+                                new Date(formData[field.id as keyof FormData] as string) :
+                                undefined}
+                              onSelect={(date) => {
+                                if (date) {
+                                  handleInputChange(field.id, date.toISOString().split('T')[0]);
+                                }
+                              }}
+                              initialFocus
+                            />
+                          </PopoverContent>
+                        </Popover>
+                        <div style={{ height: '6px', marginTop: '2px', display: 'flex', justifyContent: 'end', width: '100%' }}>
+                          {errors[field.id] && (
+                            <p className="text-red-500 text-xs">
+                              {errors[field.id]}
+                            </p>
+                          )}
+                        </div>
+                      </>
+
+                    ) :
+                      (
+                        <div className="relative">
+                          <field.icon className="absolute left-3 top-6 -translate-y-1/2 h-5 w-5 text-gray-500" />
+                          <Input
+                            id={field.id}
+                            type={field.type}
+                            placeholder={field.placeholder}
+                            className="p-10 pt-0 pb-0 pr-0 h-12 w-full bg-white"
+                            value={ (field.id.includes('.') ? formData.address[field.id.split('.')[1] as keyof AddressData]: formData[field.id as keyof FormData]) as any }
+                            onChange={(e) => handleInputChange(field.id, e.target.value)}
+                          />
+                          <div style={{ height: '6px', marginTop: '2px', display: 'flex', justifyContent: 'end', width: '100%' }}>
+                            {errors[field.id] && (
+                              <p className="text-red-500 text-xs">
+                                {errors[field.id]}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                      )}
+                  </div>
+                );
+              })}
+            </div>
+            <div className="flex flex-col sm:flex-row justify-end gap-3 sm:gap-4 mt-8 border-t pt-6">
               {currentStep > 0 && (
                 <Button
                   type="button"
                   onClick={handlePrevious}
-                  className="w-full sm:w-auto bg-gray-500 hover:bg-gray-600"
+                  className="w-full sm:w-32 bg-gray-500 hover:bg-gray-600"
                 >
                   Previous
                 </Button>
@@ -217,14 +431,14 @@ const Registration: React.FC<RegistrationProps> = ({ onSwitchToLogin }) => {
                 <Button
                   type="button"
                   onClick={handleNext}
-                  className="w-full sm:w-auto bg-zinc-900"
+                  className="w-full sm:w-32 bg-zinc-900"
                 >
                   Next
                 </Button>
               ) : (
-                <Button 
-                  type="submit" 
-                  className="w-full sm:w-auto bg-zinc-900"
+                <Button
+                  type="submit"
+                  className="w-full sm:w-48 bg-zinc-900"
                 >
                   Create Account
                 </Button>

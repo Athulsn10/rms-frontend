@@ -1,26 +1,28 @@
+import "../auth.css";
 import { FormEvent, useState } from 'react';
 import { Mail, Lock } from 'lucide-react';
 import { useAlert } from '@/hooks/useAlert';
-import CustomAlert from '@/components/alert/alert';
+import { handleLogIn } from '../authService';
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
+import CustomAlert from '@/components/alert/alert';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import "../auth.css";
-
-const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const passwordMinLength = 8;
 
 interface RegistrationProps {
   onSwitchToRegister: () => void;
 }
 
 const Login: React.FC<RegistrationProps> = ({ onSwitchToRegister }) => {
+  const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const { alert, showAlert, hideAlert } = useAlert();
   const [errors, setErrors] = useState({ email: '', password: '' });
 
-  const { alert, showAlert, hideAlert } = useAlert();
+  const passwordMinLength = 8;
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
   const handleSignIn = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -48,7 +50,7 @@ const Login: React.FC<RegistrationProps> = ({ onSwitchToRegister }) => {
     setErrors(newErrors);
 
     if (isValid) {
-      showAlert('Login successful!', 'success');
+      handleLogIn(email, password, navigate)
     }
   };
 
@@ -85,11 +87,13 @@ const Login: React.FC<RegistrationProps> = ({ onSwitchToRegister }) => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                 />
-                {errors.email && (
-                  <p className="text-red-500 text-xs mt-1">
-                    {errors.email}
-                  </p>
-                )}
+                <div style={{ height: '6px', marginTop: '2px' }}>
+                  {errors.email && (
+                    <p className="text-red-500 text-xs">
+                      {errors.email}
+                    </p>
+                  )}
+                </div>
               </div>
             </div>
 
@@ -105,11 +109,13 @@ const Login: React.FC<RegistrationProps> = ({ onSwitchToRegister }) => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                 />
-                {errors.password && (
-                  <p className="text-red-500 text-xs mt-1">
-                    {errors.password}
-                  </p>
-                )}
+                <div style={{ height: '6px', marginTop: '2px' }}>
+                  {errors.password && (
+                    <p className="text-red-500 text-xs">
+                      {errors.password}
+                    </p>
+                  )}
+                </div>
               </div>
             </div>
 

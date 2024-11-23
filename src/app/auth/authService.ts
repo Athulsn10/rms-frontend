@@ -1,28 +1,41 @@
-// import { http } from '../services/http';
-// import { useNavigate } from 'react-router-dom';
+import { http } from '../../services/http';
 
-// const router = useNavigate();
+export const handleLogIn = async (email: string, password: string,  navigate: (path: string) => void) => {
 
-export const handleSignIn = async (email: string, password: string) => {
+    const headers = {
+      'Content-Type': 'application/json',
+    };
 
-    // const headers = {
-    //   'Content-Type': 'application/json',
-    // };
+    try {
+      const response = await http.post(
+        '/auth/login/',
+        {
+          email: email,
+          password: password,
+        },
+        { headers }
+      );
 
-    // try {
-    //   const response = await http.post(
-    //     '/auth/login/',
-    //     {
-    //       email: email,
-    //       password: password,
-    //     },
-    //     { headers }
-    //   );
-
-    //   localStorage.setItem('token', response.data.data.token);
-    //   localStorage.setItem('user', response.data.data.name);
-    //   router('/home');
-    // } catch (error) {
-    //   console.error('Error logging in', error);
-    // }
+      localStorage.setItem('token', response.data.data.token);
+      localStorage.setItem('user', response.data.data.name);
+      navigate('/home');
+    } catch (error) {
+      console.error('Error logging in', error);
+    }
 };
+
+export const handleRegister = async (formData:any, navigate: (path: string) => void) => {
+    const headers = {
+        'Content-Type': 'application/json',
+      };
+  
+      try {
+        const response = await http.post('/customer',formData,{ headers });
+  
+        localStorage.setItem('token', response.data.data.token);
+        localStorage.setItem('user', response.data.data.name);
+        navigate('/home');
+      } catch (error) {
+        console.error('Error logging in', error);
+      }
+}
