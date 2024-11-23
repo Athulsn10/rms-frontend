@@ -19,8 +19,9 @@ export const handleLogIn = async (email: string, password: string,  navigate: (p
       localStorage.setItem('token', response.data.data.token);
       localStorage.setItem('user', response.data.data.name);
       navigate('/');
-    } catch (error) {
-      console.error('Error logging in', error);
+      return null;
+    } catch (error:any) {
+      return error.response?.data?.message
     }
 };
 
