@@ -1,24 +1,16 @@
 import "../auth.css";
 import { FormEvent, useState } from 'react';
 import { Mail, Lock } from 'lucide-react';
-import { useAlert } from '@/hooks/useAlert';
 import { handleLogIn } from '../authService';
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
-import CustomAlert from '@/components/alert/alert';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
-interface RegistrationProps {
-  onSwitchToRegister: () => void;
-}
-
-const Login: React.FC<RegistrationProps> = ({ onSwitchToRegister }) => {
+const Login = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const { alert, showAlert, hideAlert } = useAlert();
   const [errors, setErrors] = useState({ email: '', password: '' });
 
   const passwordMinLength = 8;
@@ -40,7 +32,6 @@ const Login: React.FC<RegistrationProps> = ({ onSwitchToRegister }) => {
 
     if (!password) {
       newErrors.password = 'Password is required.';
-      showAlert(newErrors.password, 'warning');
       isValid = false;
     } else if (password.length < passwordMinLength) {
       newErrors.password = `Password must be at least ${passwordMinLength} characters long.`;
@@ -55,25 +46,11 @@ const Login: React.FC<RegistrationProps> = ({ onSwitchToRegister }) => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-blue-600 to-indigo-600 p-4">
-      <Card className="w-full max-w-md shadow-xl">
-        <CardHeader className="space-y-1 p-4 sm:p-6">
-          <CardTitle className="text-xl sm:text-2xl font-bold tracking-tight">
-            Welcome back
-          </CardTitle>
-          <CardDescription className="text-sm">
-            Enter your credentials to access your account
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="p-4 sm:p-6">
-          {alert.show && (
-            <CustomAlert
-              message={alert.message}
-              type={alert.type}
-              onClose={hideAlert}
-              className="mb-4"
-            />
-          )}
+    <>
+      <div className="w-full">
+        <p className="text-4xl">Login</p>
+        <p className="text-xs pt-3">or <span className="text-zinc-900 hover:text-blue-700 font-medium cursor-pointer" onClick={() => navigate("/register")}>create an accoun</span>t</p>
+        <div className="p-4 sm:p-6">
           <form onSubmit={handleSignIn} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="email" className="text-sm">Email</Label>
@@ -123,19 +100,9 @@ const Login: React.FC<RegistrationProps> = ({ onSwitchToRegister }) => {
               Sign in
             </Button>
           </form>
-
-          <div className="mt-6 text-center text-sm">
-            <span className="text-gray-500">Don't have an account?</span>{' '}
-            <button
-              onClick={onSwitchToRegister}
-              className="text-zinc-900 hover:text-blue-700 font-medium"
-            >
-              Sign up
-            </button>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
+        </div>
+      </div>
+    </>
   );
 };
 

@@ -1,16 +1,20 @@
 import { useState } from 'react';
 import { useContext } from 'react';
+import Login from '@/app/auth/login/login';
 import BrandLogo from '@/assets/brandlogo';
 import { Input } from "@/components/ui/input"
 import MyContext from "@/app/context/context";
 import { useNavigate } from "react-router-dom";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { Search, LifeBuoy, User, ChevronDown, Menu, X, MapPin, ScanQrCode, Scan } from 'lucide-react';
+import { Search, LifeBuoy, User, ChevronDown, Menu, X, MapPin, ScanQrCode } from 'lucide-react';
 
 const Navbar = () => {
     const navigate = useNavigate();
     const { showQr, setshowQr } = useContext(MyContext);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const userName = localStorage.getItem('user');
 
     const toggleMenu = () => {
         setIsMenuOpen(!isMenuOpen);
@@ -19,6 +23,13 @@ const Navbar = () => {
     const pushToPath = (path: string) => {
         navigate(`/${path}`)
     }
+
+    const handleProfileClick = (e: React.MouseEvent<HTMLDivElement>) => {
+        console.log('clicked:', userName);
+        e.preventDefault();
+        localStorage.clear();
+        window.location.reload();
+      };
 
     return (
         <>
@@ -62,10 +73,29 @@ const Navbar = () => {
                                 <LifeBuoy className="w-5 h-5" />
                                 <span>Help</span>
                             </div>
-                            <div onClick={() => pushToPath("auth")} className="flex items-center gap-2 cursor-pointer hover:text-swiggyOrange">
-                                <User className="w-5 h-5" />
-                                <span>Sign In</span>
-                            </div>
+                            {userName ? (
+                                <>
+                                   <div onClick={handleProfileClick} className='flex items-center gap-2 cursor-pointer'>
+                                        <Avatar>
+                                            <AvatarImage src="https://github.com/shadcn.png" />
+                                            <AvatarFallback>CN</AvatarFallback>
+                                        </Avatar>
+                                        <p className='font-bold'>{userName}</p>
+                                   </div>
+                                </>
+                            ) : (
+                                <Sheet>
+                                    <SheetTrigger>
+                                        <div className="flex items-center gap-2 cursor-pointer hover:text-swiggyOrange">
+                                            <User className="w-5 h-5" />
+                                            <span>Sign In</span>
+                                        </div>
+                                    </SheetTrigger>
+                                    <SheetContent>
+                                        <Login />
+                                    </SheetContent>
+                                </Sheet>
+                            )}
                         </div>
                         <div className="md:hidden">
                             <button
@@ -89,7 +119,7 @@ const Navbar = () => {
                                 <span>Scan Qr</span>
                             </div>
                             <div className="flex items-center gap-2 cursor-pointer hover:text-swiggyOrange">
-                                <MapPin  className="w-4 h-4" />
+                                <MapPin className="w-4 h-4" />
                                 <span>Location</span>
                             </div>
                             <div className="flex items-center gap-2 cursor-pointer hover:text-swiggyOrange">
@@ -100,10 +130,17 @@ const Navbar = () => {
                                 <LifeBuoy className="w-5 h-5" />
                                 <span>Help</span>
                             </div>
-                            <div className="flex items-center gap-2 cursor-pointer hover:text-swiggyOrange">
-                                <User className="w-5 h-5" />
-                                <span>Sign In</span>
-                            </div>
+                            <Sheet>
+                                <SheetTrigger>
+                                    <div className="flex items-center gap-2 cursor-pointer hover:text-swiggyOrange">
+                                        <User className="w-5 h-5" />
+                                        <span>Sign In</span>
+                                    </div>
+                                </SheetTrigger>
+                                <SheetContent>
+                                    <Login />
+                                </SheetContent>
+                            </Sheet>
                         </div>
                     </div>
                 )}

@@ -13,9 +13,6 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Mail, Lock, User, MapPin, Building, Home, NutOff, Phone, Cake } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
-interface RegistrationProps {
-  onSwitchToLogin: () => void;
-}
 
 interface AddressData {
   addressLine1: string;
@@ -36,7 +33,7 @@ interface FormData {
   allergies: string[];
 }
 
-const Registration: React.FC<RegistrationProps> = ({ onSwitchToLogin }) => {
+const Registration = () => {
   const navigate = useNavigate();
   const [confirmPassword, setConfirmPassword] = useState('')
   const [currentStep, setCurrentStep] = useState(0);
@@ -449,10 +446,10 @@ const Registration: React.FC<RegistrationProps> = ({ onSwitchToLogin }) => {
           <div className="mt-6 text-center text-sm">
             <span className="text-gray-500">Already have an account?</span>{' '}
             <button
-              onClick={onSwitchToLogin}
+              onClick={()=> navigate('/')}
               className="text-zinc-900 hover:text-blue-700 font-medium"
             >
-              Sign in
+             Back to home
             </button>
           </div>
         </CardContent>
