@@ -3,7 +3,7 @@ import BrandLogo from '@/assets/brandlogo';
 import { Input } from "@/components/ui/input"
 import { useNavigate } from "react-router-dom";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { Search, LifeBuoy, User, ChevronDown, Menu, X, MapPin, ScanQrCode } from 'lucide-react';
+import { Search, LifeBuoy, User, ChevronDown, Menu, X, MapPin, ScanQrCode, Scan } from 'lucide-react';
 
 const Navbar = () => {
     const navigate = useNavigate();
@@ -21,7 +21,7 @@ const Navbar = () => {
         <>
             <nav className="bg-stone-50 shadow-sm sticky top-0">
                 <div className="px-4 md:px-9 py-3">
-                    <div className="flex items-center justify-between">
+                    <div className="flex items-center justify-between mx-14">
                         <div className="flex items-center gap-4 md:gap-6">
                             <div onClick={() => pushToPath("")} className="flex-shrink-0 cursor-pointer">
                                 <BrandLogo />

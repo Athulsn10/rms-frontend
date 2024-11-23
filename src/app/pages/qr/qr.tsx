@@ -29,6 +29,13 @@ const QRScanner: React.FC<ScannerProps> = ({ onResult, className = '' }) => {
         window.location.reload();
     };
 
+    const stopCamera = () => {
+        const video = document.querySelector('video');
+        const mediaStream = video?.srcObject;
+        const tracks = mediaStream?.getTracks();
+        tracks.forEach(track => track.stop())
+    }
+
     useEffect(() => {
         let scanner: Html5Qrcode | null = null;
 
@@ -84,7 +91,7 @@ const QRScanner: React.FC<ScannerProps> = ({ onResult, className = '' }) => {
 
         return () => {
             Html5Qrcode.getCameras()
-                .then(() => { })
+                .then(() => scanner?.stop()) 
                 .catch(console.error);
         };
     }, [onResult]);
