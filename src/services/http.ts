@@ -1,6 +1,8 @@
 import axios from 'axios';
 
-export const http = axios.create({baseURL:'https://rms.sreekanth.tech', 
+const url = import.meta.env.VITE_BASE_URL
+console.log(url)
+export const http = axios.create({baseURL:`${url}`, 
      headers: {
     'Content-Type': 'application/json',
   },})
