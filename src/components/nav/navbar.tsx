@@ -69,7 +69,7 @@ const Navbar = () => {
                             </div>
                             {userName ? (
                                 <>
-                                    <div onClick={() => pushToPath("Profile")} className='flex items-center gap-2 cursor-pointer'>
+                                    <div onClick={() => pushToPath("profile")} className='flex items-center gap-2 cursor-pointer'>
                                         <Avatar>
                                             <AvatarImage src="https://github.com/shadcn.png" />
                                             <AvatarFallback>CN</AvatarFallback>
@@ -140,7 +140,7 @@ const Navbar = () => {
                             {userName ? (
                                 <>
                                     <div className='fixed bottom-0 left-0 m-4 pb-3'>
-                                        <div onClick={() => pushToPath("Profile")} className='flex items-center gap-2 cursor-pointer'>
+                                        <div onClick={() => pushToPath("profile")} className='flex items-center gap-2 cursor-pointer'>
                                             <Avatar>
                                                 <AvatarImage src="https://github.com/shadcn.png" />
                                                 <AvatarFallback>CN</AvatarFallback>
