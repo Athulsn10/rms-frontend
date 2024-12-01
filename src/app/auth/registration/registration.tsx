@@ -1,15 +1,11 @@
 import "../auth.css";
-import { cn } from "@/lib/utils"
 import { FormEvent, useState } from 'react';
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { handleRegister } from '../authService';
-import { format as dateFnsFormat } from "date-fns";
-import { Calendar } from "@/components/ui/calendar";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Mail, Lock, User, MapPin, Building, Home, NutOff, Phone, Cake } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
