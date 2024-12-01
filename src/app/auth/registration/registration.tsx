@@ -347,50 +347,6 @@ const Registration = () => {
                     <Label htmlFor={field.id} className="text-sm font-medium block">
                       {field.label}
                     </Label>
-                    {field.type === "date" ? (
-                      <>
-                        <Popover>
-                          <PopoverTrigger asChild>
-                            <Button
-                              variant={"outline"}
-                              className={cn(
-                                "w-100 justify-start text-left py-4 font-normal",
-                                !formData[field.id as keyof FormData] && "text-muted-foreground"
-                              )}
-                            >
-                              <Cake className="mr-2 h-4 w-4" />
-                              {formData[field.id as keyof FormData] ?
-                                dateFnsFormat(new Date(formData[field.id as keyof FormData] as string), "PPP") :
-                                <span>Pick Your Date Of Birth</span>
-                              }
-                            </Button>
-                          </PopoverTrigger>
-                          <PopoverContent className="w-auto p-0">
-                            <Calendar
-                              mode="single"
-                              selected={formData[field.id as keyof FormData] ?
-                                new Date(formData[field.id as keyof FormData] as string) :
-                                undefined}
-                              onSelect={(date) => {
-                                if (date) {
-                                  handleInputChange(field.id, date.toISOString().split('T')[0]);
-                                }
-                              }}
-                              initialFocus
-                            />
-                          </PopoverContent>
-                        </Popover>
-                        <div style={{ height: '6px', marginTop: '2px', display: 'flex', justifyContent: 'end', width: '100%' }}>
-                          {errors[field.id] && (
-                            <p className="text-red-500 text-xs">
-                              {errors[field.id]}
-                            </p>
-                          )}
-                        </div>
-                      </>
-
-                    ) :
-                      (
                         <div className="relative">
                           <field.icon className="absolute left-3 top-6 -translate-y-1/2 h-5 w-5 text-gray-500" />
                           <Input
@@ -409,7 +365,6 @@ const Registration = () => {
                             )}
                           </div>
                         </div>
-                      )}
                   </div>
                 );
               })}

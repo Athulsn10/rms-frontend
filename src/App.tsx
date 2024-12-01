@@ -3,7 +3,7 @@ import Qr from "@/components/qr/qr";
 import Home from './app/pages/home/home';
 import Navbar from "@/components/nav/navbar";
 import Search from "./app/pages/search/search";
-import Profile from './app/pages/profile/profile';
+import Profile from './app/pages/customer/profile/profile';
 import { Route, Routes, useLocation  } from 'react-router-dom';
 import Registration from './app/auth/registration/registration';
 
