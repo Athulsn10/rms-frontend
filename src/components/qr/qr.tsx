@@ -1,6 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import { X } from 'lucide-react';
 import { Html5Qrcode } from 'html5-qrcode';
-import { Camera } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import BrandLogo from '@/assets/brandlogo';
+import { useNavigate } from "react-router-dom";
 
 interface QRScannerConfig {
     fps: number;
@@ -18,8 +20,9 @@ interface ScannerProps {
 }
 
 const QRScanner: React.FC<ScannerProps> = ({ onResult, className = '' }) => {
-    const [scanResult, setScanResult] = useState<string>('');
+    const navigate = useNavigate();
     const [error, setError] = useState<string>('');
+    const [scanResult, setScanResult] = useState<string>('');
     const [isScanning, setIsScanning] = useState<boolean>(true);
 
     const resetScanner = (): void => {
@@ -29,11 +32,9 @@ const QRScanner: React.FC<ScannerProps> = ({ onResult, className = '' }) => {
         window.location.reload();
     };
 
-    const stopCamera = () => {
-        const video = document.querySelector('video');
-        const mediaStream = video?.srcObject;
-        const tracks = mediaStream?.getTracks();
-        tracks.forEach(track => track.stop())
+    const handleClose = () => {
+        navigate("/");
+        window.location.reload();
     }
 
     useEffect(() => {
@@ -98,12 +99,18 @@ const QRScanner: React.FC<ScannerProps> = ({ onResult, className = '' }) => {
 
     return (
         <div className={`flex flex-col items-center max-w-md mx-auto p-6 space-y-6 ${className}`}>
-            <div className="w-full text-center space-y-4">
-                <Camera className="w-12 h-12 mx-auto text-blue-500" />
-                <h1 className="text-2xl font-bold">Scan Menu Qr Code</h1>
-                <p className="text-gray-600">
-                    {isScanning ? 'Position the QR code in the center of the camera' : 'QR Code detected!'}
-                </p>
+            <div className="w-full text-center space-y-16">
+                <div className='flex justify-between'>
+                    <BrandLogo />
+                    <X onClick={handleClose} className="w-12 h-12"/>
+                </div>
+               <div>
+                    <h1 className="text-2xl font-bold">Scan Table Qr Code</h1>
+                    <p className='p-0 m-0 text-sm'>If your are in the restaurant find a table to get the qr</p>
+                    <p className="text-gray-600">
+                        {isScanning ? 'Position the QR code in the center of the square' : 'QR Code detected!'}
+                    </p>
+               </div>
             </div>
 
             {error && (

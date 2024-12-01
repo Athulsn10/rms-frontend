@@ -1,9 +1,7 @@
 import { useState } from 'react';
-import { useContext } from 'react';
 import Login from '@/app/auth/login/login';
 import BrandLogo from '@/assets/brandlogo';
 import { Input } from "@/components/ui/input"
-import MyContext from "@/app/context/context";
 import { useNavigate } from "react-router-dom";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -12,7 +10,6 @@ import { Search, LifeBuoy, User, ChevronDown, Menu, X, MapPin, ScanQrCode } from
 
 const Navbar = () => {
     const navigate = useNavigate();
-    const { showQr, setshowQr } = useContext(MyContext);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const userName = localStorage.getItem('user');
 
@@ -27,7 +24,7 @@ const Navbar = () => {
 
     return (
         <>
-            <nav className="bg-stone-50 shadow-sm sticky top-0 ">
+            <nav className="bg-stone-50 shadow-sm sticky top-0 overflow-hidden">
                 <div className="mx-0 md:px-16 py-3">
                     <div className="flex items-center justify-between mx-3">
                         <div className="flex items-center gap-4 md:gap-6">
@@ -55,10 +52,12 @@ const Navbar = () => {
                             </div>
                         </div>
                         <div className="hidden md:flex items-center gap-8">
-                            <div onClick={() => setshowQr(!showQr)} className="flex items-center gap-2 cursor-pointer hover:text-swiggyOrange">
-                                <ScanQrCode className="w-5 h-5" />
-                                <span>Scan Qr</span>
-                            </div>
+                            {userName && (
+                                <div onClick={() => pushToPath("qrscanner")} className="flex items-center gap-2 cursor-pointer hover:text-swiggyOrange">
+                                    <ScanQrCode className="w-5 h-5" />
+                                    <span>Scan Qr</span>
+                                </div>
+                            )}
                             <div onClick={() => pushToPath("search")} className="flex items-center gap-2 cursor-pointer hover:text-swiggyOrange">
                                 <Search className="w-5 h-5" />
                                 <span>Search</span>
@@ -92,10 +91,7 @@ const Navbar = () => {
                             )}
                         </div>
                         <div className="md:hidden">
-                            <button
-                                onClick={toggleMenu}
-                                className="p-2 rounded-md hover:bg-gray-100 focus:outline-none"
-                            >
+                            <button onClick={toggleMenu} className="p-2 rounded-md hover:bg-gray-100 focus:outline-none">
                                 {isMenuOpen ? (
                                     <X className="w-6 h-6" />
                                 ) : (
@@ -106,12 +102,14 @@ const Navbar = () => {
                     </div>
                 </div>
                 {isMenuOpen && (
-                    <div className="md:hidden border-t border-gray-200 h-[700px]" >
-                        <div className="px-4 py-3 space-y-6 text-xl font-semibold ">
-                            <div onClick={() => pushToPath("qrscanner")} className="flex items-center gap-2 cursor-pointer hover:text-swiggyOrange">
-                                <ScanQrCode className="w-4 h-4" />
-                                <span>Scan Qr</span>
-                            </div>
+                    <div className="md:hidden border-t border-gray-200 h-screen  overflow-hidden" >
+                        <div className="px-4 py-3 space-y-6 text-xl font-semibold  overflow-hidden ">
+                            {userName && (
+                                <div onClick={() => pushToPath("qrscanner")} className="flex items-center gap-2 cursor-pointer hover:text-swiggyOrange">
+                                    <ScanQrCode className="w-5 h-5" />
+                                    <span>Scan Qr</span>
+                                </div>
+                            )}
                             <Popover>
                                 <PopoverTrigger className='flex items-center gap-2 cursor-pointer hover:text-swiggyOrange'>
                                     <MapPin className="w-4 h-4" />
