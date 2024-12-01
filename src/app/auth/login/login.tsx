@@ -1,6 +1,6 @@
 import "../auth.css";
 import { FormEvent, useState } from 'react';
-import { Mail, Lock, CircleAlert } from 'lucide-react';
+import { Mail, Lock, CircleAlert, Loader2 } from 'lucide-react';
 import { handleLogIn } from '../authService';
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -11,19 +11,20 @@ import toast, { Toaster } from 'react-hot-toast';
 const Login = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState({ email: '', password: '' });
 
   const passwordMinLength = 8;
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-  const notify = (message:string, type:string) => {
-    if(type) {
-      (toast as any)[type](message,{
+  const notify = (message: string, type: string) => {
+    if (type) {
+      (toast as any)[type](message, {
         icon: <CircleAlert />,
       });
     } else {
-      toast(message,{
+      toast(message, {
         icon: <CircleAlert />,
       });
     }
@@ -31,6 +32,7 @@ const Login = () => {
 
   const handleSignIn = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setIsLoading(true);
 
     const newErrors = { email: '', password: '' };
     let isValid = true;
@@ -38,17 +40,21 @@ const Login = () => {
     if (!email) {
       newErrors.email = 'Email is required.';
       isValid = false;
+      setIsLoading(false);
     } else if (!emailRegex.test(email)) {
       newErrors.email = 'Invalid email format.';
       isValid = false;
+      setIsLoading(false);
     }
 
     if (!password) {
       newErrors.password = 'Password is required.';
       isValid = false;
+      setIsLoading(false);
     } else if (password.length < passwordMinLength) {
       newErrors.password = `Password must be at least ${passwordMinLength} characters long.`;
       isValid = false;
+      setIsLoading(false);
     }
 
     setErrors(newErrors);
@@ -57,9 +63,11 @@ const Login = () => {
       const errors = await handleLogIn(email, password, navigate);
       if (errors) {
         notify(errors, 'error');
-        setTimeout(()=>{
+        setTimeout(() => {
           navigate("/register");
-        },2000)
+        }, 2000)
+      } else {
+        setIsLoading(true);
       }
     }
   };
@@ -114,9 +122,14 @@ const Login = () => {
                 </div>
               </div>
             </div>
-
-            <Button type="submit" className="w-full bg-zinc-900 mt-6">
-              Sign in
+            <Button disabled={isLoading} type="submit" className="w-full bg-swiggyOrange p-6 hover:bg-orange-500 rounded-none mt-6">
+              {
+                isLoading ? (
+                  <Loader2 className="animate-spin" />
+                ) : (
+                  <span>Login</span>
+                )
+              }
             </Button>
           </form>
         </div>
