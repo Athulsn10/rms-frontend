@@ -307,7 +307,6 @@ const Registration = () => {
   };
 
   const validateStep = (step: number) => {
-    return true
     const currentFields = formFields[step];
     const newErrors = {} as Record<string, string>;
     let isValid = true;
