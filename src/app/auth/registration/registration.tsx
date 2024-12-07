@@ -8,7 +8,7 @@ import { handleRegister } from '../authService';
 import toast, { Toaster } from 'react-hot-toast';
 import { useSearchParams } from 'react-router-dom';
 import { Checkbox } from "@/components/ui/checkbox";
-import { Mail, Lock, User, MapPin, Building, Home, NutOff, Phone, Cake, BadgeIndianRupee, ArrowRight, ArrowLeft, CircleAlert } from 'lucide-react';
+import { Mail, Lock, User, MapPin, Building, Home, NutOff, Phone, Cake, BadgeIndianRupee, ArrowRight, ArrowLeft, CircleAlert, Loader2 } from 'lucide-react';
 
 
 interface AddressData {
@@ -35,6 +35,7 @@ const Registration = () => {
   const [searchParams] = useSearchParams();
   const registrationType = searchParams.get('type');
   const [currentStep, setCurrentStep] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
   const [confirmPassword, setConfirmPassword] = useState('')
   const [formData, setFormData] = useState<FormData>({
     name: '',
@@ -364,6 +365,7 @@ const Registration = () => {
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setIsLoading(true);
     if (validateStep(currentStep) && registrationType) {
       if (registrationType === "restaurant") {
         delete (formData as Partial<typeof formData>).allergies;
@@ -373,7 +375,11 @@ const Registration = () => {
       console.log('Form submitted:', formData);
       const response = await handleRegister(formData, registrationType, navigate);
       if (response) {
+        setIsLoading(false);
         notify(response, 'error');
+      } else {
+        notify('Registration Failed', 'error');
+        setIsLoading(false);
       }
     }
   };
@@ -472,9 +478,16 @@ const Registration = () => {
               ) : (
                 <Button
                   type="submit"
+                  disabled={isLoading}
                   className="w-full rounded-none sm:w-48 bg-swiggyOrange hover:bg-orange-500"
                 >
-                  Create Account
+                 {
+                isLoading ? (
+                  <Loader2 className="animate-spin" />
+                ) : (
+                  <span>Create Account</span>
+                )
+              }
                 </Button>
               )}
             </div>
