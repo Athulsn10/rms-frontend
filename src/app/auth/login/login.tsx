@@ -66,7 +66,7 @@ const Login = () => {
         if (errors.toLowerCase() === "user not found") {
           notify(errors, 'error');
           setTimeout(() => {
-            navigate("/register");
+            navigate("/authentication");
           }, 2000)
         } else {
           notify(errors, 'error');
