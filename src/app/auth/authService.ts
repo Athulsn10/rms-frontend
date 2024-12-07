@@ -36,7 +36,9 @@ export const handleRegister = async (formData:any, registrationType:string, navi
         localStorage.setItem('token', response.data.data.token);
         localStorage.setItem('user', response.data.data.name);
         navigate('/');
-      } catch (error) {
+        return null;
+      } catch (error:any) {
         console.error('Error logging in', error);
+        return error.response?.data?.message
       }
 }

@@ -5,9 +5,10 @@ import { Label } from "@/components/ui/label";
 import { useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { handleRegister } from '../authService';
+import toast, { Toaster } from 'react-hot-toast';
 import { useSearchParams } from 'react-router-dom';
 import { Checkbox } from "@/components/ui/checkbox";
-import { Mail, Lock, User, MapPin, Building, Home, NutOff, Phone, Cake, BadgeIndianRupee, ArrowRight, ArrowLeft } from 'lucide-react';
+import { Mail, Lock, User, MapPin, Building, Home, NutOff, Phone, Cake, BadgeIndianRupee, ArrowRight, ArrowLeft, CircleAlert } from 'lucide-react';
 
 
 interface AddressData {
@@ -263,6 +264,18 @@ const Registration = () => {
     ]
   ];
 
+  const notify = (message: string, type: string) => {
+    if (type) {
+      (toast as any)[type](message, {
+        icon: <CircleAlert  color="#fc3419"/>,
+      });
+    } else {
+      toast(message, {
+        icon: <CircleAlert color="#fc3419"/>,
+      });
+    }
+  }
+
   const handleInputChange = (id: string, value: string) => {
     setFormData(prev => {
       if (id.startsWith('address.')) {
@@ -306,8 +319,16 @@ const Registration = () => {
     });
   };
 
+  const currentFields = formFields[currentStep].filter(field => 
+    field.registrationType.includes(registrationType || '')
+  );
+
+  const filteredFormFields = formFields.map(stepFields =>
+    stepFields.filter(field => field.registrationType.includes(registrationType || ''))
+  ).filter(stepFields => stepFields.length > 0);
+
   const validateStep = (step: number) => {
-    const currentFields = formFields[step];
+    const currentFields = filteredFormFields[step];
     const newErrors = {} as Record<string, string>;
     let isValid = true;
 
@@ -315,9 +336,9 @@ const Registration = () => {
       const value = field.id.includes('.')
         ? formData.address[field.id.split('.')[1] as keyof AddressData]
         : formData[field.id as keyof FormData];
-      if (field.id === "confirmPassword") {
-        console.log(field.validation(value as string))
-      }
+      // if (field.id === "confirmPassword") {
+      //   console.log(field.validation(value as string))
+      // }
       const error = field.validation(value as string);
       if (error) {
         newErrors[field.id] = error;
@@ -331,6 +352,7 @@ const Registration = () => {
 
   const handleNext = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
+    console.log(validateStep(currentStep))
     if (validateStep(currentStep)) {
       setCurrentStep(prev => prev + 1);
     }
@@ -339,14 +361,6 @@ const Registration = () => {
   const handlePrevious = () => {
     setCurrentStep(prev => prev - 1);
   };
-
-  const currentFields = formFields[currentStep].filter(field => 
-    field.registrationType.includes(registrationType || '')
-  );
-
-  const filteredFormFields = formFields.map(stepFields =>
-    stepFields.filter(field => field.registrationType.includes(registrationType || ''))
-  ).filter(stepFields => stepFields.length > 0);
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -357,7 +371,10 @@ const Registration = () => {
         
       }
       console.log('Form submitted:', formData);
-      handleRegister(formData, registrationType, navigate);
+      const response = await handleRegister(formData, registrationType, navigate);
+      if (response) {
+        notify(response, 'error');
+      }
     }
   };
 
@@ -474,6 +491,7 @@ const Registration = () => {
           </div>
         </div>
       </div>
+      <Toaster />
     </div>
   );
 };
