@@ -81,18 +81,18 @@ const Login = () => {
     <>
       <div className="w-full">
         <p className="text-4xl">Login</p>
-        <p className="text-xs pt-3">or <span className="text-zinc-900 hover:text-blue-700 font-medium cursor-pointer" onClick={() => navigate("/authentication")}>create an accoun</span>t</p>
+        <p className="text-xs pt-3">or <span className="text-orange-600 hover:text-orange-700 font-medium cursor-pointer" onClick={() => navigate("/authentication")}>create an account</span></p>
         <div className="p-4 sm:p-6">
-          <form onSubmit={handleSignIn} className="space-y-4">
-            <div className="space-y-2">
+          <form onSubmit={handleSignIn} className="space-y-2">
+            <div className="space-y-1">
               <Label htmlFor="email" className="text-sm">Email</Label>
               <div className="relative">
-                <Mail className="absolute left-3 top-5 -translate-y-1/2 h-4 w-4 text-gray-500" />
+                <Mail className="absolute left-3 top-8 -translate-y-1/2 h-4 w-4 text-gray-500" />
                 <Input
                   id="email"
                   type="email"
                   placeholder="name@example.com"
-                  className={`p-8 pt-0 pb-0 pr-0 w-full ${errors.email ? 'input-error-color' : ''}`}
+                  className={`px-10 md:py-7 w-full ${errors.email ? 'input-error-color' : ''}`}
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                 />
@@ -106,15 +106,15 @@ const Login = () => {
               </div>
             </div>
 
-            <div className="space-y-2">
+            <div className="space-y-1">
               <Label htmlFor="password" className="text-sm">Password</Label>
               <div className="relative">
-                <Lock className="absolute left-3 top-5 -translate-y-1/2 h-4 w-4 text-gray-500" />
+                <Lock className="absolute left-3 top-8 -translate-y-1/2 h-4 w-4 text-gray-500" />
                 <Input
                   id="password"
                   type="password"
                   placeholder="••••••••"
-                  className={`p-8 pt-0 pb-0 pr-0 w-full ${errors.password ? 'input-error-color' : ''}`}
+                  className={`px-10 md:py-7 w-full rounded-none ${errors.password ? 'input-error-color' : ''}`}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                 />
