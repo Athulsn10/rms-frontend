@@ -1,11 +1,10 @@
 import { useState, useEffect } from 'react';
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
 import toast, { Toaster } from 'react-hot-toast';
 import { Checkbox } from "@/components/ui/checkbox";
 import { getUserDetail, updateUserProfile } from './profileService';
-import { User, MapPin, Building, Home, NutOff, Phone, Cake, Loader2, CircleAlert, CircleCheck } from 'lucide-react';
+import { User, MapPin, Building, Home, NutOff, Phone, Cake, Loader2, CircleAlert, CircleCheck, ArrowRight, ArrowLeft, Check } from 'lucide-react';
 
 
 interface AddressData {
@@ -224,7 +223,7 @@ const Registration = () => {
         return isValid;
     };
 
-    const handleNext = (e: React.MouseEvent<HTMLButtonElement>) => {
+    const handleNext = (e: React.MouseEvent<HTMLDivElement>) => {
         e.preventDefault();
         if (validateStep(currentStep)) {
             setCurrentStep(prev => prev + 1);
@@ -235,7 +234,7 @@ const Registration = () => {
         setCurrentStep(prev => prev - 1);
     };
 
-    const handleSubmit = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    const handleSubmit = async (e: React.MouseEvent<HTMLDivElement>) => {
         e.preventDefault();
         setIsLoading(true);
         if (validateStep(currentStep)) {
@@ -307,35 +306,35 @@ const Registration = () => {
     }, [])
 
     return (
-        <div className="min-h-screen flex justify-center">
-            <div className="w-full max-w-5xl">
-                <div className='flex justify-between'>
+        <div className="flex w-full">
+            <div className="w-full">
+                <div className='flex justify-between me-5 items-center'>
                     <div className="space-y-1 sm:p-8">
                         <div className="text-2xl sm:text-3xl font-bold tracking-tight">
                             Edit your Account
                             <p className="text-sm mt-2">{`[ Page ${currentStep + 1} of ${formFields.length} ]`}</p>
                         </div>
                     </div>
-                    <div className="flex flex-col sm:flex-row justify-end gap-3 sm:gap-4 mt-8 border-t pt-6">
+                    <div className="flex justify-end gap-3 sm:gap-4 mt-8 border-t pt-6">
                         {currentStep > 0 && (
-                            <Button type="button" onClick={handlePrevious} className="w-full sm:w-32 bg-orange-600 hover:bg-orange-800 rounded-none">
-                                Previous
-                            </Button>
+                            <div onClick={handlePrevious} className="">
+                                <ArrowLeft className="w-7 h-7"/>
+                            </div>
                         )}
                         {currentStep < formFields.length - 1 ? (
-                            <Button type="button" onClick={handleNext} className="w-full sm:w-32 bg-swiggyOrange hover:bg-orange-800 rounded-none">
-                                Next
-                            </Button>
+                            <div onClick={handleNext} className="">
+                                <ArrowRight className="w-7 h-7"/>
+                            </div>
                         ) : (
-                            <Button onClick={handleSubmit} disabled={isLoading} className="w-full sm:w-48 bg-swiggyOrange hover:bg-orange-500 rounded-none">
+                            <div onClick={handleSubmit}className="">
                                 {
                                     isLoading ? (
-                                        <Loader2 className="animate-spin" />
+                                        <Loader2 className="w-7 h-7 animate-spin"/>
                                     ) : (
-                                        <span>Update Profile</span>
+                                        <Check className="w-7 h-7"/>
                                     )
                                 }
-                            </Button>
+                            </div>
                         )}
                     </div>
                 </div>

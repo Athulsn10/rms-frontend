@@ -13,7 +13,7 @@ interface Restaurant {
 function home() {
   return (
     <>
-      <p className="mt-10 ms-6 pb-5 font-medium">Top restaurant chains in "LOCATION"</p>
+      <p className="mt-10 md:mx-28 ms-6 pb-5 font-bold md:text-xl">Top restaurant chains in "LOCATION"</p>
       <div className='flex w-[full] h-fit overflow-x-scroll custom-scroll-bar md:mx-24 md:py-5'>
         {restaurant.map((restaurant: Restaurant) => (
          <div key={restaurant.id}>

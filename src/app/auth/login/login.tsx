@@ -21,11 +21,11 @@ const Login = () => {
   const notify = (message: string, type: string) => {
     if (type) {
       (toast as any)[type](message, {
-        icon: <CircleAlert />,
+        icon: <CircleAlert  color="#fc3419"/>,
       });
     } else {
       toast(message, {
-        icon: <CircleAlert />,
+        icon: <CircleAlert color="#fc3419"/>,
       });
     }
   }
@@ -62,10 +62,15 @@ const Login = () => {
     if (isValid) {
       const errors = await handleLogIn(email, password, navigate);
       if (errors) {
-        notify(errors, 'error');
-        setTimeout(() => {
-          navigate("/register");
-        }, 2000)
+        setIsLoading(false);
+        if (errors.toLowerCase() === "user not found") {
+          notify(errors, 'error');
+          setTimeout(() => {
+            navigate("/register");
+          }, 2000)
+        } else {
+          notify(errors, 'error');
+        }
       } else {
         setIsLoading(true);
       }
@@ -76,7 +81,7 @@ const Login = () => {
     <>
       <div className="w-full">
         <p className="text-4xl">Login</p>
-        <p className="text-xs pt-3">or <span className="text-zinc-900 hover:text-blue-700 font-medium cursor-pointer" onClick={() => navigate("/register")}>create an accoun</span>t</p>
+        <p className="text-xs pt-3">or <span className="text-zinc-900 hover:text-blue-700 font-medium cursor-pointer" onClick={() => navigate("/authentication")}>create an accoun</span>t</p>
         <div className="p-4 sm:p-6">
           <form onSubmit={handleSignIn} className="space-y-4">
             <div className="space-y-2">

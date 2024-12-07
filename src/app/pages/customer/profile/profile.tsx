@@ -50,12 +50,12 @@ function Profile() {
               <SidebarGroupContent>
                 <SidebarMenu>
                   {items.map((item) => (
-                    <SidebarMenuItem key={item.title}>
+                    <SidebarMenuItem key={item.title} className="py-1">
                       <SidebarMenuButton 
                         onClick={() => handleClick(item.key, item.title)}
                       >
                         <item.icon />
-                        <span>{item.title}</span>
+                        <span className={`${activeTab != item.key || 'font-bold'}`}>{item.title}</span>
                       </SidebarMenuButton>
                     </SidebarMenuItem>
                   ))}
@@ -65,8 +65,8 @@ function Profile() {
           </SidebarContent>
         </Sidebar>
 
-        <main className="flex-1 p-6">
-          <SidebarTrigger />
+        <main className="flex-1 p-4">
+          <SidebarTrigger/>
           {activeTab === "profile" && <ProfileContent />}
           {activeTab === "orders" && <Orders />}
         </main>
