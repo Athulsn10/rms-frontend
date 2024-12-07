@@ -7,7 +7,7 @@ function search() {
             <div className='flex items-center justify-center mt-4'>
                 <div className='relative w-50'>
                     <Search className='absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500' />
-                    <Input className='font-medium ' placeholder='Search Restaurants' />
+                    <Input className='font-medium w-96' placeholder='Search Restaurants' />
                 </div>
             </div>
             {/* search result */}

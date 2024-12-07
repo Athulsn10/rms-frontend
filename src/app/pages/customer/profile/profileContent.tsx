@@ -317,21 +317,25 @@ const Registration = () => {
                     </div>
                     <div className="flex justify-end gap-3 sm:gap-4 mt-8 border-t pt-6">
                         {currentStep > 0 && (
-                            <div onClick={handlePrevious} className="">
+                            <div onClick={handlePrevious} className="bg-orange-100 hover:bg-orange-200 p-2 rounded-full cursor-pointer">
                                 <ArrowLeft className="w-7 h-7"/>
                             </div>
                         )}
                         {currentStep < formFields.length - 1 ? (
-                            <div onClick={handleNext} className="">
+                            <div onClick={handleNext} className="bg-orange-100 hover:bg-orange-200 p-2 rounded-full cursor-pointer">
                                 <ArrowRight className="w-7 h-7"/>
                             </div>
                         ) : (
                             <div onClick={handleSubmit}className="">
                                 {
                                     isLoading ? (
-                                        <Loader2 className="w-7 h-7 animate-spin"/>
+                                        <div className="bg-orange-100 hover:bg-orange-200 p-2 rounded-full cursor-progress">
+                                            <Loader2 className="w-7 h-7 animate-spin"/>
+                                        </div>
                                     ) : (
-                                        <Check className="w-7 h-7"/>
+                                       <div className="bg-orange-100 hover:bg-orange-200 p-2 rounded-full cursor-pointer">
+                                            <Check className="w-7 h-7"/>
+                                       </div>
                                     )
                                 }
                             </div>
