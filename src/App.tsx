@@ -6,10 +6,10 @@ import Search from "./app/pages/search/search";
 import Profile from './app/pages/customer/profile/profile';
 import { Route, Routes, useLocation  } from 'react-router-dom';
 import Registration from './app/auth/registration/registration';
-
+import Authentication from './app/auth/authentication'
 const App =()=> {
   const location = useLocation();
-  const hideNavbarPaths = ["/register","/qrscanner"];
+  const hideNavbarPaths = ["/register","/qrscanner","/authentication"];
   const showNavbar = !hideNavbarPaths.includes(location.pathname);
   return (
     <>
@@ -19,6 +19,7 @@ const App =()=> {
       <Route path='/qrscanner' element={<Qr/>}/>
       <Route path='/Search' element={<Search/>}/>
       <Route path='/profile' element={<Profile/>}/>
+      <Route path='/authentication' element={<Authentication/>}/>
       <Route path='/register' element={<Registration/>}/>
      </Routes>
     </>
