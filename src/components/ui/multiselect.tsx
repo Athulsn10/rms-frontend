@@ -142,7 +142,7 @@ export const MultiSelect = React.forwardRef<HTMLButtonElement, MultiSelectProps>
     const handleClear = () => {
       setSelectedValues([]);
       onValueChange([]);
-      setCustomOptions([]); // Clear custom options as well
+      setCustomOptions([]);
     };
 
     const handleTogglePopover = () => {
