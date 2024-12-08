@@ -3,9 +3,10 @@ import Orders from "./orders"
 import Profile from "./profile"
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
+import { useAppContext } from "@/app/context/provider"
 import { User, ShoppingBag, LogOut, SquareMenu } from "lucide-react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { SidebarFooter, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
+import { SidebarFooter, SidebarHeader, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
 import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "@/components/ui/sidebar"
 
 
@@ -34,12 +35,16 @@ const items = [
 
 function Dashboard() {
     const navigate = useNavigate()
-    const [activeTab, setActiveTab] = useState("profile")
+    const [activeTab, setActiveTab] = useState("menu")
     const userName = localStorage.getItem('user');
     const userEmail = localStorage.getItem('email');
+    const { setIsAuthenticated, setIsRestuarant } = useAppContext();
+
     const handleClick = (key: string, title: string) => {
         if (title === "Logout") {
-            localStorage.clear()
+            localStorage.clear();
+            setIsAuthenticated(false);
+            setIsRestuarant(false);
             navigate('/')
             return
         } else {
@@ -52,13 +57,16 @@ function Dashboard() {
         <div className="flex">
             <SidebarProvider>
                 <Sidebar variant="floating" collapsible="icon">
+                    <SidebarHeader>
+                    <SidebarTrigger className="md:flex sm:hidden ps-4" />
+                    </SidebarHeader>
                     <SidebarContent>
                         <SidebarGroup>
                             <SidebarGroupLabel>Menu</SidebarGroupLabel>
                             <SidebarGroupContent>
                                 <SidebarMenu>
                                     {items.map((item) => (
-                                        <SidebarMenuItem key={item.title} className="py-1">
+                                        <SidebarMenuItem key={item.title} className={`my-1 border-s-4 ps-1 ${activeTab == item.key ? 'border-orange-400' : 'border-transparent'}`}>
                                             <SidebarMenuButton
                                                 className={`rounded-none py-6 hover:bg-orange-50 ${activeTab != item.key || 'bg-orange-100 hover:bg-orange-100'}`}
                                                 onClick={() => handleClick(item.key, item.title)}
@@ -91,7 +99,7 @@ function Dashboard() {
                 </Sidebar>
 
                 <main className="flex-1 p-4">
-                    <SidebarTrigger />
+                    <SidebarTrigger className="lg:hidden" />
                     {activeTab === "menu" && <Menu />}
                     {activeTab === "profile" && <Profile />}
                     {activeTab === "orders" && <Orders />}
