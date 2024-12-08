@@ -31,7 +31,6 @@ function menu() {
     { value: "yogurt", label: "Yogurt" },
   ];
 
-
   const formFields = [
     {
       id: 'dishName',
