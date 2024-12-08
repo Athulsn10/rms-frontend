@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Login from '@/app/auth/login/login';
 import BrandLogo from '@/assets/brandlogo';
 import { Input } from "@/components/ui/input"
@@ -11,7 +11,10 @@ import { Search, LifeBuoy, User, ChevronDown, Menu, X, MapPin, ScanQrCode } from
 const Navbar = () => {
     const navigate = useNavigate();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [isRestuarant, setIsRestuarant] = useState(false);
+
     const userName = localStorage.getItem('user');
+    const restuarant = localStorage.getItem('restuarant');
 
     const toggleMenu = () => {
         setIsMenuOpen(!isMenuOpen);
@@ -21,6 +24,12 @@ const Navbar = () => {
         navigate(`/${path}`)
         setIsMenuOpen(false);
     }
+
+    useEffect(()=>{
+        if (restuarant && userName) {
+            setIsRestuarant(true);
+        }
+    },[]);
 
     return (
         <>
@@ -68,7 +77,7 @@ const Navbar = () => {
                             </div>
                             {userName ? (
                                 <>
-                                    <div onClick={() => pushToPath("profile")} className='flex items-center gap-2 cursor-pointer'>
+                                    <div onClick={() => pushToPath(isRestuarant ? 'dashboard' : 'profile')} className='flex items-center gap-2 cursor-pointer'>
                                         <Avatar>
                                             <AvatarImage src="https://github.com/shadcn.png" />
                                             <AvatarFallback>CN</AvatarFallback>
