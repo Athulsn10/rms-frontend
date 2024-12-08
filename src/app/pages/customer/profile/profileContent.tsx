@@ -24,7 +24,7 @@ interface FormData {
     allergies: string[];
 }
 
-const Registration = () => {
+const ProfileContent = () => {
     const [currentStep, setCurrentStep] = useState(0);
     const [isLoading, setIsLoading] = useState(false);
     const [formData, setFormData] = useState<FormData>({
@@ -386,4 +386,4 @@ const Registration = () => {
     );
 };
 
-export default Registration;
+export default ProfileContent;
