@@ -1,5 +1,5 @@
-import { ReactNode } from "react";
-import { Navigate } from "react-router-dom";
+import { ReactNode, useEffect } from "react";
+import { Navigate, useLocation } from "react-router-dom";
 import { useAppContext } from "../../context/provider";
 
 interface ProtectedProps {
@@ -7,9 +7,26 @@ interface ProtectedProps {
 }
 
 const Protected = ({ children }: ProtectedProps) => {
-  const { isAuthenticated } = useAppContext();
+  const { isAuthenticated, isRestuarant } = useAppContext();
+  const location = useLocation();
 
-  return isAuthenticated ? <>{children}</> : <Navigate to="/" replace />;
+  const unAuthorisedRoutes = ['/profile', '/', '/qrscanner', '/search', '/authentication', '/register'];
+
+  // useEffect(() => {
+  //   if (isRestuarant && !unAuthorisedRoutes.includes(location.pathname) && location.pathname !== '/dashboard') {
+  //     return <Navigate to="/dashboard" replace />;
+  //   }
+  // }, [location.pathname, isRestuarant]);
+
+  if (!isAuthenticated && !unAuthorisedRoutes.includes(location.pathname)) {
+    return <Navigate to="/" replace />;
+  }
+
+  if (isRestuarant && unAuthorisedRoutes.includes(location.pathname)) {
+    return <Navigate to="/dashboard" replace />;
+  }
+
+  return <>{children}</>;
 };
 
 export default Protected;
