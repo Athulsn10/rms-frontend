@@ -52,6 +52,7 @@ function Profile() {
                   {items.map((item) => (
                     <SidebarMenuItem key={item.title} className="py-1">
                       <SidebarMenuButton 
+                        className={`rounded-none py-6 hover:bg-orange-50 ${activeTab != item.key || 'bg-orange-100 hover:bg-orange-100'}`}
                         onClick={() => handleClick(item.key, item.title)}
                       >
                         <item.icon />

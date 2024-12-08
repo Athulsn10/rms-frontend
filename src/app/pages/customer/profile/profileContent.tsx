@@ -306,7 +306,7 @@ const Registration = () => {
     }, [])
 
     return (
-        <div className="flex w-full">
+        <div className="flex w-full hover:shadow-md">
             <div className="w-full">
                 <div className='flex justify-between me-5 items-center'>
                     <div className="space-y-1 sm:p-8">
@@ -357,12 +357,12 @@ const Registration = () => {
                                             {field.label}
                                         </Label>
                                         <div className="relative">
-                                            <field.icon className="absolute left-3 top-6 -translate-y-1/2 h-5 w-5 text-gray-500" />
+                                            <field.icon className="absolute left-3 top-8 -translate-y-1/2 h-5 w-5 text-gray-500" />
                                             <Input
                                                 id={field.id}
                                                 type={field.type}
                                                 placeholder={field.placeholder}
-                                                className="p-10 pt-0 pb-0 pr-0 h-12 w-full bg-white"
+                                                className="px-10 md:py-8 h-12 rounded-none w-full bg-white"
                                                 value={(field.id.includes('.') ? formData.address[field.id.split('.')[1] as keyof AddressData] : formData[field.id as keyof FormData]) as any}
                                                 onChange={(e) => handleInputChange(field.id, e.target.value)}
                                             />
