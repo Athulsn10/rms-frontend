@@ -1,7 +1,7 @@
 import { http } from '../../../../services/http';
 
+const customerId = localStorage.getItem('id');
 export const getUserDetail = async () => {
-    const customerId = '67419746abdc9151c633bf46'
     try {
         const response = await http.get(`/customer/${customerId}`);
         localStorage.setItem('user', response.data.data.name);
@@ -12,12 +12,8 @@ export const getUserDetail = async () => {
 }
 
 export const updateUserProfile = async (formData:any) => {
-    const customerId = '67419746abdc9151c633bf46'
-    const headers = {
-        'Content-Type': 'application/json',
-    };
     try {
-        const response = await http.patch(`/customer/${customerId}`,formData, {headers});
+        const response = await http.patch(`/customer/${customerId}`,formData);
         return response.data.data.acknowledged;
     } catch (error: any) {
         return error.response?.data?.message
