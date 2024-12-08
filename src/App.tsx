@@ -8,6 +8,7 @@ import { Route, Routes, useLocation  } from 'react-router-dom';
 import Registration from './app/auth/registration/registration';
 import Authentication from './app/auth/authentication'
 import Dashboard from './app/pages/restuarant/dashboard/dashboard';
+import Protected from './app/auth/protect/protected';
 
 
 const App =()=> {
@@ -21,10 +22,10 @@ const App =()=> {
       <Route path='/' element={<Home/>}/>
       <Route path='/qrscanner' element={<Qr/>}/>
       <Route path='/Search' element={<Search/>}/>
-      <Route path='/profile' element={<Profile/>}/>
+      <Route path='/profile' element={<Protected><Profile/></Protected>}/>
       <Route path='/authentication' element={<Authentication/>}/>
       <Route path='/register' element={<Registration/>}/>
-      <Route path='/dashboard' element={<Dashboard/>}/>
+      <Route path='/dashboard' element={<Protected><Dashboard /></Protected>}/>
      </Routes>
     </>
   )

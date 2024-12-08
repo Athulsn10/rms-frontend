@@ -1,14 +1,35 @@
-import React, { useState, PropsWithChildren  } from 'react';
-import MyContext from './context';
+import { createContext, useContext, useState, ReactNode, useEffect } from "react";
 
-const MyProvider: React.FC<PropsWithChildren> = ({ children }) => {
-  const [showQr, setshowQr] = useState(false);
+interface AppContextType {
+  isAuthenticated: boolean;
+  setIsAuthenticated: (isAuthenticated: boolean) => void;
+}
+
+const AppContext = createContext<AppContextType | undefined>(undefined);
+
+export const AppProvider = ({ children }: { children: ReactNode }) => {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  useEffect(() => {
+    const user = localStorage.getItem("user"); 
+    if (user) {
+      setIsAuthenticated(true);
+    } else {
+      setIsAuthenticated(false);
+    }
+  }, []);
 
   return (
-    <MyContext.Provider value={{ showQr, setshowQr }}>
+    <AppContext.Provider value={{ isAuthenticated, setIsAuthenticated }}>
       {children}
-    </MyContext.Provider>
+    </AppContext.Provider>
   );
 };
 
-export default MyProvider;
+export const useAppContext = (): AppContextType => {
+  const context = useContext(AppContext);
+  if (!context) {
+    throw new Error("useAppContext must be used within an AppProvider");
+  }
+  return context;
+};
