@@ -8,7 +8,7 @@ import { handleRegister } from '../authService';
 import toast, { Toaster } from 'react-hot-toast';
 import { useSearchParams } from 'react-router-dom';
 import { Checkbox } from "@/components/ui/checkbox";
-import { Mail, Lock, User, MapPin, Building, Home, NutOff, Phone, Cake, BadgeIndianRupee, ArrowRight, ArrowLeft, CircleAlert, Loader2 } from 'lucide-react';
+import { Mail, Lock, User, MapPin, Building, Home, NutOff, Phone, Cake, BadgeIndianRupee, ArrowRight, ArrowLeft, CircleAlert, Loader2, Utensils } from 'lucide-react';
 
 
 interface AddressData {
@@ -243,7 +243,7 @@ const Registration = () => {
         type: 'number',
         required: true,
         placeholder: '10',
-        icon: BadgeIndianRupee,
+        icon: Utensils,
         registrationType:['restaurant'],
         validation: (value: string) => {
           if (!value) return 'Table count is required';
