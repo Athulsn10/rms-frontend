@@ -1,35 +1,18 @@
 import { Card, CardContent } from "@/components/ui/card";
-import { Plus, ShoppingBasket, Soup } from "lucide-react";
+import { Circle, IndianRupee, Plus, ShoppingBasket, Soup, Triangle, Vegan } from "lucide-react";
 import { useState } from "react"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input";
+import { ingredientsList } from "./restuarantData";
 import { MultiSelect } from "@/components/ui/multiselect";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
 
 function menu() {
+  const [isVeg, setIsVeg] = useState(true);
   const [hasMenu, sethasMenu] = useState(false);
-  const [selectedFrameworks, setSelectedFrameworks] = useState<string[]>([]);
-  const ingredientsList = [
-    { value: "turmeric", label: "Turmeric" },
-    { value: "cumin", label: "Cumin" },
-    { value: "coriander", label: "Coriander" },
-    { value: "mustard_seeds", label: "Mustard Seeds" },
-    { value: "ginger", label: "Ginger" },
-    { value: "garlic", label: "Garlic" },
-    { value: "green_chilies", label: "Green Chilies" },
-    { value: "onions", label: "Onions" },
-    { value: "tomatoes", label: "Tomatoes" },
-    { value: "curry_leaves", label: "Curry Leaves" },
-    { value: "red_chili_powder", label: "Red Chili Powder" },
-    { value: "garam_masala", label: "Garam Masala" },
-    { value: "fenugreek_leaves", label: "Fenugreek Leaves" },
-    { value: "cloves", label: "Cloves" },
-    { value: "cardamom", label: "Cardamom" },
-    { value: "cinnamon", label: "Cinnamon" },
-    { value: "bay_leaves", label: "Bay Leaves" },
-    { value: "rice", label: "Rice" },
-    { value: "lentils", label: "Lentils" },
-    { value: "yogurt", label: "Yogurt" },
-  ];
+  const [selectedFrameworks, setSelectedIngredients] = useState<string[]>([]);
+
 
   const formFields = [
     {
@@ -38,22 +21,34 @@ function menu() {
       type: 'text',
       placeholder: 'Mutton Soup',
       icon: Soup,
+      required: true,
       validation: (value: string) => !value ? 'Dish name is required' : ''
     },
     {
       id: 'picture',
-      label: 'Item Name',
+      label: 'Picture',
       type: 'file',
       placeholder: 'Upload item picture',
-      icon: Soup,
+      icon: 'none',
+      required: true,
       validation: (value: string) => !value ? 'Dish name is required' : ''
     },
     {
       id: 'isVeg',
-      label: 'Item Name',
-      type: 'text',
+      label: 'Veg or Non Veg',
+      type: 'toggle',
       placeholder: 'Mutton Soup',
-      icon: Soup,
+      icon: Vegan,
+      required: true,
+      validation: (value: string) => !value ? 'Dish name is required' : ''
+    },
+    {
+      id: 'price',
+      label: 'Price',
+      type: 'number',
+      placeholder: 'Enter The Price',
+      icon: IndianRupee,
+      required: true,
       validation: (value: string) => !value ? 'Dish name is required' : ''
     },
     {
@@ -65,11 +60,11 @@ function menu() {
       icon: ShoppingBasket,
       validation: () => ''
     }
-  ]
+  ];
 
   return (
     <>
-      <Dialog defaultOpen={false}>
+      <Dialog defaultOpen={false} >
         {!hasMenu ? (
           <div className="flex items-center w-100 justify-center md:h-[100%]">
             <Card className="md:w-[700px] h-96 bg-red-50">
@@ -93,18 +88,64 @@ function menu() {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Add Menu Item</DialogTitle>
-            <DialogDescription>
-              <div className="">
-              <MultiSelect
-              options={ingredientsList}
-              onValueChange={setSelectedFrameworks}
-              placeholder="Select Ingredients"
-              variant="inverted"
-              animation={2}
-              maxCount={3}/>
-              </div>
-            </DialogDescription>
           </DialogHeader>
+          <DialogDescription>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 md:gap-y-3">
+              {formFields.map((field, index) => {
+                return (
+                  <div key={index} className={`space-y-2 ${field.id === "ingredients" ? "col-span-full" : ""}`}>
+                    {field.id === "ingredients" ? (
+                      <>
+                        <Label htmlFor={field.id} className="text-sm font-medium block">
+                          {field.label} {field.required && <span className="text-red-500">*</span>}
+                        </Label>
+                        <MultiSelect
+                          className="px-10 md:py-8 h-12 w-full rounded-none bg-white"
+                          options={ingredientsList}
+                          onValueChange={setSelectedIngredients}
+                          placeholder="Select Ingredients"
+                          variant="rmscolor"
+                          animation={2}
+                          maxCount={7}
+                        />
+                      </>
+                    ) : field.type === "toggle" ? (
+                      <>
+                        <Label htmlFor={field.id} className="text-sm font-medium block">
+                          {field.label} {field.required && <span className="text-red-500">*</span>}
+                        </Label>
+                        <div className="flex gap-4">
+                          <Button className={`${isVeg ? "bg-green-600 text-white hover:bg-green-600" : "bg-green-200 hover:bg-green-200 text-green-600"}`} onClick={() => setIsVeg(!isVeg)}><Circle /></Button>
+                          <Button className={`${!isVeg ? "bg-red-600 text-white hover:bg-red-600" : "bg-red-200 hover:bg-red-200  text-red-600"}`} onClick={() => setIsVeg(!isVeg)}><Triangle /></Button>
+                        </div>
+
+                      </>
+
+                    )
+                      : (
+                        <>
+                          <Label htmlFor={field.id} className="text-sm font-medium block">
+                            {field.label} {field.required && <span className="text-red-500">*</span>}
+                          </Label>
+                          <div className="relative">
+                            {field.type !== "file" && (
+                              <field.icon className="absolute left-3 md:top-8 top-6 -translate-y-1/2 h-4 w-4 text-gray-500" />
+                            )}
+                            <Input
+                              id={field.id}
+                              type={field.type}
+                              placeholder={field.placeholder}
+                              className="px-10 md:py-8 h-12 w-full rounded-none bg-white hover:shadow-md"
+                            />
+                          </div>
+                        </>
+                      )}
+                  </div>
+                );
+              })}
+            </div>
+          </DialogDescription>
+          <Button className="bg-swiggyOrange p-5 hover:bg-orange-500 rounded-none">Save</Button>
         </DialogContent>
       </Dialog>
     </>
