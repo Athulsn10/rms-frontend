@@ -92,11 +92,11 @@ const Login = () => {
                   id="email"
                   type="email"
                   placeholder="name@example.com"
-                  className={`px-10 md:py-7 w-full ${errors.email ? 'input-error-color' : ''}`}
+                  className={`px-10 md:py-7 w-full rounded-none ${errors.email ? 'input-error-color' : ''}`}
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                 />
-                <div style={{ height: '6px', marginTop: '2px' }}>
+                <div style={{ height: '14px', marginTop: '2px' }}>
                   {errors.email && (
                     <p className="text-red-500 text-xs">
                       {errors.email}
@@ -118,7 +118,7 @@ const Login = () => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                 />
-                <div style={{ height: '6px', marginTop: '2px' }}>
+                <div style={{ height: '14px', marginTop: '2px' }}>
                   {errors.password && (
                     <p className="text-red-500 text-xs">
                       {errors.password}
@@ -127,7 +127,7 @@ const Login = () => {
                 </div>
               </div>
             </div>
-            <Button disabled={isLoading} type="submit" className="w-full bg-swiggyOrange p-6 hover:bg-orange-500 rounded-none mt-6">
+            <Button disabled={isLoading} type="submit" className="w-full bg-swiggyOrange p-6 hover:bg-orange-500 rounded-none">
               {
                 isLoading ? (
                   <Loader2 className="animate-spin" />
