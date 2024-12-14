@@ -8,6 +8,7 @@ import { handleRegister } from '../authService';
 import toast, { Toaster } from 'react-hot-toast';
 import { useSearchParams } from 'react-router-dom';
 import { Checkbox } from "@/components/ui/checkbox";
+import { MultiSelect } from "@/components/ui/multiselect";
 import { Mail, Lock, User, MapPin, Building, Home, NutOff, Phone, Cake, BadgeIndianRupee, ArrowRight, ArrowLeft, CircleAlert, Loader2, Utensils } from 'lucide-react';
 
 
@@ -36,7 +37,9 @@ const Registration = () => {
   const registrationType = searchParams.get('type');
   const [currentStep, setCurrentStep] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
-  const [confirmPassword, setConfirmPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [selectedAllergies, setSelectedAllergies] = useState<string[]>([]);
+
   const [formData, setFormData] = useState<FormData>({
     name: '',
     email: '',
@@ -57,21 +60,56 @@ const Registration = () => {
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const commonAllergies = [
-    "Peanuts",
-    "Tree Nuts",
-    "Milk",
-    "Egg",
-    "Wheat",
-    "Soy",
-    "Fish",
-    "Shellfish",
-    "Sesame",
-    "Mustard",
-    "Celery",
-    "Lupin",
-    "Sulphites",
-    "Gluten",
-    "Lactose",
+    { value: "peanuts", label: "Peanuts" },
+    { value: "shellfish", label: "Shellfish" },
+    { value: "milk", label: "Milk" },
+    { value: "eggs", label: "Eggs" },
+    { value: "tree_nuts", label: "Tree Nuts" },
+    { value: "soy", label: "Soy" },
+    { value: "wheat", label: "Wheat" },
+    { value: "fish", label: "Fish" },
+    { value: "sesame", label: "Sesame" },
+    { value: "dust_mites", label: "Dust Mites" },
+    { value: "pollen", label: "Pollen" },
+    { value: "mold", label: "Mold" },
+    { value: "animal_dander", label: "Animal Dander" },
+    { value: "latex", label: "Latex" },
+    { value: "insect_stings", label: "Insect Stings" },
+    { value: "penicillin", label: "Penicillin" },
+    { value: "aspirin", label: "Aspirin" },
+    { value: "sulfites", label: "Sulfites" },
+    { value: "red_dye", label: "Red Dye" },
+    { value: "perfumes", label: "Perfumes" },
+    { value: "nickel", label: "Nickel" },
+    { value: "chocolate", label: "Chocolate" },
+    { value: "gluten", label: "Gluten" },
+    { value: "corn", label: "Corn" },
+    { value: "citrus_fruits", label: "Citrus Fruits" },
+    { value: "strawberries", label: "Strawberries" },
+    { value: "bananas", label: "Bananas" },
+    { value: "kiwi", label: "Kiwi" },
+    { value: "avocado", label: "Avocado" },
+    { value: "sunflower_seeds", label: "Sunflower Seeds" },
+    { value: "pork", label: "Pork" },
+    { value: "beef", label: "Beef" },
+    { value: "chicken", label: "Chicken" },
+    { value: "celery", label: "Celery" },
+    { value: "mustard", label: "Mustard" },
+    { value: "garlic", label: "Garlic" },
+    { value: "onion", label: "Onion" },
+    { value: "pepper", label: "Pepper" },
+    { value: "chili", label: "Chili" },
+    { value: "yeast", label: "Yeast" },
+    { value: "tomatoes", label: "Tomatoes" },
+    { value: "spinach", label: "Spinach" },
+    { value: "peaches", label: "Peaches" },
+    { value: "apples", label: "Apples" },
+    { value: "grapes", label: "Grapes" },
+    { value: "melons", label: "Melons" },
+    { value: "caffeine", label: "Caffeine" },
+    { value: "alcohol", label: "Alcohol" },
+    { value: "preservatives", label: "Preservatives" },
+    { value: "food_colorings", label: "Food Colorings" },
   ];
 
   const formFields = [
@@ -84,7 +122,7 @@ const Registration = () => {
         placeholder: 'John Doe',
         icon: User,
         required: true,
-        registrationType:['customer','restaurant'],
+        registrationType: ['customer', 'restaurant'],
         validation: (value: string) => !value ? 'Full name is required' : ''
       },
       {
@@ -94,7 +132,7 @@ const Registration = () => {
         placeholder: 'name@example.com',
         icon: Mail,
         required: true,
-        registrationType:['customer','restaurant'],
+        registrationType: ['customer', 'restaurant'],
         validation: (value: string) => {
           if (!value) return 'Email is required';
           if (!/\S+@\S+\.\S+/.test(value)) return 'Invalid email format';
@@ -108,7 +146,7 @@ const Registration = () => {
         placeholder: '••••••••',
         icon: Lock,
         required: true,
-        registrationType:['customer','restaurant'],
+        registrationType: ['customer', 'restaurant'],
         validation: (value: string) => {
           if (!value) return 'Password is required';
           if (value.length < 8) return 'Password must be at least 8 characters';
@@ -122,7 +160,7 @@ const Registration = () => {
         placeholder: '••••••••',
         icon: Lock,
         required: true,
-        registrationType:['customer','restaurant'],
+        registrationType: ['customer', 'restaurant'],
         validation: () => {
           if (!confirmPassword) return 'Please confirm your password';
           if (confirmPassword !== formData.password) return 'Passwords do not match';
@@ -136,7 +174,7 @@ const Registration = () => {
         placeholder: '87333021863',
         icon: Phone,
         required: true,
-        registrationType:['customer','restaurant'],
+        registrationType: ['customer', 'restaurant'],
         validation: (value: string) => {
           if (!value) return 'Phone number is required';
           if (!/^\d{10}$/.test(value)) return 'Phone number must be exactly 10 digits';
@@ -150,10 +188,10 @@ const Registration = () => {
         required: true,
         placeholder: '17-05-2002',
         icon: Cake,
-        registrationType:['customer'],
+        registrationType: ['customer'],
         validation: (value: string) => {
           if (!value) return 'Date of birth is required';
-         }
+        }
       },
       {
         id: 'gstin',
@@ -162,7 +200,7 @@ const Registration = () => {
         required: true,
         placeholder: '22AAAAA0000A1Z5',
         icon: BadgeIndianRupee,
-        registrationType:['restaurant'],
+        registrationType: ['restaurant'],
         validation: (value: string) => {
           if (!value) return 'GST IN is required';
           // Full pattern validation
@@ -180,7 +218,7 @@ const Registration = () => {
         required: true,
         placeholder: 'Street address',
         icon: Home,
-        registrationType:['customer','restaurant'],
+        registrationType: ['customer', 'restaurant'],
         validation: (value: string) => !value ? 'Address line 2 is required' : ''
       },
       {
@@ -190,7 +228,7 @@ const Registration = () => {
         required: true,
         placeholder: 'Apartment, suite, etc. (optional)',
         icon: Home,
-        registrationType:['customer','restaurant'],
+        registrationType: ['customer', 'restaurant'],
         validation: (value: string) => !value ? 'Address line 2 is required' : ''
       },
       {
@@ -200,7 +238,7 @@ const Registration = () => {
         required: true,
         placeholder: 'City',
         icon: Building,
-        registrationType:['customer','restaurant'],
+        registrationType: ['customer', 'restaurant'],
         validation: (value: string) => !value ? 'City is required' : ''
       },
       {
@@ -210,7 +248,7 @@ const Registration = () => {
         placeholder: 'State',
         icon: Building,
         required: true,
-        registrationType:['customer','restaurant'],
+        registrationType: ['customer', 'restaurant'],
         validation: (value: string) => !value ? 'State is required' : ''
       },
       {
@@ -220,7 +258,7 @@ const Registration = () => {
         placeholder: 'Country',
         icon: Building,
         required: true,
-        registrationType:['customer','restaurant'],
+        registrationType: ['customer', 'restaurant'],
         validation: (value: string) => !value ? 'Country is required' : ''
       },
       {
@@ -230,7 +268,7 @@ const Registration = () => {
         placeholder: '123456',
         icon: MapPin,
         required: true,
-        registrationType:['customer','restaurant'],
+        registrationType: ['customer', 'restaurant'],
         validation: (value: string) => {
           if (!value) return 'PIN code is required';
           if (!/^\d{6}$/.test(value)) return 'Invalid PIN code format';
@@ -244,7 +282,7 @@ const Registration = () => {
         required: true,
         placeholder: '10',
         icon: Utensils,
-        registrationType:['restaurant'],
+        registrationType: ['restaurant'],
         validation: (value: string) => {
           if (!value) return 'Table count is required';
         }
@@ -259,7 +297,7 @@ const Registration = () => {
         required: true,
         placeholder: 'Add allergies',
         icon: NutOff,
-        registrationType:['customer'],
+        registrationType: ['customer'],
         validation: () => ''
       }
     ]
@@ -268,11 +306,11 @@ const Registration = () => {
   const notify = (message: string, type: string) => {
     if (type) {
       (toast as any)[type](message, {
-        icon: <CircleAlert  color="#fc3419"/>,
+        icon: <CircleAlert color="#fc3419" />,
       });
     } else {
       toast(message, {
-        icon: <CircleAlert color="#fc3419"/>,
+        icon: <CircleAlert color="#fc3419" />,
       });
     }
   }
@@ -307,20 +345,7 @@ const Registration = () => {
     }
   };
 
-  const handleAllergyToggle = (allergy: string) => {
-    setFormData(prev => {
-      const updatedAllergies = prev.allergies.includes(allergy)
-        ? prev.allergies.filter(a => a !== allergy)
-        : [...prev.allergies, allergy];
-
-      return {
-        ...prev,
-        allergies: updatedAllergies
-      };
-    });
-  };
-
-  const currentFields = formFields[currentStep].filter(field => 
+  const currentFields = formFields[currentStep].filter(field =>
     field.registrationType.includes(registrationType || '')
   );
 
@@ -366,13 +391,15 @@ const Registration = () => {
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
+
     if (validateStep(currentStep) && registrationType) {
       if (registrationType === "restaurant") {
         delete (formData as Partial<typeof formData>).allergies;
         delete (formData as Partial<typeof formData>).dob;
-        
+      } else {
+        formData.allergies = selectedAllergies;
       }
-      console.log('Form submitted:', formData);
+
       const response = await handleRegister(formData, registrationType, navigate);
       if (response) {
         setIsLoading(false);
@@ -383,32 +410,6 @@ const Registration = () => {
       }
     }
   };
-
-  const renderAllergiesStep = () => (
-    <div className="space-y-4 md:h-[320px]">
-      <div className="flex items-center space-x-2">
-        <NutOff className="h-5 w-5 text-gray-500" />
-        <p className="text-lg font-medium">Select Your Allergies</p>
-      </div>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {commonAllergies.map((allergy) => (
-          <div key={allergy} className="flex items-center space-x-2">
-            <Checkbox
-              id={allergy}
-              checked={formData.allergies.includes(allergy)}
-              onCheckedChange={() => handleAllergyToggle(allergy)}
-            />
-            <Label
-              htmlFor={allergy}
-              className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-            >
-              {allergy}
-            </Label>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-orange-50">
@@ -427,7 +428,18 @@ const Registration = () => {
             <div className={`${currentFields.some(field => field.id === "allergies") ? "" : "grid grid-cols-1 md:grid-cols-2"} gap-x-8 md:gap-y-3`}>
               {currentFields.map((field, index) => {
                 if (field.id === "allergies") {
-                  return renderAllergiesStep();
+                  return(
+                    <div>
+                      <p className="flex items-center justify-center text-xl font-bold">{field.label}</p>
+                      <MultiSelect
+                        className="bg-white border-r-0 py-5 hover:bg-white"
+                        options={commonAllergies}
+                        onValueChange={setSelectedAllergies}
+                        placeholder="Select Allergies"
+                        variant="inverted"
+                        animation={2}
+                        maxCount={6} />
+                    </div>)
                 }
 
                 return (
@@ -435,24 +447,24 @@ const Registration = () => {
                     <Label htmlFor={field.id} className="text-sm font-medium block">
                       {field.label} {field.required && <span className="text-red-500">*</span>}
                     </Label>
-                        <div className="relative">
-                          <field.icon className="absolute left-3 md:top-8 top-6 -translate-y-1/2 h-5 w-5 text-gray-500" />
-                          <Input
-                            id={field.id}
-                            type={field.type}
-                            placeholder={field.placeholder}
-                            className={`px-10 md:py-8 h-12 w-full rounded-none bg-white ${errors[field.id] ? 'input-error-color' : ''}`}
-                            value={ (field.id.includes('.') ? formData.address[field.id.split('.')[1] as keyof AddressData]: formData[field.id as keyof FormData]) as any }
-                            onChange={(e) => handleInputChange(field.id, e.target.value)}
-                          />
-                          <div style={{ height: '6px', marginTop: '2px', display: 'flex', justifyContent: 'end', width: '100%' }}>
-                            {errors[field.id] && (
-                              <p className="text-red-500 text-xs">
-                                {errors[field.id]}
-                              </p>
-                            )}
-                          </div>
-                        </div>
+                    <div className="relative">
+                      <field.icon className="absolute left-3 md:top-8 top-6 -translate-y-1/2 h-5 w-5 text-gray-500" />
+                      <Input
+                        id={field.id}
+                        type={field.type}
+                        placeholder={field.placeholder}
+                        className={`px-10 md:py-8 h-12 w-full rounded-none bg-white ${errors[field.id] ? 'input-error-color' : ''}`}
+                        value={(field.id.includes('.') ? formData.address[field.id.split('.')[1] as keyof AddressData] : formData[field.id as keyof FormData]) as any}
+                        onChange={(e) => handleInputChange(field.id, e.target.value)}
+                      />
+                      <div style={{ height: '6px', marginTop: '2px', display: 'flex', justifyContent: 'end', width: '100%' }}>
+                        {errors[field.id] && (
+                          <p className="text-red-500 text-xs">
+                            {errors[field.id]}
+                          </p>
+                        )}
+                      </div>
+                    </div>
                   </div>
                 );
               })}
@@ -464,7 +476,7 @@ const Registration = () => {
                   onClick={handlePrevious}
                   className=" hover:bg-orange-100 rounded-none bg-transparent border-orange-400 hover:border-swiggyOrange border-2"
                 >
-                   <ArrowLeft className="text-swiggyOrange"/>
+                  <ArrowLeft className="text-swiggyOrange" />
                 </Button>
               )}
               {currentStep < filteredFormFields.length - 1 ? (
@@ -481,13 +493,13 @@ const Registration = () => {
                   disabled={isLoading}
                   className="w-full rounded-none sm:w-48 bg-swiggyOrange hover:bg-orange-500"
                 >
-                 {
-                isLoading ? (
-                  <Loader2 className="animate-spin" />
-                ) : (
-                  <span>Create Account</span>
-                )
-              }
+                  {
+                    isLoading ? (
+                      <Loader2 className="animate-spin" />
+                    ) : (
+                      <span>Create Account</span>
+                    )
+                  }
                 </Button>
               )}
             </div>
@@ -496,10 +508,10 @@ const Registration = () => {
           <div className="mt-6 text-center text-sm">
             <span className="text-gray-500">Already have an account?</span>{' '}
             <button
-              onClick={()=> navigate('/')}
+              onClick={() => navigate('/')}
               className="text-orange-600 hover:text-orange-700 font-medium"
             >
-             Back to home
+              Back to home
             </button>
           </div>
         </div>
