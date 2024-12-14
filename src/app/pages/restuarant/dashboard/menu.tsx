@@ -73,7 +73,7 @@ function menu() {
         {!hasMenu ? (
           <div className="flex items-center w-100 justify-center md:h-[100%]">
             <Card className="md:w-[700px] h-96 bg-red-50">
-              <CardContent className="flex flex-col items-center justify-center h-full text-center p-6">
+              <CardContent className="flex flex-col items-center justify-center h-full text-center p-6 ">
                 <DialogTrigger>
                   <div className="bg-red-100 p-4 rounded-full mb-4 cursor-pointer">
                     <Plus size={48} className="text-red-500" />
