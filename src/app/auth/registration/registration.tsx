@@ -436,7 +436,7 @@ const Registration = () => {
                         options={commonAllergies}
                         onValueChange={setSelectedAllergies}
                         placeholder="Select Allergies"
-                        variant="inverted"
+                        variant="rmscolor"
                         animation={2}
                         maxCount={6} />
                     </div>)
