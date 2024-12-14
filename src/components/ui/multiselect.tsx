@@ -27,7 +27,7 @@ import {
 } from "@/components/ui/command";
 
 const multiSelectVariants = cva(
-  "m-1 transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 duration-300",
+  "m-1 md:h-6 h-4",
   {
     variants: {
       variant: {
@@ -38,6 +38,7 @@ const multiSelectVariants = cva(
         destructive:
           "border-transparent bg-destructive text-destructive-foreground hover:bg-destructive/80",
         inverted: "inverted",
+        rmscolor: "border-transparent bg-orange-200 hover:bg-orange-100 text-orange-900"
       },
     },
     defaultVariants: {
@@ -48,7 +49,7 @@ const multiSelectVariants = cva(
 
 interface MultiSelectProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement>,
-    VariantProps<typeof multiSelectVariants> {
+  VariantProps<typeof multiSelectVariants> {
   options: {
     label: string;
     value: string;
@@ -99,7 +100,7 @@ export const MultiSelect = React.forwardRef<HTMLButtonElement, MultiSelectProps>
     ) => {
       if (event.key === "Enter" && inputValue.trim() && allowCustomItems) {
         event.preventDefault();
-        
+
         // Check if the input matches any existing option
         const existingOption = allOptions.find(
           (opt) => opt.label.toLowerCase() === inputValue.trim().toLowerCase()
@@ -111,7 +112,7 @@ export const MultiSelect = React.forwardRef<HTMLButtonElement, MultiSelectProps>
             label: inputValue.trim(),
             value: `custom-${inputValue.trim().toLowerCase().replace(/\s+/g, '-')}`,
           };
-          
+
           setCustomOptions((prev) => [...prev, newOption]);
           setSelectedValues((prev) => [...prev, newOption.value]);
           onValueChange([...selectedValues, newOption.value]);
@@ -161,8 +162,8 @@ export const MultiSelect = React.forwardRef<HTMLButtonElement, MultiSelectProps>
         onOpenChange={setIsPopoverOpen}
         modal={modalPopover}
       >
-        <div className="flex justify-between items-center w-full h-16">
-          <div className="flex flex-wrap items-center">
+        <div className="flex justify-between items-center w-full h-5">
+          <div className="flex flex-wrap items-center md:max-h-none max-h-5">
             {selectedValues.slice(0, maxCount).map((value) => {
               const option = allOptions.find((o) => o.value === value);
               return (
@@ -176,7 +177,7 @@ export const MultiSelect = React.forwardRef<HTMLButtonElement, MultiSelectProps>
                 >
                   {option?.label}
                   <XCircle
-                    className="ml-2 h-4 w-4 cursor-pointer"
+                    className="ml-2 md:h-4 md:w-4 h-3 w-3 cursor-pointer"
                     onClick={(event) => {
                       event.stopPropagation();
                       toggleOption(value);
@@ -241,7 +242,7 @@ export const MultiSelect = React.forwardRef<HTMLButtonElement, MultiSelectProps>
           align="start"
           onEscapeKeyDown={() => setIsPopoverOpen(false)}
         >
-          <Command >
+          <Command>
             <CommandInput
               placeholder={allowCustomItems ? "Search or enter new item..." : "Search..."}
               onKeyDown={handleInputKeyDown}
@@ -250,11 +251,11 @@ export const MultiSelect = React.forwardRef<HTMLButtonElement, MultiSelectProps>
             />
             <CommandList className="w-96">
               <CommandEmpty>
-                {allowCustomItems 
-                  ? "Press Enter to add as new item" 
+                {allowCustomItems
+                  ? "Press Enter to add as new item"
                   : "No results found."}
               </CommandEmpty>
-              <CommandGroup>
+              <CommandGroup >
                 {allOptions.map((option) => {
                   const isSelected = selectedValues.includes(option.value);
                   return (
@@ -282,7 +283,7 @@ export const MultiSelect = React.forwardRef<HTMLButtonElement, MultiSelectProps>
             </CommandList>
           </Command>
         </PopoverContent>
-       <div className="h-6 flex items-center">
+        <div className="h-6 flex items-center">
           {animation > 0 && selectedValues.length > 0 && (
             <WandSparkles
               className={cn(
@@ -292,7 +293,7 @@ export const MultiSelect = React.forwardRef<HTMLButtonElement, MultiSelectProps>
               onClick={() => setIsAnimating(!isAnimating)}
             />
           )}
-       </div>
+        </div>
       </Popover>
     );
   }
