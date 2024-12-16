@@ -237,6 +237,11 @@ const Profile = () => {
     const getCurrentUser = async () => {
         setFetchingData(true);
         const response = await getUserDetail();
+        if (response === 'Token not valid') {
+            toast.success('Session timeout, Please login again!', {
+                icon: <CircleCheck color="#1ce867" />,
+            });
+        }
         setFormData({
             name: response.name || '',
             phone: response.phone?.toString() || '',
