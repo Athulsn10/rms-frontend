@@ -378,7 +378,6 @@ const Registration = () => {
 
   const handleNext = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-    console.log(validateStep(currentStep))
     if (validateStep(currentStep)) {
       setCurrentStep(prev => prev + 1);
     }
