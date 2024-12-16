@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button";
 import { handleRegister } from '../authService';
 import toast, { Toaster } from 'react-hot-toast';
 import { useSearchParams } from 'react-router-dom';
-import { Checkbox } from "@/components/ui/checkbox";
 import { MultiSelect } from "@/components/ui/multiselect";
 import { Mail, Lock, User, MapPin, Building, Home, NutOff, Phone, Cake, BadgeIndianRupee, ArrowRight, ArrowLeft, CircleAlert, Loader2, Utensils } from 'lucide-react';
 
