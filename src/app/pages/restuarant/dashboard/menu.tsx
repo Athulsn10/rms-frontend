@@ -8,10 +8,25 @@ import { MultiSelect } from "@/components/ui/multiselect";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 
+interface Menu {
+  dishName: string;
+  picture: File | null;
+  isVeg: boolean;
+  ingredients: string[];
+  price: number | undefined;
+}
 function menu() {
   const [isVeg, setIsVeg] = useState(true);
-  const [hasMenu, sethasMenu] = useState(false);
-  const [selectedFrameworks, setSelectedIngredients] = useState<string[]>([]);
+  const [hasMenu, setHasMenu] = useState(false);
+  const [selectedIngredients, setSelectedIngredients] = useState<string[]>([]);
+  const [menu, setMenu] = useState<Menu>({
+    dishName:'',
+    picture: null,
+    isVeg: isVeg,
+    ingredients: [],
+    price: undefined,
+  });
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
 
   const formFields = [
@@ -31,7 +46,7 @@ function menu() {
       placeholder: 'Upload item picture',
       icon: 'none',
       required: true,
-      validation: (value: string) => !value ? 'Dish name is required' : ''
+      validation: (value: string) => !value ? 'Picture is required' : ''
     },
     {
       id: 'isVeg',
@@ -40,7 +55,7 @@ function menu() {
       placeholder: 'Mutton Soup',
       icon: Vegan,
       required: true,
-      validation: (value: string) => !value ? 'Dish name is required' : ''
+      validation: (value: string) => !value ? 'Dish category is required' : ''
     },
     {
       id: 'price',
@@ -49,7 +64,7 @@ function menu() {
       placeholder: 'Enter The Price',
       icon: IndianRupee,
       required: true,
-      validation: (value: string) => !value ? 'Dish name is required' : ''
+      validation: (value: string) => !value ? 'Dish price is required' : ''
     },
     {
       id: 'ingredients',
@@ -58,9 +73,49 @@ function menu() {
       required: true,
       placeholder: 'Add ingredients',
       icon: ShoppingBasket,
-      validation: () => ''
+      validation: () => selectedIngredients.length < 3 ? 'Minimum of three ingredients is required' : ''
     }
   ];
+
+  const validateFields = () => {
+    const newErrors = {} as Record<string, string>;
+    let isValid = true;
+    formFields.forEach(field => {
+      const value = (menu as any)[field.id];
+      const error = field.validation(value);
+      console.log('error:', error)
+      if (error) {
+        newErrors[field.id] = error;
+        isValid = false;
+      }
+    });
+
+    setErrors(newErrors);
+    return isValid;
+  };
+
+  const handleInputChange = (id: string, value: string) => {
+    setMenu(prev => {
+      return {
+        ...prev,
+        [id]: value
+      };
+    });
+
+    if (errors[id]) {
+      setErrors(prev => ({
+        ...prev,
+        [id]: ''
+      }));
+    }
+  };
+
+  const handleMenuSave = () => {
+    if (validateFields()) {
+      menu.ingredients = selectedIngredients
+      console.log('Menu Data:', menu);
+    }
+  }
 
   return (
     <>
@@ -108,6 +163,13 @@ function menu() {
                           animation={2}
                           maxCount={7}
                         />
+                        <div style={{ height: '6px', marginTop: '2px', display: 'flex', justifyContent: 'end', width: '100%' }}>
+                          {errors[field.id] && (
+                            <p className="text-red-500 text-xs">
+                              {errors[field.id]}
+                            </p>
+                          )}
+                        </div>
                       </>
                     ) : field.type === "toggle" ? (
                       <>
@@ -118,9 +180,8 @@ function menu() {
                           <Button className={`${isVeg ? "bg-green-600 text-white hover:bg-green-600" : "bg-green-200 hover:bg-green-200 text-green-600"}`} onClick={() => setIsVeg(!isVeg)}><Circle /></Button>
                           <Button className={`${!isVeg ? "bg-red-600 text-white hover:bg-red-600" : "bg-red-200 hover:bg-red-200  text-red-600"}`} onClick={() => setIsVeg(!isVeg)}><Triangle /></Button>
                         </div>
-
+                        <p className="text-xs font-semibold italic">Default value is set to Veg, Please modify if needed!</p>
                       </>
-
                     )
                       : (
                         <>
@@ -134,9 +195,18 @@ function menu() {
                             <Input
                               id={field.id}
                               type={field.type}
+                              value={(menu as any)[field.id]}
                               placeholder={field.placeholder}
+                              onChange={(e) => handleInputChange(field.id, e.target.value)}
                               className="px-10 md:py-8 h-12 w-full rounded-none bg-white hover:shadow-md"
                             />
+                          </div>
+                          <div style={{ height: '6px', marginTop: '2px', display: 'flex', justifyContent: 'end', width: '100%' }}>
+                            {errors[field.id] && (
+                              <p className="text-red-500 text-xs">
+                                {errors[field.id]}
+                              </p>
+                            )}
                           </div>
                         </>
                       )}
@@ -145,7 +215,7 @@ function menu() {
               })}
             </div>
           </DialogDescription>
-          <Button className="bg-swiggyOrange p-5 hover:bg-orange-500 rounded-none">Save</Button>
+          <Button onClick={handleMenuSave} className="bg-swiggyOrange p-5 hover:bg-orange-500 rounded-none">Save</Button>
         </DialogContent>
       </Dialog>
     </>
