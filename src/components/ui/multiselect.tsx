@@ -84,11 +84,22 @@ export const MultiSelect = React.forwardRef<HTMLButtonElement, MultiSelectProps>
     },
     ref
   ) => {
+
+    // Initialize customOptions with any defaultValue items that aren't in options
+    const [customOptions, setCustomOptions] = React.useState<typeof options>(() => {
+      const defaultCustomOptions = defaultValue
+        .filter(value => !options.some(opt => opt.value === value))
+        .map(value => ({
+          label: value,
+          value: value
+        }));
+      return defaultCustomOptions;
+    });
+
     const [selectedValues, setSelectedValues] = React.useState<string[]>(defaultValue);
     const [isPopoverOpen, setIsPopoverOpen] = React.useState(false);
     const [isAnimating, setIsAnimating] = React.useState(false);
     const [inputValue, setInputValue] = React.useState(""); // New state for input tracking
-    const [customOptions, setCustomOptions] = React.useState<typeof options>([]); // New state for custom options
 
     const allOptions = React.useMemo(
       () => [...options, ...customOptions],
@@ -110,7 +121,7 @@ export const MultiSelect = React.forwardRef<HTMLButtonElement, MultiSelectProps>
           // Create new option
           const newOption = {
             label: inputValue.trim(),
-            value: `custom-${inputValue.trim().toLowerCase().replace(/\s+/g, '-')}`,
+            value: inputValue.trim(),
           };
 
           setCustomOptions((prev) => [...prev, newOption]);
@@ -163,7 +174,7 @@ export const MultiSelect = React.forwardRef<HTMLButtonElement, MultiSelectProps>
         modal={modalPopover}
       >
         <div className="flex justify-between items-center w-full h-5">
-          <div className="flex flex-wrap items-center md:max-h-none max-h-5">
+          <div className="flex flex-wrap items-center md:max-h-none max-h-5 mb-2">
             {selectedValues.slice(0, maxCount).map((value) => {
               const option = allOptions.find((o) => o.value === value);
               return (
