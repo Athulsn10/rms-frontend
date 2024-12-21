@@ -198,7 +198,7 @@ function menu() {
                               value={(menu as any)[field.id]}
                               placeholder={field.placeholder}
                               onChange={(e) => handleInputChange(field.id, e.target.value)}
-                              className="px-10 md:py-8 h-12 w-full rounded-none bg-white hover:shadow-md"
+                              className="px-10 md:py-8 h-12 w-full rounded-none bg-white hover:shadow-sm"
                             />
                           </div>
                           <div style={{ height: '6px', marginTop: '2px', display: 'flex', justifyContent: 'end', width: '100%' }}>

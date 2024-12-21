@@ -269,7 +269,7 @@ const Profile = () => {
                 <div className='flex items-center justify-center h-full text-orange-600'>
                     <Loader2 className="w-9 h-9 animate-spin" />
                 </div>) : (
-                <div className="flex w-full hover:shadow-md">
+                <div className="flex w-full">
                     <div className="w-full">
                         <div className='flex justify-between me-5 items-center'>
                             <div className="space-y-1 sm:p-8">
