@@ -312,7 +312,7 @@ const Registration = () => {
         icon: <CircleAlert color="#fc3419" />,
       });
     }
-  }
+  };
 
   const handleInputChange = (id: string, value: string) => {
     setFormData(prev => {
