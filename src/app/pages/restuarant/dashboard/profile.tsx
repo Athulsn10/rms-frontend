@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import toast, { Toaster } from 'react-hot-toast';
-import { getUserDetail, updateUserProfile } from './profileService';
+import { getUserDetail, updateUserProfile } from './restuarantService';
 import { User, MapPin, Building, Home, Phone, Loader2, CircleAlert, CircleCheck, ArrowRight, ArrowLeft, Check, BadgeIndianRupee, Utensils } from 'lucide-react';
 
 
