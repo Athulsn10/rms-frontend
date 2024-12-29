@@ -1,33 +1,41 @@
-import { Card, CardContent } from "@/components/ui/card";
-import { Circle, IndianRupee, Plus, ShoppingBasket, Soup, Triangle, Vegan } from "lucide-react";
-import { useState } from "react"
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input";
-import { ingredientsList } from "./restuarantData";
-import { MultiSelect } from "@/components/ui/multiselect";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
+import { createMenu, getMenus } from './restuarantService';
+import { ingredientsList } from "./restuarantData";
+import { useRef, useState, useEffect } from "react"
+import { MultiSelect } from "@/components/ui/multiselect";
+import { Card, CardContent } from "@/components/ui/card";
+import { Circle, CircleAlert, CircleCheck, IndianRupee, Loader2, Plus, ShoppingBasket, Soup, Triangle, Vegan } from "lucide-react";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import toast, { Toaster } from "react-hot-toast";
+
 
 interface Menu {
   dishName: string;
   picture: File | null;
-  isVeg: boolean;
+  isVeg: boolean | string;
   ingredients: string[];
   price: number | undefined;
-}
+};
+
 function menu() {
   const [isVeg, setIsVeg] = useState(true);
   const [hasMenu, setHasMenu] = useState(false);
+  const [menuList, setMenuList] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [dialogOpen, setDialogOpen] = useState(false)
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [selectedIngredients, setSelectedIngredients] = useState<string[]>([]);
   const [menu, setMenu] = useState<Menu>({
-    dishName:'',
+    dishName: '',
     picture: null,
     isVeg: isVeg,
     ingredients: [],
     price: undefined,
   });
-  const [errors, setErrors] = useState<Record<string, string>>({});
 
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   const formFields = [
     {
@@ -83,7 +91,7 @@ function menu() {
     formFields.forEach(field => {
       const value = (menu as any)[field.id];
       const error = field.validation(value);
-      console.log('error:', error)
+
       if (error) {
         newErrors[field.id] = error;
         isValid = false;
@@ -110,21 +118,70 @@ function menu() {
     }
   };
 
-  const handleMenuSave = () => {
+  const handleMenuSave = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
     if (validateFields()) {
-      menu.ingredients = selectedIngredients
-      console.log('Menu Data:', menu);
+      setIsLoading(true);
+      
+      if (!fileInputRef.current || !fileInputRef.current.files?.[0]) {
+        toast.success('Please select an image file', {
+          icon: <CircleCheck color="#1ce867" />,
+        });
+        setIsLoading(false);
+        return;
+      }
+      
+      // Create FormData
+      const formData = new FormData();
+      formData.append('name', menu.dishName);
+      formData.append('image', fileInputRef.current.files[0]);
+      formData.append('type', isVeg ? 'VEGETARIAN' : 'NONE_VEGETARIAN');
+      formData.append('price', menu.price?.toString() || '');
+      formData.append('status', 'AVAILABLE');
+
+      // Append ingredients array
+      selectedIngredients.forEach((ingredient) => {
+        formData.append(`ingredients`, ingredient);
+      });
+
+      const response = await createMenu(formData);
+
+      if (response) {
+        setIsLoading(false);
+        toast.success('Menu item created', {
+          icon: <CircleCheck color="#1ce867" />,
+        });
+        setDialogOpen(false);
+      } else {
+        setIsLoading(false);
+        toast.error('Something went wrong!', {
+          icon: <CircleAlert color="#fc3419" />,
+        });
+      }
     }
-  }
+  };
+
+  const fetchMenus = async() => {
+    const menuItems = await getMenus();
+
+    if (menuItems.length > 0) {
+      setMenuList(menuItems);
+      setHasMenu(true);
+    }
+  };
+
+  useEffect(() => {
+    fetchMenus();
+  }, []);
 
   return (
     <>
-      <Dialog defaultOpen={false} >
+      <Dialog open={dialogOpen} onOpenChange={setDialogOpen} >
         {!hasMenu ? (
           <div className="flex items-center w-100 justify-center md:h-[100%]">
             <Card className="md:w-[700px] h-96 bg-red-50">
               <CardContent className="flex flex-col items-center justify-center h-full text-center p-6 ">
-                <DialogTrigger>
+                <DialogTrigger onClick={() => setDialogOpen(true)}>
                   <div className="bg-red-100 p-4 rounded-full mb-4 cursor-pointer">
                     <Plus size={48} className="text-red-500" />
                   </div>
@@ -177,8 +234,8 @@ function menu() {
                           {field.label} {field.required && <span className="text-red-500">*</span>}
                         </Label>
                         <div className="flex gap-4">
-                          <Button className={`${isVeg ? "bg-green-600 text-white hover:bg-green-600" : "bg-green-200 hover:bg-green-200 text-green-600"}`} onClick={() => setIsVeg(!isVeg)}><Circle /></Button>
-                          <Button className={`${!isVeg ? "bg-red-600 text-white hover:bg-red-600" : "bg-red-200 hover:bg-red-200  text-red-600"}`} onClick={() => setIsVeg(!isVeg)}><Triangle /></Button>
+                          <Button className={`${isVeg ? "bg-green-600 text-white hover:bg-green-600" : "bg-green-200 hover:bg-green-200 text-green-600"}`} onClick={() => setIsVeg(true)}><Circle /></Button>
+                          <Button className={`${!isVeg ? "bg-red-600 text-white hover:bg-red-600" : "bg-red-200 hover:bg-red-200  text-red-600"}`} onClick={() => setIsVeg(false)}><Triangle /></Button>
                         </div>
                         <p className="text-xs font-semibold italic">Default value is set to Veg, Please modify if needed!</p>
                       </>
@@ -195,6 +252,7 @@ function menu() {
                             <Input
                               id={field.id}
                               type={field.type}
+                              ref={field.id === 'picture' ? fileInputRef : null}
                               value={(menu as any)[field.id]}
                               placeholder={field.placeholder}
                               onChange={(e) => handleInputChange(field.id, e.target.value)}
@@ -215,9 +273,18 @@ function menu() {
               })}
             </div>
           </DialogDescription>
-          <Button onClick={handleMenuSave} className="bg-swiggyOrange p-5 hover:bg-orange-500 rounded-none">Save</Button>
+          <Button disabled={isLoading} onClick={handleMenuSave} className="bg-swiggyOrange p-5 hover:bg-orange-500 rounded-none">
+            {
+              isLoading ? (
+                <Loader2 className="animate-spin" />
+              ) : (
+                <span>Save</span>
+              )
+            }
+          </Button>
         </DialogContent>
       </Dialog>
+      <Toaster />
     </>
   )
 }
