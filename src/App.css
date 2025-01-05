@@ -63,3 +63,11 @@ p {
 .custom-scroll-bar:hover::-webkit-scrollbar-thumb:hover {
     background-color: #555;
 }
+
+
+.focus-visible\:ring-2:focus-visible {
+    --tw-ring-offset-shadow: none !important;
+}
+
+
+
