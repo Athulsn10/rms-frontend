@@ -3,7 +3,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import toast, { Toaster } from 'react-hot-toast';
 import { MultiSelect } from "@/components/ui/multiselect";
-import { getUserDetail, updateUserProfile } from './profileService';
+import { getUserDetail, updateUserProfile } from '../../customerService';
 import { User, MapPin, Building, Home, NutOff, Phone, Cake, Loader2, CircleAlert, CircleCheck, ArrowRight, ArrowLeft, Check } from 'lucide-react';
 
 
