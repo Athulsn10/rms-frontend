@@ -22,11 +22,11 @@ interface ScannerProps {
 const QRScanner: React.FC<ScannerProps> = ({ onResult, className = '' }) => {
     const navigate = useNavigate();
     const [error, setError] = useState<string>('');
-    const [scanResult, setScanResult] = useState<string>('');
+    const [scanResult, setScanResult] = useState<any>();
     const [isScanning, setIsScanning] = useState<boolean>(true);
 
     const resetScanner = (): void => {
-        setScanResult('');
+        setScanResult(false);
         setError('');
         setIsScanning(true);
         window.location.reload();
@@ -36,6 +36,16 @@ const QRScanner: React.FC<ScannerProps> = ({ onResult, className = '' }) => {
         navigate("/");
         window.location.reload();
     }
+
+    const handlenavigate = () => {
+        const restuarantId = localStorage.getItem('resturantOrder');
+        if (restuarantId) {
+            navigate("/restuarant");
+            window.location.reload();
+        } else {
+            window.location.reload();
+        }
+    };
 
     useEffect(() => {
         let scanner: Html5Qrcode | null = null;
@@ -68,7 +78,8 @@ const QRScanner: React.FC<ScannerProps> = ({ onResult, className = '' }) => {
                                 onResult(decodedText);
                             }
                             scanner?.stop();
-                            alert(`Success! QR Code detected: ${decodedText}`);
+                            localStorage.setItem('resturantOrder', decodedText);
+                            handlenavigate();
                         },
                         (errorMessage) => {
                             if (!errorMessage.includes('NotFound')) {
@@ -92,7 +103,7 @@ const QRScanner: React.FC<ScannerProps> = ({ onResult, className = '' }) => {
 
         return () => {
             Html5Qrcode.getCameras()
-                .then(() => scanner?.stop()) 
+                .then(() => scanner?.stop())
                 .catch(console.error);
         };
     }, [onResult]);
@@ -102,15 +113,15 @@ const QRScanner: React.FC<ScannerProps> = ({ onResult, className = '' }) => {
             <div className="w-full text-center space-y-16">
                 <div className='flex justify-between'>
                     <BrandLogo />
-                    <X onClick={handleClose} className="w-12 h-12"/>
+                    <X onClick={handleClose} className="w-12 h-12" />
                 </div>
-               <div>
+                <div>
                     <h1 className="text-2xl font-bold">Scan Table Qr Code</h1>
                     <p className='p-0 m-0 text-sm'>If your are in the restaurant find a table to get the qr</p>
                     <p className="text-gray-600">
                         {isScanning ? 'Position the QR code in the center of the square' : 'QR Code detected!'}
                     </p>
-               </div>
+                </div>
             </div>
 
             {error && (
@@ -121,7 +132,7 @@ const QRScanner: React.FC<ScannerProps> = ({ onResult, className = '' }) => {
 
             {scanResult ? (
                 <div className="w-full space-y-4">
-                    <p className="bg-green-50 border-green-200 text-green-500">Success! QR Code detected: {scanResult}</p>
+                    <p className="bg-green-50 border-green-200 text-green-500">Success! QR Code detected</p>
                     <button
                         onClick={resetScanner}
                         className="w-full py-2 px-4 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
