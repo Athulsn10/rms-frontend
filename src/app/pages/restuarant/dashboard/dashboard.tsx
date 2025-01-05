@@ -1,13 +1,14 @@
-import Menu from "./menu"
-import Orders from "./orders"
-import Profile from "./profile"
-import { useState } from "react"
-import { useNavigate } from "react-router-dom"
-import { useAppContext } from "@/app/context/provider"
-import { User, ShoppingBag, LogOut, SquareMenu } from "lucide-react"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { SidebarFooter, SidebarHeader, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
-import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "@/components/ui/sidebar"
+import Menu from "./menu";
+import Orders from "./orders";
+import Profile from "./profile";
+import { useState } from "react";
+import QRGenerator from "./QrGenerator";
+import { useNavigate } from "react-router-dom";
+import { useAppContext } from "@/app/context/provider";
+import { User, ShoppingBag, LogOut, SquareMenu, QrCode } from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { SidebarFooter, SidebarHeader, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "@/components/ui/sidebar";
 
 
 const items = [
@@ -25,6 +26,11 @@ const items = [
         title: "Profile",
         key: "profile",
         icon: User,
+    },
+    {
+        title:"Generate QR",
+        key:'qr',
+        icon: QrCode
     },
     {
         title: "Logout",
@@ -103,6 +109,7 @@ function Dashboard() {
                     {activeTab === "menu" && <Menu />}
                     {activeTab === "profile" && <Profile />}
                     {activeTab === "orders" && <Orders />}
+                    {activeTab === "qr" && <QRGenerator />}
                 </main>
             </SidebarProvider>
         </div>
