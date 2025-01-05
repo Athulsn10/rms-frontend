@@ -1,3 +1,6 @@
+import { useNavigate } from "react-router-dom";
+
+
 interface cardProps {
     title: string;
     rating: string;
@@ -7,8 +10,10 @@ interface cardProps {
 }
 
 const RestaurantCard: React.FC<cardProps> = ({ title, rating, category, area, imgUrl }) => {
+    const navigate = useNavigate();
+
     return (
-        <div style={{ width: 'fit-content' }} className="ms-5 me-3 overflow-hidden rounded-lg hover:cursor-pointer">
+        <div onClick={() => navigate(`/qrscanner`)} style={{ width: 'fit-content' }} className="ms-5 me-3 overflow-hidden rounded-lg hover:cursor-pointer">
             <div className="overflow-hidden rounded-3xl">
                 <div className="h-[200px] w-[270px] rounded-lg">
                     <img src={imgUrl} alt="Restaurant" className="object-cover rounded-lg"/>
