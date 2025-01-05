@@ -381,7 +381,7 @@ function menu() {
                           <img
                             style={{ height: '60px' }}
                             src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/f0/Google_Bard_logo.svg/900px-Google_Bard_logo.svg.png"
-                            className="text-orange-600 animate-[pulse_500ms_ease-in-out_infinite]"
+                            className="text-orange-600 animate-[pulse_1000ms_ease-in-out_infinite]"
                           />
                         </div>
                       </div>
