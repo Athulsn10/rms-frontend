@@ -3,13 +3,15 @@ import Qr from "@/components/qr/qr";
 import Home from './app/pages/home/home';
 import Navbar from "@/components/nav/navbar";
 import Search from "./app/pages/search/search";
+import Protected from './app/auth/protect/protected';
+import { AppProvider } from './app/context/provider';
+import Restaurant from './app/pages/customer/restuarant';
 import Profile from './app/pages/customer/dashboard/profile/profile';
 import { Route, Routes, useLocation } from 'react-router-dom';
 import Registration from './app/auth/registration/registration';
 import Authentication from './app/auth/authentication';
 import Dashboard from './app/pages/restuarant/dashboard/dashboard';
-import Protected from './app/auth/protect/protected';
-import { AppProvider } from './app/context/provider';
+
 
 const App = () => {
   const location = useLocation();
@@ -27,6 +29,7 @@ const App = () => {
         <Route path="/authentication" element={<Protected><Authentication /></Protected>} />
         <Route path="/register" element={<Protected><Registration /></Protected>} />
         <Route path="/dashboard" element={<Protected><Dashboard /></Protected>} />
+        <Route path="/restuarant" element={<Protected><Restaurant /></Protected>} />
       </Routes>
     </AppProvider>
   );
