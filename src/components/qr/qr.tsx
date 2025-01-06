@@ -37,7 +37,7 @@ const QRScanner: React.FC<ScannerProps> = ({ onResult, className = '' }) => {
         window.location.reload();
     }
 
-    const handlenavigate = () => {
+    const handleNavigate = () => {
         const restuarantId = localStorage.getItem('resturantOrder');
         if (restuarantId) {
             navigate("/restuarant");
@@ -78,8 +78,8 @@ const QRScanner: React.FC<ScannerProps> = ({ onResult, className = '' }) => {
                                 onResult(decodedText);
                             }
                             scanner?.stop();
-                            localStorage.setItem('resturantOrder', decodedText);
-                            handlenavigate();
+                            localStorage.setItem('restaurantOrder', decodedText);
+                            handleNavigate();
                         },
                         (errorMessage) => {
                             if (!errorMessage.includes('NotFound')) {
