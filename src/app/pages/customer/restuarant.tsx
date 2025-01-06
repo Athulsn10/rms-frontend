@@ -13,6 +13,7 @@ function restuarant() {
   const [totalAmount, setTotalAmount] = useState(0);
   const [cartItems, setCartItems] = useState<any>([]);
   const [fetchingData, setFetchingData] = useState(false);
+  const base_url = import.meta.env.VITE_BASE_URL;
 
   const fetchData = async () => {
     setFetchingData(true);
@@ -135,7 +136,7 @@ function restuarant() {
                     <Card key={item._id} className="w-full">
                       <div className="relative h-48 w-full overflow-hidden">
                         <img
-                          src={`https://rms-backend-mtli.onrender.com/files/menus/${item.images}`}
+                          src={`${base_url}files/menus/${item.images}`}
                           alt={item.name}
                           className="w-full h-full object-cover transform hover:scale-105 transition-transform duration-300"
                         />
