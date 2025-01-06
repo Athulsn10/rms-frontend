@@ -16,13 +16,20 @@ function home() {
   const [restaurantList, setRestaurantList] = useState([]);
 
   const fetchRestuarants = async () => {
-    const city = localStorage.getItem('city') || 'chelakkara';
+    const city = localStorage.getItem('city');
     if (city) {
       setLocation(city);
       const response = await getRestuarentsByCity(city);
       if (response) {
         setRestaurantList(response);
         console.log(response)
+      }
+    } else {
+      const response = await getRestuarents();
+      if (response) {
+        setRestaurantList(response);
+        console.log('response:',response.data)
+
       }
     }
   }
