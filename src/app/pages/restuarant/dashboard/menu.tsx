@@ -42,6 +42,8 @@ function menu() {
     price: undefined,
   });
 
+  const base_url = import.meta.env.VITE_BASE_URL;
+
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const formFields = [
@@ -314,11 +316,11 @@ function menu() {
                     {menuList.map((item: any) => (
                       <Card key={item._id} className="overflow-hidden bg-white shadow-md border-none rounded-sm mb-4">
                         <div className="relative h-48 w-full overflow-hidden">
-                          <img
-                            src={`https://rms-backend-mtli.onrender.com/files/menus/${item.images}`}
-                            alt={item.name}
-                            className="w-full h-full object-cover transform hover:scale-105 transition-transform duration-300"
-                          />
+                        <img
+  src={`${base_url}files/menus/${item.images}`}
+  alt={item.name}
+  className="w-full h-full object-cover transform hover:scale-105 transition-transform duration-300"
+/>
                           <Button
                             variant="destructive"
                             size="icon"
