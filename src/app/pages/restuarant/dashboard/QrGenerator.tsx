@@ -1,15 +1,15 @@
 import { useState, useRef } from 'react';
 import QRCode from "react-qr-code";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Download } from "lucide-react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 const QRGenerator = () => {
   const [tableName, setTableName] = useState('');
   const [qrData, setQrData] = useState('');
-  const qrRef = useRef(null);
+  const qrContainerRef = useRef(null);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -24,18 +24,24 @@ const QRGenerator = () => {
   };
 
   const downloadQRCode = () => {
-    if (!qrRef.current) return;
+    if (!qrContainerRef.current) return;
 
-    const svg = qrRef.current;
+    const container:any = qrContainerRef.current;
+    const svg = container.querySelector('svg');
     const svgData = new XMLSerializer().serializeToString(svg);
     const canvas = document.createElement("canvas");
-    const ctx = canvas.getContext("2d");
+    const ctx:any = canvas.getContext("2d");
     const img = new Image();
 
     img.onload = () => {
-      canvas.width = img.width;
-      canvas.height = img.height;
-      ctx?.drawImage(img, 1, 1);
+      const padding = 40;
+      canvas.width = img.width + (padding * 2);
+      canvas.height = img.height + (padding * 2);
+      
+      ctx.fillStyle = "white";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      
+      ctx.drawImage(img, padding, padding);
       
       const pngFile = canvas.toDataURL("image/png");
       const downloadLink = document.createElement("a");
@@ -49,7 +55,7 @@ const QRGenerator = () => {
 
   return (
     <div className="max-w-5xl mx-auto p-6">
-      <Card className='min-h-[470px]'>
+      <Card className="min-h-[470px]">
         <CardHeader>
           <CardTitle>QR Code Generator</CardTitle>
           <CardDescription>
@@ -58,7 +64,6 @@ const QRGenerator = () => {
         </CardHeader>
         <CardContent>
           <div className="grid md:grid-cols-2 gap-6 h-100">
-            {/* Left Column - Form */}
             <div className="space-y-6">
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="space-y-2">
@@ -81,13 +86,14 @@ const QRGenerator = () => {
               </form>
             </div>
 
-            {/* Right Column - QR Code */}
             <div className={`flex flex-col items-center justify-center ${!qrData && 'hidden md:flex'}`}>
               {qrData ? (
                 <div className="flex flex-col items-center space-y-4">
-                  <div className="p-4 bg-white rounded-lg">
+                  <div 
+                    ref={qrContainerRef}
+                    className="p-8 bg-white rounded-lg"
+                  >
                     <QRCode
-                      ref={qrRef}
                       value={qrData}
                       size={256}
                       style={{ height: "auto", maxWidth: "100%", width: "100%" }}

@@ -38,7 +38,7 @@ const QRScanner: React.FC<ScannerProps> = ({ onResult, className = '' }) => {
     }
 
     const handleNavigate = () => {
-        const restuarantId = localStorage.getItem('resturantOrder');
+        const restuarantId = localStorage.getItem('restaurantOrder');
         if (restuarantId) {
             navigate("/restuarant");
             window.location.reload();
@@ -113,7 +113,7 @@ const QRScanner: React.FC<ScannerProps> = ({ onResult, className = '' }) => {
             <div className="w-full text-center space-y-16">
                 <div className='flex justify-between'>
                     <BrandLogo />
-                    <X onClick={handleClose} className="w-12 h-12" />
+                    <X onClick={handleClose} className="w-12 h-12 cursor-pointer" />
                 </div>
                 <div>
                     <h1 className="text-2xl font-bold">Scan Table Qr Code</h1>
