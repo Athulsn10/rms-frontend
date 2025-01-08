@@ -398,10 +398,11 @@ const Registration = () => {
         formData.allergies = selectedAllergies;
       }
 
-      const response = await handleRegister(formData, registrationType, navigate);
+      const response = await handleRegister(formData, registrationType);
       if (response) {
         setIsLoading(false);
-        notify(response, 'error');
+        notify('Registration successfull, Please login', 'success');
+        navigate('/');
       } else {
         notify('Registration Failed', 'error');
         setIsLoading(false);

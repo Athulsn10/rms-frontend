@@ -39,18 +39,14 @@ export const handleLogIn = async (email: string, password: string,  navigate: (p
     }
 };
 
-export const handleRegister = async (formData:any, registrationType:string, navigate: (path: string) => void) => {
+export const handleRegister = async (formData:any, registrationType:string) => {
     const headers = {
         'Content-Type': 'application/json',
       };
   
       try {
-        const response = await http.post(`/${registrationType}`,formData,{ headers });
-  
-        localStorage.setItem('token', response.data.data.token);
-        localStorage.setItem('user', response.data.data.name);
-        navigate('/');
-        return null;
+        const response = await http.post(`/${registrationType}`,formData,{ headers });  
+        return response.status >= 200 && response.status <= 300 ? true : false;
       } catch (error:any) {
         console.error('Error logging in', error);
         return error.response?.data?.message
