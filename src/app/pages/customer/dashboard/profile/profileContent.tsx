@@ -298,6 +298,7 @@ const ProfileContent = () => {
             },
             allergies: response.allergies || [],
         });
+        console.log('response.allergies:',response)
         setSelectedAllergies(response.allergies || []);
         setFetchingData(false);
     };
