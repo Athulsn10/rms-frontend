@@ -85,8 +85,18 @@ export const imageUpload = async (file: any) => {
                 ...(token && { 'Authorization': `Bearer ${token}` })
             },
         });
-        return response.status >= 200 && response.status <= 300 ? response.data.data.ingredients : false;
+        return response.status >= 200 && response.status <= 300 ? response.data.data : false;
     } catch (error: any) {
         return error.response?.data?.message
     }
 };
+
+export const getAllOrders = async () => {
+    try {
+        const restuarantId = localStorage.getItem('id')
+        const response = await http.get(`/order/restaurant/${restuarantId}`);
+        return response.data.data;
+    } catch (error: any) {
+        return error.response?.data?.message
+    }
+}
