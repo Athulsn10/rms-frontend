@@ -19,7 +19,8 @@ function home() {
     const city = localStorage.getItem('city');
     if (city) {
       setLocation(city);
-      const response = await getRestuarentsByCity(city);
+      // const response = await getRestuarentsByCity(city);
+      const response = false;
       if (response) {
         setRestaurantList(response);
         console.log(response)
