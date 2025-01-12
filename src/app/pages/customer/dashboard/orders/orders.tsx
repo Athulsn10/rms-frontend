@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Loader2, Minus, Plus, Trash2 } from 'lucide-react';
+import toast, { Toaster } from 'react-hot-toast';
+import { Textarea } from "@/components/ui/textarea";
+import { CircleAlert, CircleCheck, Clock, Edit2, Loader2, Minus, Plus, Trash2, XCircle } from 'lucide-react';
 import { getAllOrders, updateOrder } from "../../customerService";
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
@@ -34,6 +36,7 @@ interface Order {
     tableNumber?: number;
     totalAmount: number;
     status: OrderStatus;
+    remarks: String;
     createdAt: string;
     updatedAt: string;
     __v: number;
@@ -45,11 +48,13 @@ function Orders() {
     const [fetchingData, setFetchingData] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [selectedOrder, setSelectedOrder] = useState<any>();
+    const [remarks, setRemarks] = useState(selectedOrder?.remarks || '');
     const [originalOrder, setOriginalOrder] = useState<Order | null>(null);
 
     const handleEdit = (order: Order) => {
-        setSelectedOrder(order);
-        setOriginalOrder(order);
+        const orderCopy = JSON.parse(JSON.stringify(order));
+        setSelectedOrder(orderCopy);
+        setOriginalOrder(orderCopy);
         setIsEditModalOpen(true);
     };
 
@@ -63,12 +68,12 @@ function Orders() {
 
     const handleQuantityChange = (itemIndex: number, change: number) => {
         if (!selectedOrder) return;
-        const updatedOrder = { ...selectedOrder };
+        const updatedOrder = JSON.parse(JSON.stringify(selectedOrder));
         const currentQuantity = updatedOrder.order[itemIndex].quantity;
         const newQuantity = Math.max(1, currentQuantity + change);
 
         updatedOrder.order[itemIndex].quantity = newQuantity;
-        updatedOrder.totalAmount = updatedOrder.order.reduce((sum, item) => sum + item.quantity * parseFloat(item.menuId.price), 0);
+        updatedOrder.totalAmount = updatedOrder.order.reduce((sum:number, item:any) => sum + item.quantity * parseFloat(item.menuId.price), 0);
         setSelectedOrder(updatedOrder);
     };
 
@@ -89,14 +94,24 @@ function Orders() {
             })),
             totalAmount: String(selectedOrder.totalAmount),
             tableNumber: String(selectedOrder.tableNumber),
-            status: selectedOrder.status
+            remarks: remarks,
+            status: selectedOrder.order.length == 0 ? "Cancelled" : selectedOrder.status
         };
 
         // Call the update API
         const response = await updateOrder(selectedOrder._id, updatePayload);
 
         if (response) {
-            fetchOrders()
+            setIsEditModalOpen(false);
+            toast.success('Order Updated!', {
+              icon: <CircleCheck color="#1ce867" />,
+            });
+            fetchOrders();
+        } else {
+            setIsEditModalOpen(false);
+            toast.error('Order Updated!', {
+              icon: <CircleAlert color="#fc3419" />,
+            });
         }
     };
 
@@ -120,7 +135,7 @@ function Orders() {
             setFetchingData(true);
             const response = await getAllOrders();
             if (response) {
-                setOrders(response);
+                setOrders(response.reverse());
                 setFetchingData(false);
             }
         } catch (error) {
@@ -133,6 +148,10 @@ function Orders() {
         fetchOrders();
     }, []);
 
+    useEffect(() => {
+        setRemarks(selectedOrder?.remarks || '');
+    }, [selectedOrder]);
+
     return (
         <>
             <div className="p-4 max-w-4xl mx-auto">
@@ -144,33 +163,65 @@ function Orders() {
                     (<>
                         <div className="grid gap-4">
                             {orders.map((order) => (
-                                <Card key={order._id} className="w-full">
-                                    <CardHeader className="flex flex-row items-center justify-between">
-                                        <CardTitle className="text-lg">
-                                            Order #{order._id.slice(-6)}
-                                        </CardTitle>
-                                        <Badge className={getStatusColor(order.status)}>
-                                            {order.status}
-                                        </Badge>
+                                <Card className="w-full transform transition-all duration-200 hover:shadow-lg border-none">
+                                    <CardHeader className="pb-4">
+                                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                                            <div className="flex flex-col gap-2">
+                                                <CardTitle className="text-xl font-bold">
+                                                    Order #{order._id.slice(-6)}
+                                                </CardTitle>
+                                                <div className="flex items-center gap-2 text-gray-500">
+                                                    <Clock className="w-4 h-4" />
+                                                    <span className="text-sm">
+                                                        {new Date(order.createdAt).toLocaleDateString('en-GB', {
+                                                            day: '2-digit',
+                                                            month: '2-digit',
+                                                            year: 'numeric'
+                                                        })}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <Badge className={`${getStatusColor(order.status)} px-4 py-1 text-sm font-medium rounded-full`}>
+                                                {order.status}
+                                            </Badge>
+                                        </div>
                                     </CardHeader>
 
-                                    <CardContent>
-                                        <div className="space-y-2">
-                                            <p className="text-sm text-gray-600">
-                                                Date: {new Date(order.createdAt).toLocaleDateString()}
-                                            </p>
-                                            <p className="font-medium">
-                                                Total Amount: ₹{order.totalAmount}
-                                            </p>
-
-                                            <div className="flex gap-2 mt-4">
-                                                <Button className="hover:bg-orange-100 rounded-none bg-transparent border-orange-400 hover:border-swiggyOrange border-2 text-swiggyOrange" onClick={() => handleEdit(order)} disabled={order.status === 'Cancelled'}>
-                                                    Edit Order
-                                                </Button>
-                                                <Button className="rounded-none bg-orange-600 hover:bg-orange-500" onClick={() => handleCancel(order._id)} disabled={order.status === 'Cancelled'}>
-                                                    Cancel Order
-                                                </Button>
+                                    <CardContent className="space-y-6">
+                                        <div className="flex flex-col gap-4">
+                                            <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                                                <span className="text-gray-600">Total Amount</span>
+                                                <span className="text-xl font-bold text-orange-600">₹{order.totalAmount}</span>
                                             </div>
+
+                                            {(order.remarks && order.remarks !== "") && (
+                                                <div className="p-4 bg-orange-50 rounded-lg">
+                                                    <p className="text-sm text-gray-700">
+                                                        <span className="font-medium">Message to chef:</span> {order.remarks.slice(-35)}<span>{order.remarks.length > 35 && "..."}</span>
+                                                    </p>
+                                                </div>
+                                            )}
+                                        </div>
+
+                                        <div className="flex flex-col sm:flex-row gap-3 pt-4">
+                                            <Button
+                                                variant="outline"
+                                                className="flex-1 gap-2 rounded-none border-orange-400 text-orange-600 hover:text-orange-700 hover:bg-orange-50"
+                                                onClick={() => handleEdit(order)}
+                                                disabled={order.status === 'Cancelled'}
+                                            >
+                                                <Edit2 className="w-4 h-4" />
+                                                Edit Order
+                                            </Button>
+                                            <Button
+                                                variant="destructive"
+                                                className="flex-1 gap-2 rounded-none bg-orange-600 hover:bg-orange-700"
+                                                onClick={() => handleCancel(order._id)}
+                                                disabled={order.status === 'Cancelled'}
+                                            >
+                                                <XCircle className="w-4 h-4" />
+                                                Cancel Order
+                                            </Button>
                                         </div>
                                     </CardContent>
                                 </Card>
@@ -191,29 +242,15 @@ function Orders() {
                                             </div>
 
                                             <div className="flex items-center gap-2">
-                                                <Button
-                                                    size="icon"
-                                                    variant="outline"
-                                                    onClick={() => handleQuantityChange(index, -1)}
-                                                >
+                                                <Button size="icon" variant="outline" onClick={() => handleQuantityChange(index, -1)}>
                                                     <Minus className="h-4 w-4" />
                                                 </Button>
-
                                                 <span className="w-8 text-center">{item.quantity}</span>
-
-                                                <Button
-                                                    size="icon"
-                                                    variant="outline"
-                                                    onClick={() => handleQuantityChange(index, 1)}
-                                                >
+                                                <Button size="icon" variant="outline" onClick={() => handleQuantityChange(index, 1)}>
                                                     <Plus className="h-4 w-4" />
                                                 </Button>
 
-                                                <Button
-                                                    size="icon"
-                                                    variant="destructive"
-                                                    onClick={() => handleRemoveItem(index)}
-                                                >
+                                                <Button size="icon" variant="destructive" onClick={() => handleRemoveItem(index)}>
                                                     <Trash2 className="h-4 w-4" />
                                                 </Button>
                                             </div>
@@ -223,6 +260,7 @@ function Orders() {
                                     <p className="font-medium text-right">
                                         Total: ₹{selectedOrder?.totalAmount}
                                     </p>
+                                    <Textarea placeholder="Type your message here." value={remarks}  onChange={(e) => setRemarks(e.target.value)}/>
                                 </div>
 
                                 <DialogFooter>
@@ -235,6 +273,7 @@ function Orders() {
                                 </DialogFooter>
                             </DialogContent>
                         </Dialog>
+                        <Toaster />
                     </>)}
             </div>
         </>
