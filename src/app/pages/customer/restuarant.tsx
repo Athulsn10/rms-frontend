@@ -1,18 +1,22 @@
 import { useEffect, useState } from "react"
-import { getRestuarantById, placeOrder } from "./customerService";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { AlertCircle, Circle, CircleAlert, Loader2, Minus, Plus, ShoppingCart, Triangle, TriangleAlert, Utensils, UtensilsCrossed } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea"
+import { getRestuarantById, placeOrder } from "./customerService";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { AlertCircle, ChefHat, Circle, CircleAlert, CircleCheck, Loader2, Minus, Plus, ShoppingCart, Triangle, TriangleAlert, Utensils, UtensilsCrossed } from "lucide-react";
+import toast, { Toaster } from 'react-hot-toast';
 
 function restuarant() {
+  const [remarks, setRemarks] = useState('');
   const [menuList, setMenuList] = useState([]);
   const [hasMenu, setHasMenu] = useState(false);
-  const [orderData, setOrderData] = useState<any>({});
   const [totalAmount, setTotalAmount] = useState(0);
   const [cartItems, setCartItems] = useState<any>([]);
   const [fetchingData, setFetchingData] = useState(false);
+  const [isEditModalOpen, setIsRemarksModalOpen] = useState(false);
   const base_url = import.meta.env.VITE_BASE_URL;
 
   const fetchData = async () => {
@@ -75,17 +79,28 @@ function restuarant() {
     if (resturant) {
       const parsedRestuarant = JSON.parse(resturant);
       const restaurantId = parsedRestuarant.restaurantId;
-      const tableNumber = parsedRestuarant.tableNumber;
+      const tableName = parsedRestuarant.tableName;
       const orderObject = {
         restaurantId: String(restaurantId),
         order: cartItems,
         totalAmount: String(totalAmount),
-        tableNumber: tableNumber,
-        status: "Ordered" 
+        tableNumber: tableName,
+        status: "Ordered",
+        remarks: remarks
       };
-
-      console.log('orderObject:',orderObject);
       const response = await placeOrder(orderObject);
+      if (response) {
+        setIsRemarksModalOpen(false);
+        toast.success('Order Placed!', {
+          icon: <CircleCheck color="#1ce867" />,
+        });
+        setRemarks('');
+      } else {
+        setIsRemarksModalOpen(false);
+        toast.error('Order not palced due a error!', {
+          icon: <CircleAlert color="#1ce867" />,
+        });
+      }
     }
   };
 
@@ -95,7 +110,7 @@ function restuarant() {
   };
 
   useEffect(() => {
-    const total = cartItems.reduce((sum, cartItem) => {
+    const total = cartItems.reduce((sum:number, cartItem:any) => {
       const menuItem: any = menuList.find((item: any) => item._id === cartItem.menuId);
       return sum + (parseFloat(menuItem?.price || 0) * cartItem.quantity);
     }, 0);
@@ -215,7 +230,7 @@ function restuarant() {
                       <div className="flex items-center gap-2">
                         <ShoppingCart className="w-5 h-5 text-gray-600" />
                         <span className="font-medium">
-                          {cartItems.reduce((total:string, item:any) => total + item.quantity, 0)} items
+                          {cartItems.reduce((total: string, item: any) => total + item.quantity, 0)} items
                         </span>
                       </div>
                       <div className="text-lg font-bold">
@@ -230,17 +245,39 @@ function restuarant() {
                         Reset <UtensilsCrossed color="#ea580c" />
                       </Button>
                       <Button
-                        onClick={handlePlaceOrder}
+                        onClick={() => setIsRemarksModalOpen(true)}
                         className="bg-orange-600 hover:bg-orange-700 text-white px-8 py-3 rounded-none"
                       >
-                        Place Order <Utensils color="#ffff" />
+                        Continue <Utensils color="#ffff" />
                       </Button>
                     </div>
                   </div>
                 )}
-                </>
+              </>
               )
             }
+
+            <Dialog open={isEditModalOpen} onOpenChange={() => setIsRemarksModalOpen(false)}>
+              <DialogContent className="max-w-md">
+                <DialogHeader>
+                  <DialogTitle className="flex">Message To The Chef</DialogTitle>
+                </DialogHeader>
+
+                <div className="space-y-4">
+                <Textarea placeholder="Type your message here." onChange={(e) => setRemarks(e.target.value)}/>
+                </div>
+
+                <DialogFooter>
+                  <Button className="hover:bg-orange-100 rounded-none bg-transparent border-orange-400 hover:border-swiggyOrange border-2 text-swiggyOrange" onClick={() => setIsRemarksModalOpen(false)}>
+                    Cancel
+                  </Button>
+                  <Button className="rounded-none bg-orange-600 hover:bg-orange-500" onClick={handlePlaceOrder}>
+                    Place Order
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+            <Toaster />
           </>)
       }
     </>
