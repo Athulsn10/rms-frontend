@@ -1,15 +1,16 @@
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { createMenu, deleteMenu, editMenu, getMenus, imageUpload } from './restuarantService';
+import toast, { Toaster } from "react-hot-toast";
 import { ingredientsList } from "./restuarantData";
-import { useRef, useState, useEffect } from "react"
+import { useRef, useState, useEffect } from "react";
 import { MultiSelect } from "@/components/ui/multiselect";
 import { Card, CardContent } from "@/components/ui/card";
-import { Circle, CircleAlert, CircleCheck, CircleX, IndianRupee, Loader2, Pencil, Plus, Search, ShoppingBasket, Soup, Sparkles, Trash2, Triangle, Vegan } from "lucide-react";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
-import toast, { Toaster } from "react-hot-toast";
-import { Badge } from "@/components/ui/badge";
+import { createMenu, deleteMenu, editMenu, getMenus, imageUpload } from './restuarantService';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Circle, CircleAlert, CircleCheck, CircleX, Flame, IndianRupee, Loader2, Pencil, Plus, Search, ShoppingBasket, Soup, Trash2, Triangle, Vegan } from "lucide-react";
+
 
 
 interface Menu {
@@ -18,12 +19,14 @@ interface Menu {
   isVeg: boolean | string;
   ingredients: string[];
   price: number | undefined;
+  calories:number | undefined;
 };
 
 function menu() {
   const [isVeg, setIsVeg] = useState(true);
   const [hasMenu, setHasMenu] = useState(false);
   const [menuList, setMenuList] = useState([]);
+  const [calories, setCalories] = useState();
   const [searchValue, setSearchValue] = useState('');
   const [aiLoading, setAiLoading] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -40,6 +43,7 @@ function menu() {
     isVeg: isVeg,
     ingredients: [],
     price: undefined,
+    calories: undefined
   });
 
   const base_url = import.meta.env.VITE_BASE_URL;
@@ -84,6 +88,15 @@ function menu() {
       validation: (value: string) => !value ? 'Dish price is required' : ''
     },
     {
+      id: 'calories',
+      label: 'Calories',
+      type: 'number',
+      placeholder: 'Enter Total Calories',
+      icon: Flame,
+      required: true,
+      validation: (value: string) => !value ? 'Dish price is required' : ''
+    },
+    {
       id: 'ingredients',
       label: 'Ingredients',
       type: 'text',
@@ -113,10 +126,12 @@ function menu() {
 
   const handleImageUpload = async (value: any) => {
     setAiLoading(true);
-    const aiIngredients = await imageUpload(value);
+    const aiResult = await imageUpload(value);
+    console.log('a:',aiResult)
 
-    if (aiIngredients) {
-      setSelectedIngredients(aiIngredients);
+    if (aiResult) {
+      setSelectedIngredients(aiResult.ingredients);
+      setCalories(aiResult.calories);
       setAiLoading(false);
     } else {
       toast.error('AI failed to fetch ingredients!', {
@@ -249,10 +264,13 @@ function menu() {
   }, []);
 
   useEffect(() => {
+    setCalories((menu as any).calories || '');
+  }, [menu]);
+
+  useEffect(() => {
     setMultiSelectKey(multiSelectKey + 1);
   }, [selectedIngredients]);
 
-  // clean up when dialog is closed
   useEffect(() => {
     if (!dialogOpen) {
       setMenu({
@@ -399,7 +417,7 @@ function menu() {
                                 </Label>
                                 <MultiSelect
                                   key={multiSelectKey}
-                                  className="px-10 md:py-8 h-12 w-full rounded-none bg-white"
+                                  className="px-10 md:py-6 h-12 w-full rounded-none bg-white"
                                   options={ingredientsList}
                                   defaultValue={selectedIngredients}
                                   onValueChange={setSelectedIngredients}
@@ -442,7 +460,7 @@ function menu() {
                                 </Label>
                                 <div className="relative">
                                   {field.type !== "file" && (
-                                    <field.icon className="absolute left-3 md:top-8 top-6 -translate-y-1/2 h-4 w-4 text-gray-500" />
+                                    <field.icon className="absolute left-3 md:top-6 top-6 -translate-y-1/2 h-4 w-4 text-gray-500" />
                                   )}
                                   {field.type === "file" ? (
                                     <Input
@@ -450,16 +468,16 @@ function menu() {
                                       type="file"
                                       ref={fileInputRef}
                                       onChange={(e) => handleInputChange(field.id, e.target.value)}
-                                      className="px-10 md:py-8 h-12 w-full rounded-none bg-white hover:shadow-sm"
+                                      className="px-10 md:py-6 h-12 w-full rounded-none bg-white hover:shadow-sm"
                                     />
                                   ) : (
                                     <Input
                                       id={field.id}
                                       type={field.type}
-                                      value={(menu as any)[field.id]}
+                                      value={field.id == 'calories' ? calories : (menu as any)[field.id]}
                                       placeholder={field.placeholder}
                                       onChange={(e) => handleInputChange(field.id, e.target.value)}
-                                      className="px-10 md:py-8 h-12 w-full rounded-none bg-white hover:shadow-sm"
+                                      className="px-10 md:py-6 h-12 w-full rounded-none bg-white hover:shadow-sm"
                                     />
                                   )}
                                 </div>
