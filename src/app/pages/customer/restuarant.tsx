@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react"
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea"
+import toast, { Toaster } from 'react-hot-toast';
+import { Textarea } from "@/components/ui/textarea";
 import { getRestuarantById, placeOrder } from "./customerService";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { AlertCircle, ChefHat, Circle, CircleAlert, CircleCheck, Loader2, Minus, Plus, ShoppingCart, Triangle, TriangleAlert, Utensils, UtensilsCrossed } from "lucide-react";
-import toast, { Toaster } from 'react-hot-toast';
+import { AlertCircle, Circle, CircleAlert, CircleCheck, Loader2, Minus, Plus, ShoppingCart, Triangle, TriangleAlert, Utensils, UtensilsCrossed } from "lucide-react";
 
 function restuarant() {
   const [remarks, setRemarks] = useState('');
