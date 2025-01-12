@@ -44,7 +44,15 @@ export const placeOrder = async (orderData: Object) => {
 export const getAllOrders = async () => {
     try {
         const response = await http.get(`/order`);
-        console.log('response:',response)
+        return response.data.data;
+    } catch (error: any) {
+        return error.response?.data?.message
+    }
+}
+
+export const updateOrder = async (itemId: string, item:Object) => {
+    try {
+        const response  = await http.patch(`/order/${itemId}`, item);
         return response.data.data;
     } catch (error: any) {
         return error.response?.data?.message
