@@ -473,7 +473,7 @@ const Registration = () => {
                 <Button
                   type="button"
                   onClick={handlePrevious}
-                  className=" hover:bg-orange-100 rounded-none bg-transparent border-orange-400 hover:border-swiggyOrange border-2"
+                  className="hover:bg-orange-100 rounded-none bg-transparent border-orange-400 hover:border-swiggyOrange border-2"
                 >
                   <ArrowLeft className="text-swiggyOrange" />
                 </Button>
