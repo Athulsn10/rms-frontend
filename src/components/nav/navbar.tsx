@@ -33,7 +33,7 @@ const Navbar = () => {
 
     return (
         <>
-            <nav className="bg-stone-50 shadow-sm sticky top-0 overflow-hidden">
+            <nav className="bg-stone-50 shadow-sm sticky top-0 overflow-hidden z-20">
                 <div className="mx-0 md:px-16 py-3">
                     <div className="flex items-center justify-between mx-3">
                         <div className="flex items-center gap-4 md:gap-6">
