@@ -99,4 +99,32 @@ export const getAllOrders = async () => {
     } catch (error: any) {
         return error.response?.data?.message
     }
-}
+};
+
+export const updateOrder = async (orderId: string, order: object) => {
+    try {
+        const response = await http.patch(`/order/status/${orderId}`, order);
+        return response.data.data;
+    } catch (error: any) {
+        return error.response?.data?.message
+    }
+};
+
+export const handleFetchBillPath = async (orderId:string) => {
+    try {
+        const response = await http.get(`/order/bill/${orderId}`);
+        return response.data.data ? response.data.data : false;
+    } catch (error: any) {
+        return error.response?.data?.message;
+    }
+};
+
+export const handleBillPdfDownload = async (path:string) => {
+    try {
+        const response = await http.get(`/files/orders/bill/${path}`, { responseType: 'blob'});
+        console.log('response.data:',response.data)
+        return response.data ? response.data : false;
+    } catch (error: any) {
+        return error.response?.data?.message;
+    }
+};

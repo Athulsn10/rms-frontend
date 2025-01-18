@@ -1,3 +1,4 @@
+import axios from 'axios';
 import { http } from '../../../services/http';
 
 export const getUserDetail = async () => {
@@ -9,7 +10,7 @@ export const getUserDetail = async () => {
     } catch (error: any) {
         return error.response?.data?.message
     }
-}
+};
 
 export const updateUserProfile = async (formData:any) => {
     try {
@@ -19,7 +20,7 @@ export const updateUserProfile = async (formData:any) => {
     } catch (error: any) {
         return error.response?.data?.message
     }
-}
+};
 
 export const getRestuarantById = async (id:string) => {
     try {
@@ -28,18 +29,17 @@ export const getRestuarantById = async (id:string) => {
     } catch (error: any) {
         return error.response?.data?.message
     }
-}
-
+};
 
 export const placeOrder = async (orderData: Object) => {
     try {
         const response = await http.post(`/order`,orderData);
         console.log('response:',response)
-        return response.data.data;
+        return response.data.data ? response.data.data : false;
     } catch (error: any) {
         return error.response?.data?.message
     }
-}
+};
 
 export const getAllOrders = async () => {
     try {
@@ -48,7 +48,7 @@ export const getAllOrders = async () => {
     } catch (error: any) {
         return error.response?.data?.message
     }
-}
+};
 
 export const updateOrder = async (itemId: string, item:Object) => {
     try {
@@ -57,4 +57,19 @@ export const updateOrder = async (itemId: string, item:Object) => {
     } catch (error: any) {
         return error.response?.data?.message
     }
-}
+};
+
+export const handleImageSearch = async (formData: Object) => {
+    try {
+        const url = import.meta.env.VITE_BASE_URL;
+        const token = localStorage.getItem('token');
+        const response = await axios.post(`${url}menus/image/search`, formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+                ...(token && { 'Authorization': `Bearer ${token}` })
+            }});
+        return response.data.data ?  response.data.data : false;
+    } catch (error) {
+        return false;
+    }
+};
