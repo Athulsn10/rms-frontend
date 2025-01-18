@@ -236,6 +236,7 @@ function menu() {
         isVeg: selectedItem.type === 'VEGETARIAN' ? true : false,
         ingredients: selectedItem.ingredients,
         price: selectedItem.price,
+        calories: selectedItem.calories
       });
     }
     setIsVeg(selectedItem.type === 'VEGETARIAN' ? true : false);
@@ -257,7 +258,7 @@ function menu() {
   const handleSearch = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     console.log('searchValue', searchValue)
-  }
+  };
 
   useEffect(() => {
     fetchMenus();
@@ -279,6 +280,7 @@ function menu() {
         isVeg: isVeg,
         ingredients: [],
         price: undefined,
+        calories: undefined
       });
       setSelectedIngredients([]);
     }
