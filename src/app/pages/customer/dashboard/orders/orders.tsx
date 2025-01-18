@@ -238,7 +238,7 @@ function Orders() {
                                         <div key={item.menuId._id} className="flex items-center justify-between p-2 border rounded">
                                             <div>
                                                 <p className="font-medium">{item.menuId.name}</p>
-                                                <p className="text-sm text-gray-600">${item.menuId.price} each</p>
+                                                <p className="text-sm text-gray-600">₹{item.menuId.price} each</p>
                                             </div>
 
                                             <div className="flex items-center gap-2">
