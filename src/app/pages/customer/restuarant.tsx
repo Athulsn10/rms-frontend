@@ -1,19 +1,25 @@
 import { useEffect, useState } from "react"
+import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import toast, { Toaster } from 'react-hot-toast';
 import { Textarea } from "@/components/ui/textarea";
-import { getRestuarantById, placeOrder } from "./customerService";
+import { getRestuarantById, placeOrder, handleImageSearch } from "./customerService";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { AlertCircle, Circle, CircleAlert, CircleCheck, Loader2, Minus, Plus, ShoppingCart, Triangle, TriangleAlert, Utensils, UtensilsCrossed } from "lucide-react";
+import { AlertCircle, Circle, CircleAlert, CircleCheck, Upload , Loader2, Minus, Plus, Search, ShoppingCart, Triangle, TriangleAlert, Utensils, UtensilsCrossed } from "lucide-react";
 
 function restuarant() {
   const [remarks, setRemarks] = useState('');
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [preview, setPreview] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [result, setResult] = useState<any>(null);
   const [menuList, setMenuList] = useState([]);
   const [hasMenu, setHasMenu] = useState(false);
   const [totalAmount, setTotalAmount] = useState(0);
+  const [dialogOpen, setDialogOpen] = useState(false);
   const [cartItems, setCartItems] = useState<any>([]);
   const [fetchingData, setFetchingData] = useState(false);
   const [isEditModalOpen, setIsRemarksModalOpen] = useState(false);
@@ -33,7 +39,7 @@ function restuarant() {
         setFetchingData(false);
       }
     }
-  }
+  };
 
   const formatIngredients = (ingredients: string[]) => {
     return ingredients.map((ingredient: string) =>
@@ -42,6 +48,7 @@ function restuarant() {
       ).join(' ')
     ).join(', ');
   };
+
   const updateQuantity = (item: any, delta: number) => {
     const menuId = item._id;
     setCartItems((prev: any) => {
@@ -73,7 +80,6 @@ function restuarant() {
     });
   };
 
-
   const handlePlaceOrder = async () => {
     const resturant = localStorage.getItem('restaurantOrder');
     if (resturant) {
@@ -81,6 +87,7 @@ function restuarant() {
       const restaurantId = parsedRestuarant.restaurantId;
       const tableName = parsedRestuarant.tableName;
       const orderObject = {
+        isPaid: false,
         restaurantId: String(restaurantId),
         order: cartItems,
         totalAmount: String(totalAmount),
@@ -98,7 +105,7 @@ function restuarant() {
       } else {
         setIsRemarksModalOpen(false);
         toast.error('Order not palced due a error!', {
-          icon: <CircleAlert color="#1ce867" />,
+          icon: <CircleAlert color="#fc3419" />,
         });
       }
     }
@@ -107,6 +114,45 @@ function restuarant() {
   const getQuantity = (menuId: string) => {
     const item = cartItems.find((item: any) => item.menuId === menuId);
     return item ? item.quantity : 0;
+  };
+
+  const handleFileSelect = (e:any) => {
+    const file = e.target.files[0];
+    if (file) {
+      setSelectedFile(file);
+      const reader:any = new FileReader();
+      reader.onloadend = () => {
+        setPreview(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleSubmit = async () => {
+    setIsLoading(true);
+    const resturant = localStorage.getItem('restaurantOrder');
+    if (!resturant || !selectedFile) {
+      toast.error('Something went wrong!', {
+        icon: <CircleAlert color="#fc3419" />,
+      });
+      setIsLoading(false);
+      return;
+    }
+    const parsedRestuarant = JSON.parse(resturant);
+    const restaurantId = parsedRestuarant.restaurantId;
+    const formData = new FormData();
+    formData.append('restaurantId', restaurantId);
+    formData.append('image', selectedFile);
+    const response = await handleImageSearch(formData);
+    if (response) {
+      setResult(response[0]);
+      setIsLoading(false);
+    } else {
+      toast.error('Something went wrong!', {
+        icon: <CircleAlert color="#fc3419" />,
+      });
+      setIsLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -146,7 +192,129 @@ function restuarant() {
                 </div>
               </>) :
               (<>
-                <div className="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-4 gap-6 p-6">
+                <div className="w-100 flex justify-center bg-orange-100 ">
+                      <div className="flex flex-col p-4 md:flex-row items-center justify-between gap-4 md:gap-16 w-full max-w-7xl">
+                        <Button className="flex items-center bg-orange-200 rounded-none w-100 md:w-50 hover:bg-orange-200 px-5 py-5" onClick={() => setDialogOpen(true)}>
+                          <Search size={28} className="text-orange-500" />
+                          <p className="font-bold text-orange-500 text-xl">Search Image</p>
+                        </Button>
+
+                        <div className="flex items-center w-full md:w-auto justify-center">
+                          <div className="relative w-full md:w-[700px]">
+                            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
+                            <Input  className="font-medium w-full py-5 rounded-none" placeholder="Search Menu Item" />
+                          </div>
+                          <Button  className="flex ml-2 md:ml-4 items-center bg-orange-200 rounded-none hover:bg-orange-200 px-5 py-5">
+                            <Search size={28} className="text-orange-500" />
+                            <p className="font-bold text-orange-500 text-xl hidden md:inline">Search</p>
+                          </Button>
+                        </div>
+                      </div>
+                      <Dialog open={dialogOpen} onOpenChange={() => setDialogOpen(false)}>
+                      <DialogContent>
+                        <DialogHeader>
+                          <DialogTitle>Upload A Food Image</DialogTitle>
+                        </DialogHeader>
+                        {isLoading && (
+                          <div className="absolute inset-0 flex items-center justify-center z-20">
+                            <div className="inline-block transition-all duration-300">
+                              <img style={{ height: '60px' }} src="/ai-loading-2.gif"/>
+                            </div>
+                          </div>
+                        )}
+                        <div className={`${isLoading ? 'blur-sm pointer-events-none space-y-6' : 'space-y-6'}`}>
+                          {/* Upload Section */}
+                          <div className="flex flex-col items-center gap-4">
+                            <div className="w-full max-w-md aspect-video bg-slate-100 rounded-none border-2 border-dashed border-orange-300 hover:border-orange-400 transition-colors relative overflow-hidden">
+                              {preview ? (
+                                <img
+                                  src={preview}
+                                  alt="Preview"
+                                  className="w-full h-full object-cover"
+                                />
+                              ) : (
+                                <div className="absolute inset-0 flex flex-col items-center justify-center text-slate-500">
+                                  <Upload size={32} />
+                                  <p className="mt-2 text-sm">Click or drag image to upload</p>
+                                </div>
+                              )}
+                              <input
+                                type="file"
+                                accept="image/*"
+                                onChange={handleFileSelect}
+                                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                              />
+                            </div>
+                            
+                            <Button 
+                              onClick={handleSubmit} 
+                              disabled={!selectedFile || isLoading}
+                              className="w-full max-w-md rounded-none bg-orange-600 hover:bg-orange-500"
+                            >Analyze Image
+                            </Button>
+                          </div>
+
+                          {/* Results Section */}
+                          {result && (
+                            <div className="overflow-hidden">
+                              <div className="p-6 space-y-4">
+                                <div className="flex items-center justify-between">
+                                  <h3 className="text-xl font-semibold">{result.name}</h3>
+                                  <div className={`${result.type === "VEGETARIAN" ? "bg-green-600 text-white hover:bg-green-600 p-2 rounded-sm" : "bg-red-600 hover:bg-red-600 text-white p-2 rounded-sm"}`}>
+                                   {result.type === "VEGETARIAN" ? <Circle /> : <Triangle />}
+                                  </div>
+                                </div>
+                                
+                                <div className="flex items-center gap-2 text-sm text-slate-600">
+                                  <Badge variant="outline" className={`${result.status === 'AVAILABLE' ? "bg-green-200" : "bg-red-200"} `}>
+                                    {result.status}
+                                  </Badge>
+                                  <span className="font-medium text-lg">₹{result.price}</span>
+                                </div>
+
+                                <div className="space-y-2">
+                                  <h4 className="font-medium text-slate-700">Ingredients:</h4>
+                                  <div className="flex flex-wrap gap-2">
+                                    {result.ingredients.map((ingredient:any, idx:number) => (
+                                      <span 
+                                        key={idx}
+                                        className="px-3 py-1 rounded-full text-sm bg-slate-100 text-slate-700"
+                                      >
+                                        {ingredient}
+                                      </span>
+                                    ))}
+                                  </div>
+                                </div>
+                                <div className="flex items-center gap-3 justify-end">
+                                <Button
+                                  variant="outline"
+                                  size="icon"
+                                  className="h-8 w-8 bg-orange-100 rounded-none hover:bg-orange-200"
+                                  onClick={() => updateQuantity(result, -1)}
+                                  disabled={!getQuantity(result._id)}
+                                >
+                                  <Minus className="h-4 w-4" />
+                                </Button>
+                                <span className="w-8 text-center font-medium">
+                                  {getQuantity(result._id)}
+                                </span>
+                                <Button
+                                  variant="outline"
+                                  size="icon"
+                                  className="h-8 w-8 bg-orange-100 rounded-none hover:bg-orange-200"
+                                  onClick={() => updateQuantity(result, 1)}
+                                >
+                                  <Plus className="h-4 w-4" />
+                                </Button>
+                        </div>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      </DialogContent>
+                    </Dialog>
+                </div>
+                <div className={`grid grid-cols-1 md:grid-cols-4 lg:grid-cols-4 gap-6 p-6 ${cartItems.length > 0 ? 'mb-16' : ''}`}>
                   {menuList.map((item: any) => (
                     <Card key={item._id} className="w-full">
                       <div className="relative h-48 w-full overflow-hidden">
@@ -195,7 +363,7 @@ function restuarant() {
                         </div>
                       </CardContent>
                       <CardFooter className="flex justify-between items-center">
-                        <Badge variant="outline" className="mr-2">
+                        <Badge variant="outline" className={`${item.status === 'AVAILABLE' ? "bg-green-200" : "bg-red-200"} `}>
                           {item.status}
                         </Badge>
                         <div className="flex items-center gap-3">
@@ -225,8 +393,8 @@ function restuarant() {
                   ))}
                 </div>
                 {cartItems.length > 0 && (
-                  <div className="fixed bottom-0 left-0 right-0 bg-white border-t shadow-lg p-4 flex justify-between items-center">
-                    <div className="flex items-center gap-4">
+                  <div className="fixed bottom-16 md:bottom-0 left-0 right-0 bg-white border-t shadow-lg p-3 sm:p-4 flex flex-col sm:flex-row justify-between items-center sm:bottom-10 space-y-3 sm:space-y-0">
+                    <div className="flex items-center gap-4 w-full sm:w-auto justify-center sm:justify-start">
                       <div className="flex items-center gap-2">
                         <ShoppingCart className="w-5 h-5 text-gray-600" />
                         <span className="font-medium">
@@ -237,18 +405,18 @@ function restuarant() {
                         ₹{totalAmount.toFixed(2)}
                       </div>
                     </div>
-                    <div className="flex gap-5">
+                    <div className="flex gap-2 sm:gap-5 w-full sm:w-auto">
                       <Button
                         onClick={() => setCartItems([])}
-                        className="bg-transparent border-orange-400 hover:border-orange-500 text-orange-400 px-8 py-3 rounded-none border-2 hover:bg-orange-100"
+                        className="flex-1 sm:flex-none bg-transparent border-orange-400 hover:border-orange-500 text-orange-400 px-4 sm:px-8 py-2 sm:py-3 rounded-none border-2 hover:bg-orange-100 text-sm sm:text-base"
                       >
-                        Reset <UtensilsCrossed color="#ea580c" />
+                        Reset <UtensilsCrossed color="#ea580c" className="ml-2" />
                       </Button>
                       <Button
                         onClick={() => setIsRemarksModalOpen(true)}
-                        className="bg-orange-600 hover:bg-orange-700 text-white px-8 py-3 rounded-none"
+                        className="flex-1 sm:flex-none bg-orange-600 hover:bg-orange-700 text-white px-4 sm:px-8 py-2 sm:py-3 rounded-none text-sm sm:text-base"
                       >
-                        Continue <Utensils color="#ffff" />
+                        Continue <Utensils color="#ffff" className="ml-2" />
                       </Button>
                     </div>
                   </div>
