@@ -1,4 +1,8 @@
-import React from "react";
+import { Button } from "@/components/ui/button";
+import { CircleAlert, Download, Loader2 } from "lucide-react";
+import React, { useState } from "react";
+import { handleBillPdfDownload, handleFetchBillPath } from "./restuarantService";
+import toast, { Toaster } from "react-hot-toast";
 
 interface MenuItem {
   _id: string;
@@ -15,6 +19,7 @@ interface OrderItem {
 
 interface OrderProps {
   order: {
+    _id: string;
     order: OrderItem[];
     totalAmount: number;
     remarks?: string;
@@ -22,6 +27,44 @@ interface OrderProps {
 }
 
 const OrderModal: React.FC<OrderProps> = ({ order }) => {
+
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleBillDownload = async (orderId: string) => {
+      setIsLoading(true);
+      const billPdfPath = await handleFetchBillPath(orderId);
+      if (!billPdfPath?.billPath) {
+        setIsLoading(false);
+        toast.success('Bill Generation Failed', {
+          icon: <CircleAlert color="#fc3419"/>,
+        });
+        return;
+      }
+
+      const response = await handleBillPdfDownload(billPdfPath.billPath);
+      console.log('billPdfPath.billPath:',response)
+      if (!response) {
+        toast.success('Bill Generation Failed', {
+          icon: <CircleAlert color="#fc3419"/>,
+        });
+        setIsLoading(false);
+        return;
+      }
+      const pdfBlob = new Blob([response], { type: "application/pdf"});
+      const url = window.URL.createObjectURL(pdfBlob);
+      const tempLink = document.createElement("a");
+      tempLink.href = url;
+      tempLink.setAttribute(
+        "download",
+        `bill_${order._id}.pdf`
+      );
+      document.body.appendChild(tempLink);
+      tempLink.click();
+      document.body.removeChild(tempLink);
+      window.URL.revokeObjectURL(url);
+      setIsLoading(false);
+  };
+
   return (
     <div className="space-y-6">
       <div className="overflow-x-auto">
@@ -56,21 +99,33 @@ const OrderModal: React.FC<OrderProps> = ({ order }) => {
                 Total Amount
               </td>
               <td colSpan={2} className="px-4 py-3 text-sm font-bold text-right">
-                ₹{order.totalAmount}
+                ₹{order.totalAmount} 
               </td>
             </tr>
           </tbody>
         </table>
+        <div className="flex justify-end mt-3">
+          <Button onClick={()=> handleBillDownload(order._id)} className="rounded-none w-full bg-orange-600 hover:bg-orange-400">
+            {
+              isLoading ? (
+                <Loader2 className="animate-spin" />
+              ) : (
+                <>Download Bill <Download /></>
+              )
+            }
+          </Button>
+        </div>
       </div>
 
       {order.remarks && (
-        <div className="border-t pt-4 w-full">
+        <div className="border-t w-full">
           <p className="text-sm text-gray-600 w-full md:w-[900px] break-words">
             <span className="font-medium">Note: </span>
             <span className="italic">{order.remarks}</span>
           </p>
         </div>
       )}
+      <Toaster/>
     </div>
   );
 };

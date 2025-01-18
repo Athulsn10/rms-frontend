@@ -2,8 +2,9 @@ import { useEffect } from "react";
 import { useState } from 'react';
 import OrderModal from "./orderModal";
 import { Button } from "@/components/ui/button";
-import { Clock, Edit2, Eye } from 'lucide-react';
-import { getAllOrders } from "./restuarantService";
+import { CircleAlert, CircleCheck, Clock, Edit2, Eye } from 'lucide-react';
+import toast, { Toaster } from 'react-hot-toast';
+import { getAllOrders, updateOrder } from "./restuarantService";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -11,7 +12,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 
 function Orders() {
   const [orders, setOrder] = useState<any>([]);
-  const [selectedOrder, setSelectedOrder] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [dialogOpen, setDialogOpen] = useState<string | null>(null);
+  const [selectedStatus, setSelectedStatus] = useState<string>("");
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -25,7 +28,7 @@ function Orders() {
   const statusColors: any = {
     Ordered: 'bg-yellow-100 text-yellow-800',
     Preparing: 'bg-blue-100 text-blue-800',
-    Completed: 'bg-green-100 text-green-800',
+    Delivered: 'bg-green-100 text-green-800',
     Cancelled: 'bg-red-100 text-red-800'
   };
 
@@ -34,7 +37,35 @@ function Orders() {
     if (response) {
       setOrder(response.reverse());
     }
-  }
+  };
+
+  const handleStatusUpdate = async (order:any , status:string) => {
+    setIsLoading(true);
+    const editedOrder = { "status": status };
+    const response = await updateOrder(order._id, editedOrder);
+    if (response) {
+      fetchOrders();
+      setDialogOpen(null);
+      toast.success('Order Status Updated', {
+        icon: <CircleCheck color="#1ce867"/>,
+      });
+    } else {
+      setDialogOpen(null);
+      toast.success('A Error Occured!', {
+        icon: <CircleAlert color="#fc3419"/>,
+      });
+    }
+  };
+
+  const handleDialogChange = (open:boolean, order:any) => {
+    if (open) {
+      setDialogOpen(order._id);
+      setSelectedStatus(order.status);
+    } else {
+      setDialogOpen(null);
+    }
+  };
+
   useEffect(() => {
     fetchOrders();
   }, [])
@@ -65,8 +96,8 @@ function Orders() {
                   {/* view */}
                   <Dialog >
                     <DialogTrigger>
-                      <Button className="hover:bg-orange-100 rounded-none bg-transparent border-orange-400 hover:border-swiggyOrange border-2 text-swiggyOrange">
-                        <Eye className="h-4 w-4" />Open
+                      <Button disabled={order.status === 'Cancelled'} className="hover:bg-orange-100 rounded-none bg-transparent border-orange-400 hover:border-swiggyOrange border-2 text-swiggyOrange">
+                        <Eye className="h-4 w-4" />View Order
                       </Button>
                     </DialogTrigger>
                     <DialogContent>
@@ -77,9 +108,9 @@ function Orders() {
                     </DialogContent>
                   </Dialog>
                   {/* Edit */}
-                  <Dialog>
+                  <Dialog open={dialogOpen === order._id} onOpenChange={(open) => {handleDialogChange(open, order)}}>
                     <DialogTrigger>
-                      <Button className="flex-1 gap-2 rounded-none bg-orange-600 hover:bg-orange-700">
+                      <Button disabled={order.status === 'Cancelled'} className="flex-1 gap-2 rounded-none bg-orange-600 hover:bg-orange-700">
                         <Edit2 className="w-4 h-4"/> Edit Status
                       </Button>
                     </DialogTrigger>
@@ -88,14 +119,15 @@ function Orders() {
                         <DialogTitle>Update Order Status</DialogTitle>
                       </DialogHeader>
                       <div className="py-4">
-                        <Select defaultValue={order.status}>
+                        <Select value={order.status} onValueChange={(value) => handleStatusUpdate(order, value)}>
                           <SelectTrigger className="w-full">
                             <SelectValue placeholder="Select status" />
                           </SelectTrigger>
                           <SelectContent>
                             <SelectItem value="Ordered">Ordered</SelectItem>
                             <SelectItem value="Preparing">Preparing</SelectItem>
-                            <SelectItem value="Completed">Completed</SelectItem>
+                            {/* <SelectItem value="Completed">Completed</SelectItem> */}
+                            <SelectItem value="Delivered">Delivered</SelectItem>
                             <SelectItem value="Cancelled">Cancelled</SelectItem>
                           </SelectContent>
                         </Select>
@@ -106,11 +138,13 @@ function Orders() {
               </div>
             </div>
           </CardContent>
-          <CardFooter className="border-t bg-orange-50">
+          <CardFooter className="bg-orange-50">
             <div className="w-full mt-4">
-              {order.remarks && (
-                <p className="text-sm text-gray-600 italic">Note: {order.remarks.slice(-35)} <span>{order.remarks.length > 35 && "..."}</span></p>
-              )}
+             <p className="h-8">
+                {order.remarks && (
+                  <p className="text-sm text-gray-600 italic">Note: {order.remarks.slice(-35)} <span>{order.remarks.length > 35 && "..."}</span></p>
+                )}
+             </p>
               <div className="flex justify-between items-center mt-2">
                 <span className="text-sm font-medium">Total</span>
                 <span className="text-lg font-semibold">₹{order.totalAmount}</span>
@@ -119,6 +153,7 @@ function Orders() {
           </CardFooter>
         </Card>
       ))}
+      <Toaster />
     </div>
   )
 }
