@@ -124,9 +124,9 @@ function Orders() {
 
     const getStatusColor = (status: OrderStatus) => {
         switch (status) {
-            case 'Cancelled': return 'bg-red-100 text-red-800';
-            case 'Ordered': return 'bg-green-100 text-green-800';
-            default: return 'bg-gray-100 text-gray-800';
+            case 'Cancelled': return 'bg-red-100 hover:bg-red-100 text-red-800';
+            case 'Ordered': return 'bg-green-100 hover:bg-green-100 text-green-800';
+            default: return 'bg-gray-100 hover:bg-gray-100 text-gray-800';
         }
     };
 

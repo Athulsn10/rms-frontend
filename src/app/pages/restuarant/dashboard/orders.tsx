@@ -95,8 +95,8 @@ function Orders() {
                 <div className="flex space-x-5">
                   {/* view */}
                   <Dialog >
-                    <DialogTrigger>
-                      <Button disabled={order.status === 'Cancelled'} className="hover:bg-orange-100 rounded-none bg-transparent border-orange-400 hover:border-swiggyOrange border-2 text-swiggyOrange">
+                    <DialogTrigger asChild>
+                      <Button disabled={order.status === 'Cancelled'} className="hover:bg-orange-100 rounded-none bg-transparent border-orange-400 hover:border-swiggyOrange border-2 text-swiggyOrange disabled:pointer-events-none">
                         <Eye className="h-4 w-4" />View Order
                       </Button>
                     </DialogTrigger>
@@ -109,8 +109,8 @@ function Orders() {
                   </Dialog>
                   {/* Edit */}
                   <Dialog open={dialogOpen === order._id} onOpenChange={(open) => {handleDialogChange(open, order)}}>
-                    <DialogTrigger>
-                      <Button disabled={order.status === 'Cancelled'} className="flex-1 gap-2 rounded-none bg-orange-600 hover:bg-orange-700">
+                    <DialogTrigger asChild>
+                      <Button disabled={order.status === 'Cancelled'} className="flex-1 gap-2 rounded-none bg-orange-600 hover:bg-orange-700 disabled:pointer-events-none">
                         <Edit2 className="w-4 h-4"/> Edit Status
                       </Button>
                     </DialogTrigger>
