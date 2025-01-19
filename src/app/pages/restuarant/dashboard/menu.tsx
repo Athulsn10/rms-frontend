@@ -94,7 +94,7 @@ function menu() {
       placeholder: 'Enter Total Calories',
       icon: Flame,
       required: true,
-      validation: (value: string) => !value ? 'Dish price is required' : ''
+      validation: (value: string) => !value ? 'Dish Calories is required' : ''
     },
     {
       id: 'ingredients',

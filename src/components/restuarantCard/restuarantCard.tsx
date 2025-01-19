@@ -1,4 +1,6 @@
+import { CircleAlert } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import toast, { Toaster } from 'react-hot-toast';
 
 
 interface cardProps {
@@ -12,8 +14,20 @@ interface cardProps {
 const RestaurantCard: React.FC<cardProps> = ({ title, rating, category, area, imgUrl }) => {
     const navigate = useNavigate();
 
+    const handleNavigate = (e: React.MouseEvent<HTMLDivElement>) => {
+        e.preventDefault();
+        const user = localStorage.getItem('user');
+        if (user) {
+            navigate(`/qrscanner`)
+        } else {
+            toast.error('Login To Continue!', {
+                icon: <CircleAlert color="#fc3419" />,
+            });
+        }
+    }
+
     return (
-        <div onClick={() => navigate(`/qrscanner`)} style={{ width: 'fit-content' }} className="ms-5 me-3 overflow-hidden rounded-lg hover:cursor-pointer">
+        <div onClick={handleNavigate} style={{ width: 'fit-content' }} className="ms-5 me-3 overflow-hidden rounded-lg hover:cursor-pointer">
             <div className="overflow-hidden rounded-3xl">
                 <div className="h-[200px] w-[270px] rounded-lg">
                     <img src={imgUrl} alt="Restaurant" className="object-cover rounded-lg"/>
@@ -37,6 +51,7 @@ const RestaurantCard: React.FC<cardProps> = ({ title, rating, category, area, im
                 <p className="text-sm text-gray-600">{category}</p>
                 <p className="text-sm text-gray-600">{area}</p>
             </div>
+            <Toaster/>
         </div>
     );
 };
