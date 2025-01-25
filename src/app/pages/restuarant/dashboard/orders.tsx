@@ -4,7 +4,7 @@ import OrderModal from "./orderModal";
 import { Button } from "@/components/ui/button";
 import { CircleAlert, CircleCheck, Clock, Edit2, Eye } from 'lucide-react';
 import toast, { Toaster } from 'react-hot-toast';
-import { getAllOrders, updateOrder } from "./restuarantService";
+import { getAllOrders, orderPaymentStatus, updateOrder } from "./restuarantService";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -36,6 +36,7 @@ function Orders() {
     const response = await getAllOrders();
     if (response) {
       setOrder(response.reverse());
+      console.log('response:',response)
     }
   };
 
@@ -46,11 +47,33 @@ function Orders() {
     if (response) {
       fetchOrders();
       setDialogOpen(null);
+      setIsLoading(false);
       toast.success('Order Status Updated', {
         icon: <CircleCheck color="#1ce867"/>,
       });
     } else {
       setDialogOpen(null);
+      setIsLoading(false);
+      toast.success('A Error Occured!', {
+        icon: <CircleAlert color="#fc3419"/>,
+      });
+    }
+  };
+
+  const handlePaymentStatus = async (order:any , status:boolean) => {
+    setIsLoading(true);
+    const editedOrder = { "isPaid": status };
+    const response = await orderPaymentStatus(order._id, editedOrder);
+    if (response) {
+      fetchOrders();
+      setDialogOpen(null);
+      setIsLoading(false);
+      toast.success('Order Payment Status Updated', {
+        icon: <CircleCheck color="#1ce867"/>,
+      });
+    } else {
+      setDialogOpen(null);
+      setIsLoading(false);
       toast.success('A Error Occured!', {
         icon: <CircleAlert color="#fc3419"/>,
       });
@@ -82,6 +105,9 @@ function Orders() {
                     <span className="text-lg font-medium">Table {order.tableNumber}</span>
                     <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${statusColors[order.status]}`}>
                       {order.status}
+                    </span>
+                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${order.isPaid ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"} `}>
+                      {order.isPaid ? "Paid" : "Not Paid"}
                     </span>
                   </div>
                   <div className="flex items-center space-x-1 text-sm text-gray-500 mt-1">
@@ -119,18 +145,29 @@ function Orders() {
                         <DialogTitle>Update Order Status</DialogTitle>
                       </DialogHeader>
                       <div className="py-4">
-                        <Select value={order.status} onValueChange={(value) => handleStatusUpdate(order, value)}>
-                          <SelectTrigger className="w-full">
-                            <SelectValue placeholder="Select status" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="Ordered">Ordered</SelectItem>
-                            <SelectItem value="Preparing">Preparing</SelectItem>
-                            {/* <SelectItem value="Completed">Completed</SelectItem> */}
-                            <SelectItem value="Delivered">Delivered</SelectItem>
-                            <SelectItem value="Cancelled">Cancelled</SelectItem>
-                          </SelectContent>
-                        </Select>
+                        <div className="grid grid-cols-1 md:grid-cols-2">
+                          <Select value={order.status} onValueChange={(value) => handleStatusUpdate(order, value)}>
+                            <SelectTrigger className="w-full">
+                              <SelectValue placeholder="Select status" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="Ordered">Ordered</SelectItem>
+                              <SelectItem value="Preparing">Preparing</SelectItem>
+                              {/* <SelectItem value="Completed">Completed</SelectItem> */}
+                              <SelectItem value="Delivered">Delivered</SelectItem>
+                              <SelectItem value="Cancelled">Cancelled</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <Select value={order.isPaid.toString()} onValueChange={(value) => handlePaymentStatus(order, value === "true")}>
+                            <SelectTrigger className="w-full">
+                              <SelectValue placeholder="Select status" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="true">Paid</SelectItem>
+                              <SelectItem value="false">Not Paid</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
                       </div>
                     </DialogContent>
                   </Dialog>

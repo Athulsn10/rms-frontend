@@ -110,6 +110,15 @@ export const updateOrder = async (orderId: string, order: object) => {
     }
 };
 
+export const orderPaymentStatus = async (orderId: string, order: object) => {
+    try {
+        const response = await http.patch(`/order/payment/${orderId}`, order);
+        return response.data.data;
+    } catch (error: any) {
+        return error.response?.data?.message
+    }
+};
+
 export const handleFetchBillPath = async (orderId:string) => {
     try {
         const response = await http.get(`/order/bill/${orderId}`);
