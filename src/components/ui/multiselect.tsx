@@ -173,7 +173,7 @@ export const MultiSelect = React.forwardRef<HTMLButtonElement, MultiSelectProps>
         onOpenChange={setIsPopoverOpen}
         modal={modalPopover}
       >
-        <div className="flex justify-between items-center w-full h-5">
+        <div className="flex justify-between items-center w-full h-5 pointer-events-auto">
           <div className="flex flex-wrap items-center md:max-h-none max-h-5 mb-2">
             {selectedValues.slice(0, maxCount).map((value) => {
               const option = allOptions.find((o) => o.value === value);
@@ -240,7 +240,7 @@ export const MultiSelect = React.forwardRef<HTMLButtonElement, MultiSelectProps>
               className
             )}
           >
-            <div className="flex items-center justify-between w-full mx-auto">
+            <div className="flex items-center justify-between w-full mx-auto pointer-events-auto">
               <span className="text-sm text-muted-foreground mx-3">
                 {placeholder}
               </span>
@@ -249,11 +249,11 @@ export const MultiSelect = React.forwardRef<HTMLButtonElement, MultiSelectProps>
           </Button>
         </PopoverTrigger>
         <PopoverContent
-          className="w-auto p-0"
+          className="w-auto p-0 pointer-events-auto"
           align="start"
           onEscapeKeyDown={() => setIsPopoverOpen(false)}
         >
-          <Command>
+          <Command className="relative z-50">
             <CommandInput
               placeholder={allowCustomItems ? "Search or enter new item..." : "Search..."}
               onKeyDown={handleInputKeyDown}
@@ -277,7 +277,7 @@ export const MultiSelect = React.forwardRef<HTMLButtonElement, MultiSelectProps>
                     >
                       <div
                         className={cn(
-                          "mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-primary",
+                          "mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-primary pointer-events-auto",
                           isSelected
                             ? "bg-primary text-primary-foreground"
                             : "opacity-50 [&_svg]:invisible"
@@ -298,7 +298,7 @@ export const MultiSelect = React.forwardRef<HTMLButtonElement, MultiSelectProps>
           {animation > 0 && selectedValues.length > 0 && (
             <WandSparkles
               className={cn(
-                "cursor-pointer text-foreground bg-background w-3 h-3",
+                "cursor-pointer text-foreground bg-background w-3 h-3 pointer-events-auto",
                 isAnimating ? "" : "text-muted-foreground"
               )}
               onClick={() => setIsAnimating(!isAnimating)}
