@@ -8,7 +8,7 @@ import { useRef, useState, useEffect } from "react";
 import { MultiSelect } from "@/components/ui/multiselect";
 import { Card, CardContent } from "@/components/ui/card";
 import { createMenu, deleteMenu, editMenu, getMenus, imageUpload } from './restuarantService';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Circle, CircleAlert, CircleCheck, CircleX, Flame, ImageIcon, IndianRupee, Loader2, Pencil, Plus, Search, ShoppingBasket, Soup, Trash2, Triangle, Vegan, X } from "lucide-react";
 
 
