@@ -9,7 +9,7 @@ import { MultiSelect } from "@/components/ui/multiselect";
 import { Card, CardContent } from "@/components/ui/card";
 import { createMenu, deleteMenu, editMenu, getMenus, imageUpload } from './restuarantService';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Circle, CircleAlert, CircleCheck, CircleX, Flame, IndianRupee, Loader2, Pencil, Plus, Search, ShoppingBasket, Soup, Trash2, Triangle, Vegan } from "lucide-react";
+import { Circle, CircleAlert, CircleCheck, CircleX, Flame, ImageIcon, IndianRupee, Loader2, Pencil, Plus, Search, ShoppingBasket, Soup, Trash2, Triangle, Vegan, X } from "lucide-react";
 
 
 
@@ -19,14 +19,14 @@ interface Menu {
   isVeg: boolean | string;
   ingredients: string[];
   price: number | undefined;
-  calories:number | undefined;
+  calories: number | undefined;
 };
 
 function menu() {
   const [isVeg, setIsVeg] = useState(true);
   const [hasMenu, setHasMenu] = useState(false);
-  const [menuList, setMenuList] = useState([]);
-  const [calories, setCalories] = useState();
+  const [menuList, setMenuList] = useState<any[]>([]);
+  const [calories, setCalories] = useState<number | undefined>(undefined);
   const [searchValue, setSearchValue] = useState('');
   const [aiLoading, setAiLoading] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -37,10 +37,11 @@ function menu() {
   const [fetchingData, setFetchingData] = useState(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [selectedIngredients, setSelectedIngredients] = useState<string[]>([]);
+  const [preview, setPreview] = useState<any>();
   const [menu, setMenu] = useState<Menu>({
     dishName: '',
     image: null,
-    isVeg: isVeg,
+    isVeg: true,
     ingredients: [],
     price: undefined,
     calories: undefined
@@ -55,28 +56,10 @@ function menu() {
       id: 'dishName',
       label: 'Item Name',
       type: 'text',
-      placeholder: 'Mutton Soup',
+      placeholder: 'Enter Dish Name',
       icon: Soup,
       required: true,
       validation: (value: string) => !value ? 'Dish name is required' : ''
-    },
-    {
-      id: 'image',
-      label: 'image',
-      type: 'file',
-      placeholder: 'Upload item image',
-      icon: 'none',
-      required: true,
-      validation: (value: string) => !value ? 'image is required' : ''
-    },
-    {
-      id: 'isVeg',
-      label: 'Veg or Non Veg',
-      type: 'toggle',
-      placeholder: 'Mutton Soup',
-      icon: Vegan,
-      required: true,
-      validation: (value: string) => !value ? 'Dish category is required' : ''
     },
     {
       id: 'price',
@@ -86,6 +69,24 @@ function menu() {
       icon: IndianRupee,
       required: true,
       validation: (value: string) => !value ? 'Dish price is required' : ''
+    },
+    {
+      id: 'image',
+      label: 'Image',
+      type: 'file',
+      placeholder: 'Upload item image',
+      icon: 'none',
+      required: !isEditMode,
+      validation: (value: string) => !value && !isEditMode ? 'Image is required' : ''
+    },
+    {
+      id: 'isVeg',
+      label: 'Veg or Non Veg',
+      type: 'toggle',
+      placeholder: 'Mutton Soup',
+      icon: Vegan,
+      required: true,
+      validation: () => ''
     },
     {
       id: 'calories',
@@ -111,8 +112,8 @@ function menu() {
     const newErrors = {} as Record<string, string>;
     let isValid = true;
     formFields.forEach(field => {
-      const value = (menu as any)[field.id];
-      const error = field.validation(value);
+      const value = field.id === 'calories' ? calories : (menu as any)[field.id];
+      const error = field.validation(value?.toString() || '');
 
       if (error) {
         newErrors[field.id] = error;
@@ -124,35 +125,54 @@ function menu() {
     return isValid;
   };
 
-  const handleImageUpload = async (value: any) => {
+  const handleImageUpload = async (value: File) => {
     setAiLoading(true);
-    const aiResult = await imageUpload(value);
-    console.log('a:',aiResult)
-
-    if (aiResult) {
-      setSelectedIngredients(aiResult.ingredients);
-      setCalories(aiResult.calories);
-      setAiLoading(false);
-    } else {
-      toast.error('AI failed to fetch ingredients!', {
+    try {
+      const aiResult = await imageUpload(value);
+      if (aiResult) {
+        setSelectedIngredients(aiResult.ingredients);
+        setCalories(aiResult.calories);
+        setMenu(prev => ({
+          ...prev,
+          calories: aiResult.calories,
+          ingredients: aiResult.ingredients
+        }));
+      } else {
+        toast.error('AI failed to fetch ingredients!', {
+          icon: <CircleX color="#fc3419" />,
+        });
+      }
+    } catch (error) {
+      toast.error('Error uploading image', {
         icon: <CircleX color="#fc3419" />,
       });
+    } finally {
       setAiLoading(false);
+    }
+  };
+
+  const handleFileChange = async (e) => {
+    const file = e.target.files[0];
+    await handleImageUpload(file);
+    if (file) {
+      const reader:any = new FileReader();
+    reader.onloadend = () => {
+        setPreview(reader.result);
+      };
+      reader.readAsDataURL(file);
     }
   }
 
-  const handleInputChange = (id: string, value: string) => {
-    if (id === 'image' && fileInputRef.current && fileInputRef.current.files?.[0]) {
-      console.log('fileInputRef:',fileInputRef.current.value)
-      handleImageUpload(fileInputRef.current.files[0]);
-    };
-
-    setMenu(prev => {
-      return {
+  const handleInputChange = (id: string, value: string | number) => {
+    if (id === 'calories') {
+      setCalories(Number(value));
+      setMenu(prev => ({ ...prev, calories: Number(value) }));
+    } else {
+      setMenu(prev => ({
         ...prev,
-        [id]: value
-      };
-    });
+        [id]: id === 'price' ? Number(value) : value
+      }));
+    }
 
     if (errors[id]) {
       setErrors(prev => ({
@@ -167,97 +187,149 @@ function menu() {
     if (validateFields()) {
       setIsLoading(true);
 
-      if (!fileInputRef.current || !fileInputRef.current.files?.[0]) {
-        toast.error('Please select an image file', {
+      try {
+        const formData = new FormData();
+        formData.append('name', menu.dishName);
+
+        // Only append image if it's a new item or image is selected in edit mode
+        if (!isEditMode || (fileInputRef.current && fileInputRef.current.files?.[0])) {
+          if (!fileInputRef.current?.files?.[0]) {
+            toast.error('Please select an image file', {
+              icon: <CircleAlert color="#fc3419" />,
+            });
+            setIsLoading(false);
+            return;
+          }
+          formData.append('image', fileInputRef.current.files[0]);
+        }
+
+        formData.append('type', isVeg ? 'VEGETARIAN' : 'NONE_VEGETARIAN');
+        formData.append('price', menu.price?.toString() || '');
+        formData.append('status', 'AVAILABLE');
+        formData.append('calories', calories?.toString() || '');
+
+        selectedIngredients.forEach((ingredient) => {
+          formData.append(`ingredients`, ingredient);
+        });
+
+        const response = isEditMode
+          ? await editMenu(editItemId, formData)
+          : await createMenu(formData);
+
+        if (response) {
+          toast.success(`Menu item ${isEditMode ? "modified" : "created"}`, {
+            icon: <CircleCheck color="#1ce867" />,
+          });
+          fetchMenus();
+          setDialogOpen(false);
+          resetForm();
+        } else {
+          toast.error('Something went wrong!', {
+            icon: <CircleAlert color="#fc3419" />,
+          });
+        }
+      } catch (error) {
+        toast.error('Error saving menu item', {
           icon: <CircleAlert color="#fc3419" />,
         });
+      } finally {
         setIsLoading(false);
-        return;
-      }
-
-      // Create FormData
-      const formData = new FormData();
-      formData.append('name', menu.dishName);
-      formData.append('image', fileInputRef.current.files[0]);
-      formData.append('type', isVeg ? 'VEGETARIAN' : 'NONE_VEGETARIAN');
-      formData.append('price', menu.price?.toString() || '');
-      formData.append('status', 'AVAILABLE');
-
-      // Append ingredients array
-      selectedIngredients.forEach((ingredient) => {
-        formData.append(`ingredients`, ingredient);
-      });
-      let response;
-      if (isEditMode) {
-        const id = editItemId;
-        response = await editMenu(id,formData);
-      } else {
-        response = await createMenu(formData);
-      }
-     
-      if (response) {
-        setIsLoading(false);
-        toast.success(`Menu item ${isEditMode ? "modified" : "created"}`, {
-          icon: <CircleCheck color="#1ce867" />,
-        });
-        fetchMenus();
-        setDialogOpen(false);
-      } else {
-        setIsLoading(false);
-        toast.error('Something went wrong!', {
-          icon: <CircleAlert color="#fc3419" />,
-        });
       }
     }
   };
 
+  const resetForm = () => {
+    setMenu({
+      dishName: '',
+      image: null,
+      isVeg: true,
+      ingredients: [],
+      price: undefined,
+      calories: undefined
+    });
+    setPreview(null);
+    setSelectedIngredients([]);
+    setIsEditMode(false);
+    setEditItemId("");
+    setErrors({});
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+    setCalories(undefined);
+  };
+
   const handleMenuDelete = async (itemId: string) => {
-    const response = await deleteMenu(itemId);
-    if (response) {
-      toast.success('Menu item deleted', {
-        icon: <CircleCheck color="#1ce867" />,
-      });
-      setMenuList(prevItems => prevItems.filter((item: any) => item._id !== itemId));
-    } else {
-      toast.error('Failed please try after sometime!', {
+    try {
+      const response = await deleteMenu(itemId);
+      if (response) {
+        toast.success('Menu item deleted', {
+          icon: <CircleCheck color="#1ce867" />,
+        });
+        setMenuList(prevItems => prevItems.filter((item: any) => item._id !== itemId));
+      } else {
+        toast.error('Failed to delete, please try again', {
+          icon: <CircleX color="#fc3419" />,
+        });
+      }
+    } catch (error) {
+      toast.error('Error deleting menu item', {
         icon: <CircleX color="#fc3419" />,
       });
     }
   };
 
   const handleMenuEdit = async (itemId: string) => {
-    setIsEditMode(true);
-    setEditItemId(itemId);
     const selectedItem: any = menuList.find((item: any) => item._id === itemId);
     if (selectedItem) {
+      setIsEditMode(true);
+      setEditItemId(itemId);
       setMenu({
         dishName: selectedItem.name,
         image: null,
-        isVeg: selectedItem.type === 'VEGETARIAN' ? true : false,
+        isVeg: selectedItem.type === 'VEGETARIAN',
         ingredients: selectedItem.ingredients,
         price: selectedItem.price,
         calories: selectedItem.calories
       });
+      setIsVeg(selectedItem.type === 'VEGETARIAN');
+      setPreview(`${base_url}files/menus/${selectedItem.images}`)
+      setSelectedIngredients(selectedItem.ingredients);
+      setCalories(selectedItem.calories);
+      setDialogOpen(true);
     }
-    setIsVeg(selectedItem.type === 'VEGETARIAN' ? true : false);
-    setSelectedIngredients(selectedItem.ingredients);
-    setDialogOpen(true);
   };
 
   const fetchMenus = async () => {
     setFetchingData(true);
-    const menuItems = await getMenus();
-
-    if (menuItems.length > 0) {
-      setMenuList(menuItems);
-      setHasMenu(true);
+    try {
+      const menuItems = await getMenus();
+      if (menuItems.length > 0) {
+        setMenuList(menuItems);
+        setHasMenu(true);
+      } else {
+        setHasMenu(false);
+      }
+    } catch (error) {
+      toast.error('Error fetching menus', {
+        icon: <CircleX color="#fc3419" />,
+      });
+    } finally {
+      setFetchingData(false);
     }
-    setFetchingData(false);
   };
 
-  const handleSearch = (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault();
-    console.log('searchValue', searchValue)
+  const handleRemovePreview = () => {
+    setPreview(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
+  const handleSearch = () => {
+    const filteredMenus = menuList.filter(item =>
+      item.name.toLowerCase().includes(searchValue.toLowerCase())
+    );
+    setMenuList(filteredMenus);
   };
 
   useEffect(() => {
@@ -265,24 +337,12 @@ function menu() {
   }, []);
 
   useEffect(() => {
-    setCalories((menu as any).calories || '');
-  }, [menu]);
-
-  useEffect(() => {
     setMultiSelectKey(multiSelectKey + 1);
   }, [selectedIngredients]);
 
   useEffect(() => {
     if (!dialogOpen) {
-      setMenu({
-        dishName: '',
-        image: null,
-        isVeg: isVeg,
-        ingredients: [],
-        price: undefined,
-        calories: undefined
-      });
-      setSelectedIngredients([]);
+      resetForm();
     }
   }, [dialogOpen]);
 
@@ -294,217 +354,284 @@ function menu() {
         </div>) :
         (
           <>
-            <Dialog open={dialogOpen} onOpenChange={setDialogOpen} >
-              {!hasMenu ? (
-                <div className="flex items-center w-100 justify-center md:h-[100%]">
-                  <Card className="md:w-[700px] h-96 bg-red-50">
-                    <CardContent className="flex flex-col items-center justify-center h-full text-center p-6 ">
-                      <DialogTrigger onClick={() => setDialogOpen(true)}>
-                        <div className="bg-red-100 p-4 rounded-full mb-4 cursor-pointer">
-                          <Plus size={48} className="text-red-500" />
-                        </div>
-                      </DialogTrigger>
-                      <p className="text-gray-700 mb-4">
-                        Add Menus, You don't have any menus yet!
-                      </p>
-                    </CardContent>
-                  </Card>
-                </div>
-              ) : (
-                <>
-                  <div className="w-100 flex justify-center bg-orange-100">
-                    <div className="flex flex-col p-4 md:flex-row items-center justify-between gap-4 md:gap-16 w-full max-w-7xl">
-                      <Button className="flex items-center bg-orange-200 rounded-none w-100 md:w-50 hover:bg-orange-200 px-5 py-5" onClick={() => setDialogOpen(true)}>
-                        <Plus size={28} className="text-orange-500" />
-                        <p className="font-bold text-orange-500 text-xl"> Add Menu</p>
-                      </Button>
+            {!hasMenu ? (
+              <div className="flex items-center w-100 justify-center md:h-[100%]">
+                <Card className="md:w-[700px] h-96 bg-red-50">
+                  <CardContent className="flex flex-col items-center justify-center h-full text-center p-6 ">
+                    <div onClick={() => setDialogOpen(true)}>
+                      <div className="bg-red-100 p-4 rounded-full mb-4 cursor-pointer">
+                        <Plus size={48} className="text-red-500" />
+                      </div>
+                    </div>
+                    <p className="text-gray-700 mb-4">
+                      Add Menus, You don't have any menus yet!
+                    </p>
+                  </CardContent>
+                </Card>
+              </div>
+            ) : (
+              <>
+                <div className="w-100 flex justify-center bg-orange-100">
+                  <div className="flex flex-col p-4 md:flex-row items-center justify-between gap-4 md:gap-16 w-full max-w-7xl">
+                    <Button className="flex items-center bg-orange-200 rounded-none w-100 md:w-50 hover:bg-orange-200 px-5 py-5" onClick={() => setDialogOpen(true)}>
+                      <Plus size={28} className="text-orange-500" />
+                      <p className="font-bold text-orange-500 text-xl"> Add Menu</p>
+                    </Button>
 
-                      <div className="flex items-center w-full md:w-auto justify-center">
-                        <div className="relative w-full md:w-[700px]">
-                          <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
-                          <Input onChange={(e) => setSearchValue(e.target.value)} className="font-medium w-full py-5 rounded-none" placeholder="Search Menu Item" />
-                        </div>
-                        <Button onClick={handleSearch} className="flex ml-2 md:ml-4 items-center bg-orange-200 rounded-none hover:bg-orange-200 px-5 py-5">
-                          <Search size={28} className="text-orange-500" />
-                          <p className="font-bold text-orange-500 text-xl hidden md:inline">Search</p>
+                    <div className="flex items-center w-full md:w-auto justify-center">
+                      <div className="relative w-full md:w-[700px]">
+                        <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
+                        <Input onChange={(e) => setSearchValue(e.target.value)} className="font-medium w-full py-5 rounded-none" placeholder="Search Menu Item" />
+                      </div>
+                      <Button onClick={handleSearch} className="flex ml-2 md:ml-4 items-center bg-orange-200 rounded-none hover:bg-orange-200 px-5 py-5">
+                        <Search size={28} className="text-orange-500" />
+                        <p className="font-bold text-orange-500 text-xl hidden md:inline">Search</p>
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="pt-10 grid grid-cols-1 md:grid-cols-3 gap-x-8 md:gap-y-3">
+                  {menuList.map((item: any) => (
+                    <Card key={item._id} className="overflow-hidden bg-white shadow-md border-none rounded-sm mb-4">
+                      <div className="relative h-48 w-full overflow-hidden">
+                        <img
+                          src={`${base_url}files/menus/${item.images}`}
+                          alt={item.name}
+                          className="w-full h-full object-cover transform hover:scale-105 transition-transform duration-300"
+                        />
+                        <Button
+                          variant="destructive"
+                          size="icon"
+                          className="absolute top-2 right-2"
+                          onClick={() => handleMenuDelete(item._id)}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          size="icon"
+                          className="absolute top-2 right-14 bg-orange-400 hover:bg-orange-300"
+                          onClick={() => handleMenuEdit(item._id)}
+                        >
+                          <Pencil className="h-4 w-4" />
                         </Button>
                       </div>
-                    </div>
+
+                      <div className="p-6">
+                        <div className="flex justify-between items-start mb-4">
+                          <h3 className="text-xl font-bold text-gray-900">{item.name}</h3>
+                          <div className="flex items-center">
+                            <span className="text-2xl font-bold text-green-600">₹{item.price}</span>
+                          </div>
+                        </div>
+
+                        <div className="flex gap-2 mb-4">
+                          <Badge className={`${item.type === 'VEGETARIAN' ? "bg-green-600 text-white" : "bg-red-600 text-white"}`}>
+                            {item.type.replace('_', ' ')}
+                          </Badge>
+                          <Badge>
+                            {item.status}
+                          </Badge>
+                        </div>
+
+                        <div className="mb-4">
+                          <h4 className="text-sm font-semibold text-gray-700 mb-2">Ingredients:</h4>
+                          <div className="flex flex-wrap gap-2">
+                            {item.ingredients.map((ingredient, index) => (
+                              <Badge key={index} variant="outline" className="bg-gray-100">
+                                {ingredient.replace('_', ' ')}
+                              </Badge>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    </Card>
+                  ))}
+                </div>
+              </>
+            )}
+            <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+              <DialogContent className="max-w-4xl w-full p-4 bg-white rounded-lg shadow-xl max-h-[90vh]">
+                <DialogHeader className="mb-2">
+                  <DialogTitle className="text-xl font-bold text-gray-800">
+                    {isEditMode ? 'Edit Menu Item' : 'Add Menu Item'}
+                  </DialogTitle>
+                </DialogHeader>
+
+                {aiLoading && (
+                  <div className="absolute inset-0 z-50 flex items-center justify-center bg-white/50">
+                    <img
+                      src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/f0/Google_Bard_logo.svg/900px-Google_Bard_logo.svg.png"
+                      alt="Loading"
+                      className="h-16 animate-pulse"
+                    />
                   </div>
+                )}
 
-                  <div className="pt-10 grid grid-cols-1 md:grid-cols-3 gap-x-8 md:gap-y-3">
-                    {menuList.map((item: any) => (
-                      <Card key={item._id} className="overflow-hidden bg-white shadow-md border-none rounded-sm mb-4">
-                        <div className="relative h-48 w-full overflow-hidden">
-                          <img
-                            src={`${base_url}files/menus/${item.images}`}
-                            alt={item.name}
-                            className="w-full h-full object-cover transform hover:scale-105 transition-transform duration-300"
-                          />
-                          <Button
-                            variant="destructive"
-                            size="icon"
-                            className="absolute top-2 right-2"
-                            onClick={() => handleMenuDelete(item._id)}
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                          <Button
-                            size="icon"
-                            className="absolute top-2 right-14 bg-orange-400 hover:bg-orange-300"
-                            onClick={() => handleMenuEdit(item._id)}
-                          >
-                            <Pencil className="h-4 w-4" />
-                          </Button>
-                        </div>
+                <DialogDescription className={`${aiLoading ? 'opacity-30' : ''}`}>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                    {formFields.map((field, index) => (
+                      <div 
+                        key={index} 
+                        className={`
+                          space-y-1 
+                          ${field.id === "ingredients" ? "md:col-span-2" : ""}
+                          ${field.type === "file" ? "md:col-span-2" : ""}
+                        `}
+                      >
+                        <Label 
+                          htmlFor={field.id} 
+                          className="text-xs font-medium text-gray-700 block"
+                        >
+                          {field.label} 
+                          {field.required && <span className="text-red-500 ml-1">*</span>}
+                        </Label>
 
-                        <div className="p-6">
-                          <div className="flex justify-between items-start mb-4">
-                            <h3 className="text-xl font-bold text-gray-900">{item.name}</h3>
-                            <div className="flex items-center">
-                              <span className="text-2xl font-bold text-green-600">₹{item.price}</span>
+                        {field.id === "ingredients" && (
+                          <div>
+                            <MultiSelect
+                              key={multiSelectKey}
+                              className="w-full rounded-md border-gray-300"
+                              options={ingredientsList}
+                              defaultValue={selectedIngredients}
+                              onValueChange={setSelectedIngredients}
+                              placeholder="Select Ingredients"
+                              variant="rmscolor"
+                              animation={2}
+                              maxCount={7}
+                            />
+                            <div style={{ height: '6px', marginTop: '2px', display: 'flex', justifyContent: 'end', width: '100%' }}>
+                              {errors[field.id] && (
+                                <p className="text-red-500 text-xs">{errors[field.id]}</p>
+                              )}
                             </div>
                           </div>
+                        )}
 
-                          <div className="flex gap-2 mb-4">
-                            <Badge className={`${item.type === 'VEGETARIAN' ? "bg-green-600 text-white" : "bg-red-600 text-white"}`}>
-                              {item.type.replace('_', ' ')}
-                            </Badge>
-                            <Badge >
-                              {item.status}
-                            </Badge>
+                        {field.type === "toggle" && (
+                          <div>
+                            <div className="flex gap-2">
+                              <Button
+                                type="button"
+                                className={`
+                                  flex-1 text-xs py-2
+                                  ${isVeg ? "bg-green-600 hover:bg-green-600 text-white rounded-none" : "bg-green-200 hover:bg-green-200 text-green-600 rounded-none"}
+                                `}
+                                onClick={() => setIsVeg(true)}
+                              >
+                                <Circle className="mr-1 h-4 w-4" /> Veg
+                              </Button>
+                              <Button
+                                type="button"
+                                className={`
+                                  flex-1 text-xs py-2
+                                  ${!isVeg ? "bg-red-600 hover:bg-red-600 text-white rounded-none" : "bg-red-200 text-red-600 hover:bg-red-200 rounded-none"}
+                                `}
+                                onClick={() => setIsVeg(false)}
+                              >
+                                <Triangle className="mr-1 h-4 w-4" /> Non-Veg
+                              </Button>
+                            </div>
+                            <p className="text-xs text-gray-500 mt-1">
+                              Default is set to Veg. Modify if needed!
+                            </p>
                           </div>
+                        )}
 
-                          <div className="mb-4">
-                            <h4 className="text-sm font-semibold text-gray-700 mb-2">Ingredients:</h4>
-                            <div className="flex flex-wrap gap-2">
-                              {item.ingredients.map((ingredient, index) => (
-                                <Badge key={index} variant="outline" className="bg-gray-100">
-                                  {ingredient.replace('_', ' ')}
-                                </Badge>
-                              ))}
+                        {field.type === "file" && (
+                          <div>
+                            <Input
+                              type="file"
+                              ref={fileInputRef}
+                              onChange={handleFileChange}
+                              accept="image/*"
+                              className="hidden"
+                              id="menuItemImage"
+                            />
+                            <Label 
+                              htmlFor="menuItemImage" 
+                              className={`
+                                flex items-center justify-center 
+                                border-2 border-dashed rounded-none p-4 
+                                cursor-pointer hover:border-blue-500 
+                                transition min-h-[180px] relative
+                                ${preview ? 'border-transparent' : 'border-gray-300'}
+                              `}
+                            >
+                              {preview ? (
+                                <>
+                                  <img 
+                                    src={preview} 
+                                    alt="Preview" 
+                                    className="max-h-[145px] max-w-full object-cover rounded-lg"
+                                  />
+                                  <Button 
+                                    size="icon" 
+                                    variant="destructive" 
+                                    className="absolute top-2 right-2 rounded-full"
+                                    onClick={(e) => {
+                                      e.preventDefault();
+                                      handleRemovePreview();
+                                    }}
+                                  >
+                                    <X className="h-4 w-4" />
+                                  </Button>
+                                </>
+                              ) : (
+                                <div className="flex flex-col items-center">
+                                  <ImageIcon className="h-8 w-8 text-gray-400 mb-2" />
+                                  <span className="text-gray-600 text-sm">
+                                    Click to Upload Image
+                                  </span>
+                                </div>
+                              )}
+                            </Label>
+                          </div>
+                        )}
+
+                        {field.type !== "toggle" && field.type !== "file" && field.id !== "ingredients" && (
+                          <div className="relative">
+                            {field.icon && (
+                              <field.icon className="absolute left-3 top-1/2 -translate-y-[73%] h-4 w-4 text-gray-500" />
+                            )}
+                            <Input
+                              id={field.id}
+                              type={field.type}
+                              value={field.id === 'calories' ? calories : (menu as any)[field.id]}
+                              placeholder={field.placeholder}
+                              onChange={(e) => handleInputChange(field.id, e.target.value)}
+                              className={`
+                                pl-8 py-4 w-full rounded-none
+                                border-gray-300 focus:border-blue-500
+                                text-sm
+                                ${field.icon ? 'pl-8' : ''}
+                              `}
+                            />
+                            <div style={{ height: '6px', marginTop: '2px', display: 'flex', justifyContent: 'end', width: '100%' }}>
+                              {errors[field.id] && (
+                                <p className="text-red-500 text-xs">{errors[field.id]}</p>
+                              )}
                             </div>
                           </div>
-                        </div>
-                      </Card>
+                        )}
+                      </div>
                     ))}
                   </div>
-                </>
-              )}
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Add Menu Item</DialogTitle>
-                </DialogHeader>
-                <DialogDescription>
-                  <div className="">
-                    {aiLoading && (
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <div className="inline-block transition-all duration-300">
-                          <img
-                            style={{ height: '60px' }}
-                            src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/f0/Google_Bard_logo.svg/900px-Google_Bard_logo.svg.png"
-                            className="text-orange-600 animate-[pulse_1000ms_ease-in-out_infinite]"
-                          />
-                        </div>
-                      </div>
-                    )}
-                    <div className={`${aiLoading ? 'blur-sm pointer-events-none' : ''}`}>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 md:gap-y-3">
-                        {formFields.map((field, index) => (
-                          <div key={index} className={`space-y-2 ${field.id === "ingredients" ? "col-span-full" : ""}`}>
-                            {field.id === "ingredients" ? (
-                              <>
-                                <Label htmlFor={field.id} className="text-sm font-medium block">
-                                  {field.label} {field.required && <span className="text-red-500">*</span>}
-                                </Label>
-                                <MultiSelect
-                                  key={multiSelectKey}
-                                  className="px-10 md:py-6 h-12 w-full rounded-none bg-white"
-                                  options={ingredientsList}
-                                  defaultValue={selectedIngredients}
-                                  onValueChange={setSelectedIngredients}
-                                  placeholder="Select Ingredients"
-                                  variant="rmscolor"
-                                  animation={2}
-                                  maxCount={7}
-                                />
-                                <div style={{ height: '6px', marginTop: '2px', display: 'flex', justifyContent: 'end', width: '100%' }}>
-                                  {errors[field.id] && (
-                                    <p className="text-red-500 text-xs">{errors[field.id]}</p>
-                                  )}
-                                </div>
-                              </>
-                            ) : field.type === "toggle" ? (
-                              <>
-                                <Label htmlFor={field.id} className="text-sm font-medium block">
-                                  {field.label} {field.required && <span className="text-red-500">*</span>}
-                                </Label>
-                                <div className="flex gap-4">
-                                  <Button
-                                    className={`${isVeg ? "bg-green-600 text-white hover:bg-green-600" : "bg-green-200 hover:bg-green-200 text-green-600"}`}
-                                    onClick={() => setIsVeg(true)}
-                                  >
-                                    <Circle />
-                                  </Button>
-                                  <Button
-                                    className={`${!isVeg ? "bg-red-600 text-white hover:bg-red-600" : "bg-red-200 hover:bg-red-200  text-red-600"}`}
-                                    onClick={() => setIsVeg(false)}
-                                  >
-                                    <Triangle />
-                                  </Button>
-                                </div>
-                                <p className="text-xs font-semibold italic">Default value is set to Veg, Please modify if needed!</p>
-                              </>
-                            ) : (
-                              <>
-                                <Label htmlFor={field.id} className="text-sm font-medium block">
-                                  {field.label} {field.required && <span className="text-red-500">*</span>}
-                                </Label>
-                                <div className="relative">
-                                  {field.type !== "file" && (
-                                    <field.icon className="absolute left-3 md:top-6 top-6 -translate-y-1/2 h-4 w-4 text-gray-500" />
-                                  )}
-                                  {field.type === "file" ? (
-                                    <Input
-                                      id={field.id}
-                                      type="file"
-                                      ref={fileInputRef}
-                                      onChange={(e) => handleInputChange(field.id, e.target.value)}
-                                      className="px-10 md:py-6 h-12 w-full rounded-none bg-white hover:shadow-sm"
-                                    />
-                                  ) : (
-                                    <Input
-                                      id={field.id}
-                                      type={field.type}
-                                      value={field.id == 'calories' ? calories : (menu as any)[field.id]}
-                                      placeholder={field.placeholder}
-                                      onChange={(e) => handleInputChange(field.id, e.target.value)}
-                                      className="px-10 md:py-6 h-12 w-full rounded-none bg-white hover:shadow-sm"
-                                    />
-                                  )}
-                                </div>
-                                <div style={{ height: '6px', marginTop: '2px', display: 'flex', justifyContent: 'end', width: '100%' }}>
-                                  {errors[field.id] && (
-                                    <p className="text-red-500 text-xs">{errors[field.id]}</p>
-                                  )}
-                                </div>
-                              </>
-                            )}
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
                 </DialogDescription>
-                <Button disabled={isLoading} onClick={handleMenuSave} className="bg-swiggyOrange p-5 hover:bg-orange-500 rounded-none">
-                  {
-                    isLoading ? (
-                      <Loader2 className="animate-spin" />
+
+                <div className="mt-3">
+                  <Button 
+                    disabled={isLoading} 
+                    onClick={handleMenuSave} 
+                    className="w-full bg-swiggyOrange hover:bg-orange-500 py-2 text-sm rounded-none"
+                  >
+                    {isLoading ? (
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     ) : (
-                      <span>Save</span>
-                    )
-                  }
-                </Button>
+                      'Save'
+                    )}
+                  </Button>
+                </div>
               </DialogContent>
             </Dialog>
             <Toaster />
