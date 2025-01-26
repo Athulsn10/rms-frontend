@@ -152,7 +152,7 @@ function Orders() {
                           <DialogTitle>Update Order Status</DialogTitle>
                         </DialogHeader>
                         <div className="py-4">
-                          <div className="grid grid-cols-1 md:grid-cols-2">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                             <Select value={order.status} onValueChange={(value) => handleStatusUpdate(order, value)}>
                               <SelectTrigger className="w-full">
                                 <SelectValue placeholder="Select status" />
