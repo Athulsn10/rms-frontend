@@ -25,7 +25,7 @@ interface OrderItem {
 }
 
 // Order status type
-type OrderStatus = 'Ordered' | 'Processing' | 'Completed' | 'Cancelled' | 'Delivered';
+type OrderStatus = 'Ordered' | 'Preparing' | 'Completed' | 'Cancelled' | 'Delivered';
 
 // Main order interface
 interface Order {
@@ -95,6 +95,7 @@ function Orders() {
             totalAmount: String(selectedOrder.totalAmount),
             tableNumber: String(selectedOrder.tableNumber),
             remarks: remarks,
+            isPaid: selectedOrder.isPaid,
             status: selectedOrder.order.length == 0 ? "Cancelled" : selectedOrder.status
         };
 
@@ -208,7 +209,7 @@ function Orders() {
                                                 variant="outline"
                                                 className="flex-1 gap-2 rounded-none border-orange-400 text-orange-600 hover:text-orange-700 hover:bg-orange-50"
                                                 onClick={() => handleEdit(order)}
-                                                disabled={order.status === 'Cancelled' || order.status === 'Delivered'}
+                                                disabled={order.status === 'Cancelled' || order.status === 'Delivered' || order.status === 'Preparing'}
                                             >
                                                 <Edit2 className="w-4 h-4" />
                                                 Edit Order
@@ -217,7 +218,7 @@ function Orders() {
                                                 variant="destructive"
                                                 className="flex-1 gap-2 rounded-none bg-orange-600 hover:bg-orange-700"
                                                 onClick={() => handleCancel(order._id)}
-                                                disabled={order.status === 'Cancelled' || order.status === 'Delivered'}
+                                                disabled={order.status === 'Cancelled' || order.status === 'Delivered' || order.status === 'Preparing'}
                                             >
                                                 <XCircle className="w-4 h-4" />
                                                 Cancel Order

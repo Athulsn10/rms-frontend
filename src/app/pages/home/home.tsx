@@ -23,14 +23,11 @@ function home() {
       const response = await getRestuarentsByCity(city);
       if (response) {
         setRestaurantList(response);
-        console.log(response)
       }
     } else {
       const response = await getRestuarents();
       if (response) {
         setRestaurantList(response);
-        console.log('response:', response.data)
-
       }
     }
   }
