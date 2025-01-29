@@ -112,7 +112,14 @@ function menu() {
     const newErrors = {} as Record<string, string>;
     let isValid = true;
     formFields.forEach(field => {
-      const value = field.id === 'calories' ? calories : (menu as any)[field.id];
+      let value;
+      if (field.id === 'calories') {
+        value = calories
+      } else if (field.id === 'image') {
+        value = fileInputRef.current?.value;
+      } else {
+        value = (menu as any)[field.id]
+      }
       const error = field.validation(value?.toString() || '');
 
       if (error) {
@@ -156,7 +163,7 @@ function menu() {
     await handleImageUpload(file);
     if (file) {
       const reader:any = new FileReader();
-    reader.onloadend = () => {
+        reader.onloadend = () => {
         setPreview(reader.result);
       };
       reader.readAsDataURL(file);
@@ -235,7 +242,7 @@ function menu() {
       } finally {
         setIsLoading(false);
       }
-    }
+    }   
   };
 
   const resetForm = () => {
