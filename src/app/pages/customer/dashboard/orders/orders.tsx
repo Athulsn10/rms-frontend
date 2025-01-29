@@ -3,10 +3,11 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import toast, { Toaster } from 'react-hot-toast';
 import { Textarea } from "@/components/ui/textarea";
-import { CircleAlert, CircleCheck, Clock, Edit2, Loader2, Minus, Plus, Trash2, XCircle } from 'lucide-react';
+import { CircleAlert, CircleCheck, Clock, Download, Edit2, Loader2, Minus, Plus, Trash2, XCircle } from 'lucide-react';
 import { getAllOrders, updateOrder } from "../../customerService";
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { handleBillPdfDownload, handleFetchBillPath } from "@/app/pages/restuarant/dashboard/restuarantService";
 
 // Menu item interface
 interface MenuItem {
@@ -36,6 +37,7 @@ interface Order {
     tableNumber?: number;
     totalAmount: number;
     status: OrderStatus;
+    isPaid: Boolean;
     remarks: String;
     createdAt: string;
     updatedAt: string;
@@ -45,6 +47,7 @@ interface Order {
 // Order component
 function Orders() {
     const [orders, setOrders] = useState<Order[]>([]);
+    const [isLoadingId, setIsLoadingId] = useState<string | null>(null);
     const [fetchingData, setFetchingData] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [selectedOrder, setSelectedOrder] = useState<any>();
@@ -73,7 +76,7 @@ function Orders() {
         const newQuantity = Math.max(1, currentQuantity + change);
 
         updatedOrder.order[itemIndex].quantity = newQuantity;
-        updatedOrder.totalAmount = updatedOrder.order.reduce((sum:number, item:any) => sum + item.quantity * parseFloat(item.menuId.price), 0);
+        updatedOrder.totalAmount = updatedOrder.order.reduce((sum: number, item: any) => sum + item.quantity * parseFloat(item.menuId.price), 0);
         setSelectedOrder(updatedOrder);
     };
 
@@ -105,15 +108,50 @@ function Orders() {
         if (response) {
             setIsEditModalOpen(false);
             toast.success('Order Updated!', {
-              icon: <CircleCheck color="#1ce867" />,
+                icon: <CircleCheck color="#1ce867" />,
             });
             fetchOrders();
         } else {
             setIsEditModalOpen(false);
             toast.error('Order Updated!', {
-              icon: <CircleAlert color="#fc3419" />,
+                icon: <CircleAlert color="#fc3419" />,
             });
         }
+    };
+
+    const handleBillDownload = async (orderId: string) => {
+        setIsLoadingId(orderId);
+        const billPdfPath = await handleFetchBillPath(orderId);
+        if (!billPdfPath?.billPath) {
+            setIsLoadingId(null);
+            toast.success('Bill Generation Failed', {
+                icon: <CircleAlert color="#fc3419" />,
+            });
+            return;
+        }
+
+        const response = await handleBillPdfDownload(billPdfPath.billPath);
+        console.log('billPdfPath.billPath:', response)
+        if (!response) {
+            toast.success('Bill Generation Failed', {
+                icon: <CircleAlert color="#fc3419" />,
+            });
+            setIsLoadingId(null);
+            return;
+        }
+        const pdfBlob = new Blob([response], { type: "application/pdf" });
+        const url = window.URL.createObjectURL(pdfBlob);
+        const tempLink = document.createElement("a");
+        tempLink.href = url;
+        tempLink.setAttribute(
+            "download",
+            `bill_${orderId}.pdf`
+        );
+        document.body.appendChild(tempLink);
+        tempLink.click();
+        document.body.removeChild(tempLink);
+        window.URL.revokeObjectURL(url);
+        setIsLoadingId(null);
     };
 
     const handleModalClose = () => {
@@ -169,9 +207,19 @@ function Orders() {
                                         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                                             <div className="flex flex-col gap-2">
                                                 <CardTitle className="text-xl font-bold">
-                                                    Order #{order._id.slice(-6)}
+                                                    <div onClick={() => handleBillDownload(order._id)} className="bg-orange-100 px-4 py-1 rounded-xl flex gap-3 items-center cursor-pointer">
+                                                        <p>Order #{order._id.slice(-6)}</p>
+                                                        <div>
+                                                            {
+                                                                isLoadingId === order._id  ? (
+                                                                    <Loader2 className="animate-spin" />
+                                                                ) : (
+                                                                    <Download size={20} />
+                                                                )
+                                                            }</div>
+                                                    </div>
                                                 </CardTitle>
-                                                <div className="flex items-center gap-2 text-gray-500">
+                                                <div className="flex items-center gap-2 text-gray-500 ms-2">
                                                     <Clock className="w-4 h-4" />
                                                     <span className="text-sm">
                                                         {new Date(order.createdAt).toLocaleDateString('en-GB', {
@@ -182,9 +230,15 @@ function Orders() {
                                                     </span>
                                                 </div>
                                             </div>
-                                            <Badge className={`${getStatusColor(order.status)} px-4 py-1 text-sm font-medium rounded-full`}>
-                                                {order.status}
-                                            </Badge>
+                                           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                                                <Badge className={`${getStatusColor(order.status)} px-4 py-1 text-sm font-medium rounded-full`}>
+                                                    {order.status}
+                                                </Badge>
+                                                <span className={`inline-flex items-center px-4 py-1 rounded-full text-sm font-medium ${order.isPaid ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"} `}>
+                                                    {order.isPaid ? "Paid" : "Not Paid"}
+                                                </span>
+                                           </div>
+                                            
                                         </div>
                                     </CardHeader>
 
@@ -261,7 +315,7 @@ function Orders() {
                                     <p className="font-medium text-right">
                                         Total: ₹{selectedOrder?.totalAmount}
                                     </p>
-                                    <Textarea placeholder="Type your message here." value={remarks}  onChange={(e) => setRemarks(e.target.value)}/>
+                                    <Textarea placeholder="Type your message here." value={remarks} onChange={(e) => setRemarks(e.target.value)} />
                                 </div>
 
                                 <DialogFooter>
