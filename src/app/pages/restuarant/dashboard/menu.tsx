@@ -151,7 +151,7 @@ function menu() {
     }
   };
 
-  const handleFileChange = async (e) => {
+  const handleFileChange = async (e:any) => {
     const file = e.target.files[0];
     await handleImageUpload(file);
     if (file) {
