@@ -2,12 +2,12 @@ import { useEffect } from "react";
 import { useState } from 'react';
 import OrderModal from "./orderModal";
 import { Button } from "@/components/ui/button";
-import { CircleAlert, CircleCheck, Clock, Edit2, Eye, Loader2 } from 'lucide-react';
 import toast, { Toaster } from 'react-hot-toast';
-import { getAllOrders, orderPaymentStatus, updateOrder } from "./restuarantService";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { CircleAlert, CircleCheck, Clock, Edit2, Eye, Loader2 } from 'lucide-react';
+import { getAllOrders, orderPaymentStatus, updateOrder } from "./restuarantService";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 
 
 function Orders() {
