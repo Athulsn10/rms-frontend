@@ -33,8 +33,7 @@ const createAxiosInstance = () => {
       const originalRequest = error.config;
       if (error.response?.status === 403 && !originalRequest._retry) {
         originalRequest._retry = true;
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
+        localStorage.clear();
         window.location.href = '/';
         return Promise.reject(error);
       }
