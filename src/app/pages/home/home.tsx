@@ -51,7 +51,7 @@ function home() {
       </div>
 
       <div>
-        <p className="md:mx-28 ms-6 pb-5 font-bold md:text-xl">Top restaurant chains in {location}</p>
+        <p className="md:mx-28 ms-6 pb-5 font-bold md:text-xl">Top restaurant chains in { location ? location : "tavalo"}</p>
         <div className='flex w-[full] h-fit overflow-x-scroll custom-scroll-bar md:mx-24 md:py-5'>
           {restaurantList.map((restaurant: Restaurant) => (
             <div key={restaurant.id}>
