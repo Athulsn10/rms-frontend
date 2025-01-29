@@ -1,14 +1,14 @@
 import "../auth.css";
-import { FormEvent, useState } from 'react';
+import { FormEvent, useRef, useState } from 'react';
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
-import { handleRegister } from '../authService';
+import { handleCustomerRegister, handleRestuarantRegister } from '../authService';
 import toast, { Toaster } from 'react-hot-toast';
 import { useSearchParams } from 'react-router-dom';
 import { MultiSelect } from "@/components/ui/multiselect";
-import { Mail, Lock, User, MapPin, Building, Home, NutOff, Phone, Cake, BadgeIndianRupee, ArrowRight, ArrowLeft, CircleAlert, Loader2, Utensils } from 'lucide-react';
+import { Mail, Lock, User, MapPin, Building, Home, NutOff, Phone, Cake, BadgeIndianRupee, ArrowRight, ArrowLeft, CircleAlert, Loader2, Utensils, WalletCards, Camera, ImageIcon, X } from 'lucide-react';
 
 
 interface AddressData {
@@ -28,15 +28,20 @@ interface FormData {
   dob: string,
   address: AddressData;
   allergies: string[];
+  gstin: string;
+  upiId: string;
+  tableCount: string;
 }
 
 const Registration = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const [preview, setPreview] = useState<any>();
   const registrationType = searchParams.get('type');
   const [currentStep, setCurrentStep] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [confirmPassword, setConfirmPassword] = useState('');
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [selectedAllergies, setSelectedAllergies] = useState<string[]>([]);
 
   const [formData, setFormData] = useState<FormData>({
@@ -54,6 +59,10 @@ const Registration = () => {
       pincode: '',
     },
     allergies: [],
+    gstin: '',
+    tableCount: '',
+    upiId: ''
+
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -118,7 +127,7 @@ const Registration = () => {
         id: 'name',
         label: 'Full Name',
         type: 'text',
-        placeholder: 'John Doe',
+        placeholder: 'Enter Name',
         icon: User,
         required: true,
         registrationType: ['customer', 'restaurant'],
@@ -285,6 +294,18 @@ const Registration = () => {
         validation: (value: string) => {
           if (!value) return 'Table count is required';
         }
+      },
+      {
+        id: 'upiId',
+        label: 'UPI Id',
+        type: 'text',
+        required: true,
+        placeholder: 'example@oksbi',
+        icon: WalletCards,
+        registrationType: ['restaurant'],
+        validation: (value: string) => {
+          if (!value) return 'UPI Id is required';
+        }
       }
     ],
     // Step 4: Allergies
@@ -298,8 +319,18 @@ const Registration = () => {
         icon: NutOff,
         registrationType: ['customer'],
         validation: () => ''
+      },
+      {
+        id: 'image',
+        label: 'Profile Photo',
+        type: 'file',
+        required: true,
+        placeholder: 'Upload Profile Photo',
+        icon: Camera,
+        registrationType: ['restaurant'],
+        validation: () => ''
       }
-    ]
+    ],
   ];
 
   const notify = (message: string, type: string) => {
@@ -375,6 +406,18 @@ const Registration = () => {
     return isValid;
   };
 
+  const handleFileChange = async (e:any) => {
+    const file = e.target.files[0];
+    // await handleImageUpload(file);
+    if (file) {
+      const reader:any = new FileReader();
+    reader.onloadend = () => {
+        setPreview(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const handleNext = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     if (validateStep(currentStep)) {
@@ -396,15 +439,45 @@ const Registration = () => {
         delete (formData as Partial<typeof formData>).dob;
       } else {
         formData.allergies = selectedAllergies;
+        delete (formData as Partial<typeof formData>).gstin;
+        delete (formData as Partial<typeof formData>).tableCount;
+        delete (formData as Partial<typeof formData>).upiId;
       }
 
-      const response = await handleRegister(formData, registrationType);
-      if (response) {
+      let response;
+      if ( registrationType === 'restaurant' ) {
+        const data = new FormData();
+        data.append('name', formData.name);
+        data.append('email', formData.email);
+        data.append('password', formData.password);
+        data.append('phone', formData.phone);
+        data.append('gstin', formData.gstin);
+        data.append('tableCount', formData.tableCount);
+        data.append('upiId', formData.upiId);
+        data.append('address[addressLine1]', formData.address.addressLine1);
+        data.append('address[addressLine2]', formData.address.addressLine2);
+        data.append('address[city]', formData.address.city);
+        data.append('address[state]', formData.address.state);
+        data.append('address[country]', formData.address.country);
+        data.append('address[pincode]', formData.address.pincode);
+
+      if (fileInputRef.current && fileInputRef.current.files?.[0]) {
+        data.append('image', fileInputRef.current.files[0]);
+      }
+        response = await handleRestuarantRegister(data);
+      } else {
+        response = await handleCustomerRegister(formData);
+      }
+
+     
+      if (response.status) {
         setIsLoading(false);
         notify('Registration successfull, Please login', 'success');
-        navigate('/');
+        setTimeout(() => {
+          navigate("/");
+        }, 2000)
       } else {
-        notify('Registration Failed', 'error');
+        notify(`${response.message}`, 'error');
         setIsLoading(false);
       }
     }
@@ -424,10 +497,10 @@ const Registration = () => {
         </div>
         <div className="p-6 sm:p-8">
           <form onSubmit={handleSubmit} className="space-y-6">
-            <div className={`${currentFields.some(field => field.id === "allergies") ? "" : "grid grid-cols-1 md:grid-cols-2"} gap-x-8 md:gap-y-3`}>
+            <div className={`${currentFields.some(field => field.id === "allergies" || field.id === "image") ? "" : "grid grid-cols-1 md:grid-cols-2"} gap-x-8 md:gap-y-3`}>
               {currentFields.map((field, index) => {
                 if (field.id === "allergies") {
-                  return(
+                  return (
                     <div>
                       <p className="flex items-center justify-center text-xl font-bold">{field.label}</p>
                       <MultiSelect
@@ -439,6 +512,72 @@ const Registration = () => {
                         animation={2}
                         maxCount={6} />
                     </div>)
+                }
+
+                if (field.id.toLowerCase() === "image") {
+                  return (
+                    <>
+                      <div className="flex flex-col items-center">
+                        <Input
+                          type="file"
+                          ref={fileInputRef}
+                          onChange={handleFileChange}
+                          accept="image/*"
+                          className="hidden"
+                          id="menuItemImage"
+                        />
+                        <Label
+                          htmlFor="menuItemImage"
+                          className={`
+                              relative
+                              w-56 h-56
+                              flex items-center justify-center 
+                              rounded-full
+                              cursor-pointer
+                              transition-all duration-300
+                              overflow-hidden
+                              group
+                              ${preview ?
+                              'border-none shadow-lg' :
+                              'border-2 border-dashed border-gray-300 hover:border-orange-400 hover:bg-orange-50'
+                            }`}>
+                          {preview ? (
+                            <div className="w-full h-full relative">
+                              <img
+                                src={preview}
+                                alt="Preview"
+                                className="w-full h-full object-cover"
+                              />
+                              <div className="
+                                      absolute inset-0 
+                                      bg-black/0 group-hover:bg-black/40
+                                      transition-all duration-300
+                                      flex items-center justify-center
+                                      opacity-0 group-hover:opacity-100">
+                                <Camera className="w-8 h-8 text-white" />
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="flex flex-col items-center space-y-2 p-4">
+                              <div className="
+                                      w-12 h-12 
+                                      rounded-full 
+                                      bg-orange-100 
+                                      flex items-center justify-center
+                                      group-hover:bg-orange-200
+                                      transition-colors duration-300
+                                    ">
+                                <Camera className="h-6 w-6 text-orange-600" />
+                              </div>
+                              <span className="text-sm text-gray-600 text-center">
+                                Upload Profile
+                              </span>
+                            </div>
+                          )}
+                        </Label>
+                      </div>
+                    </>
+                  )
                 }
 
                 return (

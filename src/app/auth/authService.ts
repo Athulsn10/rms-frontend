@@ -1,3 +1,4 @@
+import axios from 'axios';
 import { http } from '../../services/http';
 
 export const handleLogIn = async (email: string, password: string,  navigate: (path: string) => void) => {
@@ -39,16 +40,31 @@ export const handleLogIn = async (email: string, password: string,  navigate: (p
     }
 };
 
-export const handleRegister = async (formData:any, registrationType:string) => {
+export const handleCustomerRegister = async (formData:any) => {
     const headers = {
         'Content-Type': 'application/json',
       };
   
       try {
-        const response = await http.post(`/${registrationType}`,formData,{ headers });  
-        return response.status >= 200 && response.status <= 300 ? true : false;
+        const response = await http.post(`/customer`,formData,{ headers });  
+        return response.status >= 200 && response.status <= 300 ? {status: true} : {status: false};
       } catch (error:any) {
-        console.error('Error logging in', error);
-        return error.response?.data?.message
+        return {status : false , message: error.response?.data?.message};
       }
+};
+
+export const handleRestuarantRegister = async (formData:any) => {
+  try {
+    const url = import.meta.env.VITE_BASE_URL;
+    const token = localStorage.getItem('token');
+    const response:any = await axios.post(`${url}restaurant`, formData, {
+        headers: {
+            'Content-Type': 'multipart/form-data',
+            ...(token && { 'Authorization': `Bearer ${token}` })
+        },
+    });
+    return response.status >= 200 && response.status <= 300 ? {status: true} : {status: false};
+} catch (error: any) {
+   return {status : false , message: error.response?.data?.message};
+}
 }
