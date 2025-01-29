@@ -9,12 +9,13 @@ interface Restaurant {
   rating: string,
   tableCount: string,
   area: string,
-  imgUrl: string
+  images: string
 }
 
 function home() {
   const [location, setLocation] = useState('')
   const [restaurantList, setRestaurantList] = useState([]);
+  const base_url = import.meta.env.VITE_BASE_URL;
 
   const fetchRestuarants = async () => {
     const city = localStorage.getItem('city');
@@ -26,11 +27,12 @@ function home() {
       }
     } else {
       const response = await getRestuarents();
+      console.log('response:',response)
       if (response) {
         setRestaurantList(response);
       }
     }
-  }
+  };
 
   useEffect(() => {
     fetchRestuarants();
@@ -58,7 +60,7 @@ function home() {
                 rating={restaurant.rating}
                 category={restaurant.tableCount}
                 area={restaurant.area}
-                imgUrl='https://media-assets.swiggy.com/swiggy/image/upload/fl_lossy,f_auto,q_auto,w_660/86f52324ecee5fc94cbf63c4a568b672'
+                imgUrl={`${restaurant.images ? `${base_url}files/restaurants/${restaurant.images}` : 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQQ_VOrKf8cjdbXzZHa-DDUtU0luArTacQhJg&s'}`}
               />
             </div>
           ))}
