@@ -56,7 +56,7 @@ export const editMenu = async (id: string, formData: any) => {
 
 export const getMenus = async () => {
     try {
-        const response = await http.get(`/menus`);
+        const response = await http.get(`/menus/restaurant/all`);
         return response.data.data;
     } catch (error: any) {
         return error.response?.data?.message
