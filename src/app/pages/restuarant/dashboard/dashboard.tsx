@@ -3,9 +3,10 @@ import Orders from "./orders";
 import Profile from "./profile";
 import { useState } from "react";
 import QRGenerator from "./QrGenerator";
+import Analytics from "./analytics";
 import { useNavigate } from "react-router-dom";
 import { useAppContext } from "@/app/context/provider";
-import { User, ShoppingBag, LogOut, SquareMenu, QrCode } from "lucide-react";
+import { User, ShoppingBag, LogOut, SquareMenu, QrCode, ChartPie } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { SidebarFooter, SidebarHeader, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "@/components/ui/sidebar";
@@ -31,6 +32,11 @@ const items = [
         title:"Generate QR",
         key:'qr',
         icon: QrCode
+    },
+    {
+        title:"Analytics",
+        key:'analytics',
+        icon: ChartPie
     },
     {
         title: "Logout",
@@ -110,6 +116,7 @@ function Dashboard() {
                     {activeTab === "profile" && <Profile />}
                     {activeTab === "orders" && <Orders />}
                     {activeTab === "qr" && <QRGenerator />}
+                    {activeTab === "analytics" && <Analytics />}
                 </main>
             </SidebarProvider>
         </div>

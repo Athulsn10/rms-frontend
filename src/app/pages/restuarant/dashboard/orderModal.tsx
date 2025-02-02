@@ -42,7 +42,6 @@ const OrderModal: React.FC<OrderProps> = ({ order }) => {
       }
 
       const response = await handleBillPdfDownload(billPdfPath.billPath);
-      console.log('billPdfPath.billPath:',response)
       if (!response) {
         toast.success('Bill Generation Failed', {
           icon: <CircleAlert color="#fc3419"/>,

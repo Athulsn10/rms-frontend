@@ -27,7 +27,6 @@ function home() {
       }
     } else {
       const response = await getRestuarents();
-      console.log('response:',response)
       if (response) {
         setRestaurantList(response);
       }

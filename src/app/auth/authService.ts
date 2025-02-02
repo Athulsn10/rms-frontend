@@ -16,7 +16,6 @@ export const handleLogIn = async (email: string, password: string,  navigate: (p
         },
         { headers }
       );
-      console.log(response.data.data);
       localStorage.setItem('token', response.data.data.token);
       localStorage.setItem('user', response.data.data.name);
       localStorage.setItem('email', response.data.data.email);

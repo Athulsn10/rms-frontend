@@ -186,9 +186,9 @@ const Profile = () => {
             const value = field.id.includes('.')
                 ? formData.address[field.id.split('.')[1] as keyof AddressData]
                 : formData[field.id as keyof FormData];
-            if (field.id === "confirmPassword") {
-                console.log(field.validation(value as string))
-            }
+            // if (field.id === "confirmPassword") {
+            //     console.log(field.validation(value as string))
+            // }
             const error = field.validation(value as string);
             if (error) {
                 newErrors[field.id] = error;
@@ -215,7 +215,6 @@ const Profile = () => {
         e.preventDefault();
         setIsLoading(true);
         if (validateStep(currentStep)) {
-            console.log('Form submitted:', formData);
             const response = await updateUserProfile(formData);
             if (response) {
                 setIsLoading(false);

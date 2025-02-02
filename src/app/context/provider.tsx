@@ -24,7 +24,6 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     const restuarant = localStorage.getItem('restuarant');
     if (restuarant && user) {
       setIsRestuarant(true);
-      console.log(true)
     }
     if (user) {
       setIsAuthenticated(true);

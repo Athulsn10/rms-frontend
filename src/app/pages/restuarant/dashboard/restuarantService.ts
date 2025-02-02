@@ -66,7 +66,6 @@ export const getMenus = async () => {
 export const deleteMenu = async (itemId: String) => {
     try {
         const response = await http.delete(`/menus/${itemId}`);
-        console.log('response:',response)
         return response.status >= 200 && response.status <= 300 ? true : false;
     } catch (error: any) {
         return error.response?.data?.message
@@ -131,7 +130,6 @@ export const handleFetchBillPath = async (orderId:string) => {
 export const handleBillPdfDownload = async (path:string) => {
     try {
         const response = await http.get(`/files/orders/bill/${path}`, { responseType: 'blob'});
-        console.log('response.data:',response.data)
         return response.data ? response.data : false;
     } catch (error: any) {
         return error.response?.data?.message;

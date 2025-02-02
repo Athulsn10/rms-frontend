@@ -34,7 +34,6 @@ export const getRestuarantById = async (id:string) => {
 export const placeOrder = async (orderData: Object) => {
     try {
         const response = await http.post(`/order`,orderData);
-        console.log('response:',response)
         return response.data.data ? response.data.data : false;
     } catch (error: any) {
         return error.response?.data?.message
