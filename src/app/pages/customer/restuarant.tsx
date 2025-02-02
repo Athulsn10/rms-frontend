@@ -8,7 +8,7 @@ import { getRestuarantById, placeOrder, handleImageSearch } from "./customerServ
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { AlertCircle, Circle, CircleAlert, CircleCheck, Upload , Loader2, Minus, Plus, Search, ShoppingCart, Triangle, TriangleAlert, Utensils, UtensilsCrossed } from "lucide-react";
+import { AlertCircle, Circle, CircleAlert, CircleCheck, Upload, Loader2, Minus, Plus, Search, ShoppingCart, Triangle, TriangleAlert, Utensils, UtensilsCrossed, Flame } from "lucide-react";
 
 function restuarant() {
   const [remarks, setRemarks] = useState('');
@@ -116,11 +116,11 @@ function restuarant() {
     return item ? item.quantity : 0;
   };
 
-  const handleFileSelect = (e:any) => {
+  const handleFileSelect = (e: any) => {
     const file = e.target.files[0];
     if (file) {
       setSelectedFile(file);
-      const reader:any = new FileReader();
+      const reader: any = new FileReader();
       reader.onloadend = () => {
         setPreview(reader.result);
       };
@@ -156,7 +156,7 @@ function restuarant() {
   };
 
   useEffect(() => {
-    const total = cartItems.reduce((sum:number, cartItem:any) => {
+    const total = cartItems.reduce((sum: number, cartItem: any) => {
       const menuItem: any = menuList.find((item: any) => item._id === cartItem.menuId);
       return sum + (parseFloat(menuItem?.price || 0) * cartItem.quantity);
     }, 0);
@@ -193,99 +193,99 @@ function restuarant() {
               </>) :
               (<>
                 <div className="w-100 flex justify-center bg-orange-100 ">
-                      <div className="flex flex-col p-4 md:flex-row items-center justify-between gap-4 md:gap-16 w-full max-w-7xl">
-                        <Button className="flex items-center bg-orange-200 rounded-none w-100 md:w-50 hover:bg-orange-200 px-5 py-5" onClick={() => setDialogOpen(true)}>
-                          <Search size={28} className="text-orange-500" />
-                          <p className="font-bold text-orange-500 text-xl">Search Image</p>
-                        </Button>
+                  <div className="flex flex-col p-4 md:flex-row items-center justify-between gap-4 md:gap-16 w-full max-w-7xl">
+                    <Button className="flex items-center bg-orange-200 rounded-none w-100 md:w-50 hover:bg-orange-200 px-5 py-5" onClick={() => setDialogOpen(true)}>
+                      <Search size={28} className="text-orange-500" />
+                      <p className="font-bold text-orange-500 text-xl">Search Image</p>
+                    </Button>
 
-                        <div className="flex items-center w-full md:w-auto justify-center">
-                          <div className="relative w-full md:w-[700px]">
-                            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
-                            <Input  className="font-medium w-full py-5 rounded-none" placeholder="Search Menu Item" />
+                    <div className="flex items-center w-full md:w-auto justify-center">
+                      <div className="relative w-full md:w-[700px]">
+                        <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
+                        <Input className="font-medium w-full py-5 rounded-none" placeholder="Search Menu Item" />
+                      </div>
+                      <Button className="flex ml-2 md:ml-4 items-center bg-orange-200 rounded-none hover:bg-orange-200 px-5 py-5">
+                        <Search size={28} className="text-orange-500" />
+                        <p className="font-bold text-orange-500 text-xl hidden md:inline">Search</p>
+                      </Button>
+                    </div>
+                  </div>
+                  <Dialog open={dialogOpen} onOpenChange={() => setDialogOpen(false)}>
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>Upload A Food Image</DialogTitle>
+                      </DialogHeader>
+                      {isLoading && (
+                        <div className="absolute inset-0 flex items-center justify-center z-20">
+                          <div className="inline-block transition-all duration-300">
+                            <img style={{ height: '60px' }} src="/ai-loading-2.gif" />
                           </div>
-                          <Button  className="flex ml-2 md:ml-4 items-center bg-orange-200 rounded-none hover:bg-orange-200 px-5 py-5">
-                            <Search size={28} className="text-orange-500" />
-                            <p className="font-bold text-orange-500 text-xl hidden md:inline">Search</p>
+                        </div>
+                      )}
+                      <div className={`${isLoading ? 'blur-sm pointer-events-none space-y-6' : 'space-y-6'}`}>
+                        {/* Upload Section */}
+                        <div className="flex flex-col items-center gap-4">
+                          <div className="w-full max-w-md aspect-video bg-slate-100 rounded-none border-2 border-dashed border-orange-300 hover:border-orange-400 transition-colors relative overflow-hidden">
+                            {preview ? (
+                              <img
+                                src={preview}
+                                alt="Preview"
+                                className="w-full h-full object-cover"
+                              />
+                            ) : (
+                              <div className="absolute inset-0 flex flex-col items-center justify-center text-slate-500">
+                                <Upload size={32} />
+                                <p className="mt-2 text-sm">Click or drag image to upload</p>
+                              </div>
+                            )}
+                            <input
+                              type="file"
+                              accept="image/*"
+                              onChange={handleFileSelect}
+                              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                            />
+                          </div>
+
+                          <Button
+                            onClick={handleSubmit}
+                            disabled={!selectedFile || isLoading}
+                            className="w-full max-w-md rounded-none bg-orange-600 hover:bg-orange-500"
+                          >Analyze Image
                           </Button>
                         </div>
-                      </div>
-                      <Dialog open={dialogOpen} onOpenChange={() => setDialogOpen(false)}>
-                      <DialogContent>
-                        <DialogHeader>
-                          <DialogTitle>Upload A Food Image</DialogTitle>
-                        </DialogHeader>
-                        {isLoading && (
-                          <div className="absolute inset-0 flex items-center justify-center z-20">
-                            <div className="inline-block transition-all duration-300">
-                              <img style={{ height: '60px' }} src="/ai-loading-2.gif"/>
-                            </div>
-                          </div>
-                        )}
-                        <div className={`${isLoading ? 'blur-sm pointer-events-none space-y-6' : 'space-y-6'}`}>
-                          {/* Upload Section */}
-                          <div className="flex flex-col items-center gap-4">
-                            <div className="w-full max-w-md aspect-video bg-slate-100 rounded-none border-2 border-dashed border-orange-300 hover:border-orange-400 transition-colors relative overflow-hidden">
-                              {preview ? (
-                                <img
-                                  src={preview}
-                                  alt="Preview"
-                                  className="w-full h-full object-cover"
-                                />
-                              ) : (
-                                <div className="absolute inset-0 flex flex-col items-center justify-center text-slate-500">
-                                  <Upload size={32} />
-                                  <p className="mt-2 text-sm">Click or drag image to upload</p>
-                                </div>
-                              )}
-                              <input
-                                type="file"
-                                accept="image/*"
-                                onChange={handleFileSelect}
-                                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                              />
-                            </div>
-                            
-                            <Button 
-                              onClick={handleSubmit} 
-                              disabled={!selectedFile || isLoading}
-                              className="w-full max-w-md rounded-none bg-orange-600 hover:bg-orange-500"
-                            >Analyze Image
-                            </Button>
-                          </div>
 
-                          {/* Results Section */}
-                          {result && (
-                            <div className="overflow-hidden">
-                              <div className="p-6 space-y-4">
-                                <div className="flex items-center justify-between">
-                                  <h3 className="text-xl font-semibold">{result.name}</h3>
-                                  <div className={`${result.type === "VEGETARIAN" ? "bg-green-600 text-white hover:bg-green-600 p-2 rounded-sm" : "bg-red-600 hover:bg-red-600 text-white p-2 rounded-sm"}`}>
-                                   {result.type === "VEGETARIAN" ? <Circle /> : <Triangle />}
-                                  </div>
+                        {/* Results Section */}
+                        {result && (
+                          <div className="overflow-hidden">
+                            <div className="p-6 space-y-4">
+                              <div className="flex items-center justify-between">
+                                <h3 className="text-xl font-semibold">{result.name}</h3>
+                                <div className={`${result.type === "VEGETARIAN" ? "bg-green-600 text-white hover:bg-green-600 p-2 rounded-sm" : "bg-red-600 hover:bg-red-600 text-white p-2 rounded-sm"}`}>
+                                  {result.type === "VEGETARIAN" ? <Circle /> : <Triangle />}
                                 </div>
-                                
-                                <div className="flex items-center gap-2 text-sm text-slate-600">
-                                  <Badge variant="outline" className={`${result.status === 'AVAILABLE' ? "bg-green-200" : "bg-red-200"} `}>
-                                    {result.status}
-                                  </Badge>
-                                  <span className="font-medium text-lg">₹{result.price}</span>
-                                </div>
+                              </div>
 
-                                <div className="space-y-2">
-                                  <h4 className="font-medium text-slate-700">Ingredients:</h4>
-                                  <div className="flex flex-wrap gap-2">
-                                    {result.ingredients.map((ingredient:any, idx:number) => (
-                                      <span 
-                                        key={idx}
-                                        className="px-3 py-1 rounded-full text-sm bg-slate-100 text-slate-700"
-                                      >
-                                        {ingredient}
-                                      </span>
-                                    ))}
-                                  </div>
+                              <div className="flex items-center gap-2 text-sm text-slate-600">
+                                <Badge variant="outline" className={`${result.status === 'AVAILABLE' ? "bg-green-200" : "bg-red-200"} `}>
+                                  {result.status}
+                                </Badge>
+                                <span className="font-medium text-lg">₹{result.price}</span>
+                              </div>
+
+                              <div className="space-y-2">
+                                <h4 className="font-medium text-slate-700">Ingredients:</h4>
+                                <div className="flex flex-wrap gap-2">
+                                  {result.ingredients.map((ingredient: any, idx: number) => (
+                                    <span
+                                      key={idx}
+                                      className="px-3 py-1 rounded-full text-sm bg-slate-100 text-slate-700"
+                                    >
+                                      {ingredient}
+                                    </span>
+                                  ))}
                                 </div>
-                                <div className="flex items-center gap-3 justify-end">
+                              </div>
+                              <div className="flex items-center gap-3 justify-end">
                                 <Button
                                   variant="outline"
                                   size="icon"
@@ -306,13 +306,13 @@ function restuarant() {
                                 >
                                   <Plus className="h-4 w-4" />
                                 </Button>
-                        </div>
                               </div>
                             </div>
-                          )}
-                        </div>
-                      </DialogContent>
-                    </Dialog>
+                          </div>
+                        )}
+                      </div>
+                    </DialogContent>
+                  </Dialog>
                 </div>
                 <div className={`grid grid-cols-1 md:grid-cols-4 lg:grid-cols-4 gap-6 p-6 ${cartItems.length > 0 ? 'mb-16' : ''}`}>
                   {menuList.map((item: any) => (
@@ -326,10 +326,23 @@ function restuarant() {
                         <Popover>
                           <PopoverTrigger asChild>
                             <Button
-                              size="icon"
-                              className="absolute top-2 right-2 bg-white hover:bg-white"
-                            >
-                              <AlertCircle className="w-5 h-5 text-yellow-500" />
+                              size="sm"
+                              className="absolute top-2 right-2 bg-orange-100 hover:bg-orange-100 rounded-full px-2 group">
+                              <div className="flex items-center justify-end overflow-hidden rounded-full transition-all duration-300">
+                                <div className="flex items-center">
+                                  <div className="max-w-0 overflow-hidden whitespace-nowrap transition-all duration-300 group-hover:max-w-xs">
+                                    <img
+                                      style={{ height: '20px' }}
+                                      src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/f0/Google_Bard_logo.svg/900px-Google_Bard_logo.svg.png"
+                                      className="text-orange-600"
+                                      alt="Bard Logo"
+                                    />
+                                  </div>
+                                  <div className="p-1">
+                                    <AlertCircle className="w-5 h-5 text-yellow-600" />
+                                  </div>
+                                </div>
+                              </div>
                             </Button>
                           </PopoverTrigger>
                           <PopoverContent className="w-80">
@@ -343,6 +356,18 @@ function restuarant() {
                             </div>
                           </PopoverContent>
                         </Popover>
+                        <div className="absolute top-14 right-2 group">
+                          <div className="flex items-center justify-end bg-orange-100 rounded-full overflow-hidden transition-all duration-300">
+                            <div className="flex items-center">
+                              <p className="max-w-0 overflow-hidden whitespace-nowrap transition-all duration-300 group-hover:max-w-xs group-hover:pl-2">
+                                {item.calories}
+                              </p>
+                              <div className="p-2">
+                                <Flame className="w-5 h-5 text-yellow-600" />
+                              </div>
+                            </div>
+                          </div>
+                        </div>
                       </div>
                       <CardHeader>
                         <div className="flex justify-between items-start">
@@ -432,7 +457,7 @@ function restuarant() {
                 </DialogHeader>
 
                 <div className="space-y-4">
-                <Textarea placeholder="Type your message here." onChange={(e) => setRemarks(e.target.value)}/>
+                  <Textarea placeholder="Type your message here." onChange={(e) => setRemarks(e.target.value)} />
                 </div>
 
                 <DialogFooter>
