@@ -28,14 +28,18 @@ const RestaurantCard: React.FC<cardProps> = ({ id, title, rating, category, area
     }
 
     return (
-        <div onClick={handleNavigate} style={{ width: 'fit-content' }} className="ms-5 me-3 overflow-hidden rounded-lg hover:cursor-pointer">
-            <div className="overflow-hidden rounded-3xl">
-                <div className="h-[200px] w-[270px] rounded-lg">
-                    <img src={imgUrl} alt="Restaurant" className="object-cover rounded-lg"/>
+        <div onClick={handleNavigate} className="ms-5 me-3 w-[270px] overflow-hidden rounded-lg rounded-t-3xl hover:cursor-pointer bg-white hover:shadow-md">
+            <div className="overflow-hidden">
+                <div className="h-48 w-full">
+                    <img
+                        src={imgUrl}
+                        alt="Restaurant"
+                        className="h-full w-full object-cover transform hover:scale-105 transition-transform duration-300"
+                    />
                 </div>
             </div>
             <div className="p-3 pt-1">
-                <p className="font-[700] text-[18px] text-gray-800">{title}</p>
+                <p className="font-bold text-lg text-gray-800">{title}</p>
                 <div className="flex items-center gap-1">
                     <svg width="20" height="20" viewBox="0 0 20 20" fill="none" role="img" aria-hidden="true">
                         <circle cx="10" cy="10" r="9" fill="url(#StoreRatingGradient)"></circle>
@@ -47,12 +51,15 @@ const RestaurantCard: React.FC<cardProps> = ({ id, title, rating, category, area
                             </linearGradient>
                         </defs>
                     </svg>
-                    <p className="text-[16px] font-medium">{rating || '0'}</p>
+                    <p className="text-base font-medium">{rating || '0'}</p>
                 </div>
-                <p className="text-sm text-gray-600 flex items-center gap-2 mt-2"><Armchair size={20} />{category}</p>
+                <p className="text-sm text-gray-600 flex items-center gap-2 mt-2">
+                    <Armchair size={20} />
+                    {category}
+                </p>
                 <p className="text-sm text-gray-600">{area}</p>
             </div>
-            <Toaster/>
+            <Toaster />
         </div>
     );
 };

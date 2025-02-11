@@ -69,7 +69,7 @@ function home() {
         <div className="px-4 sm:px-6 lg:px-8 py-8">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {cards.map(({ value, label, icon }) => (
-              <div key={label} className="flex items-center space-x-4 p-4 sm:p-6 bg-gray-100 rounded-lg">
+              <div key={label} className="flex items-center space-x-4 p-4 sm:p-6 bg-orange-50 hover:shadow-md rounded-lg">
                 {icon}
                 <div>
                   <h3 className="text-2xl sm:text-3xl font-bold text-gray-800">{value}</h3>
