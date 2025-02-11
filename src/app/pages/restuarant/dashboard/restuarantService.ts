@@ -135,3 +135,12 @@ export const handleBillPdfDownload = async (path:string) => {
         return error.response?.data?.message;
     }
 };
+
+export const getMenuInsights = async () => {
+    try {
+        const response = await http.get(`/menus/insights/trending`);
+        return response.data ? response.data : false;
+    } catch (error: any) {
+        return error.response?.data?.message;
+    }
+}
