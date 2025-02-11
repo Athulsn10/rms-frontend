@@ -4,7 +4,7 @@ import { getRestuarents, getRestuarentsByCity } from './homeService.js';
 import { Facebook, Instagram, Twitter, Linkedin, Utensils, Star, MapPin, Coffee } from 'lucide-react';
 
 interface Restaurant {
-  id: number,
+  _id: string,
   name: string,
   rating: string,
   tableCount: string,
@@ -90,8 +90,9 @@ function home() {
             <div className='mt-4 px-4 sm:px-6 lg:px-8 overflow-x-auto custom-scroll-bar'>
               <div className='flex space-x-4 min-w-full pb-4 '>
                 {restaurantList.map((restaurant: Restaurant) => (
-                  <div key={restaurant.id} className="flex-none w-72 sm:w-80">
+                  <div key={restaurant._id} className="flex-none w-72 sm:w-80">
                     <RestaurantCard
+                      id={restaurant._id}
                       title={restaurant.name}
                       rating={restaurant.rating}
                       category={restaurant.tableCount}
@@ -112,8 +113,9 @@ function home() {
             <div className='mt-4 px-4 sm:px-6 lg:px-8 overflow-x-auto'>
               <div className='flex space-x-4 min-w-full pb-4 custom-scroll-bar'>
                 {allRestaurantList.map((restaurant: Restaurant) => (
-                  <div key={restaurant.id} className="flex-none w-72 sm:w-80">
+                  <div key={restaurant._id} className="flex-none w-72 sm:w-80">
                     <RestaurantCard
+                      id={restaurant._id}
                       title={restaurant.name}
                       rating={restaurant.rating}
                       category={restaurant.tableCount}
@@ -174,9 +176,9 @@ function home() {
                   <input
                     type="email"
                     placeholder="Your email"
-                    className="w-full px-4 py-2 rounded-lg bg-orange-50 border border-orange-200 focus:outline-none focus:ring-2 focus:ring-orange-300"
+                    className="w-full px-4 py-2 rounded-none bg-orange-50 border border-orange-200 focus:outline-none focus:ring-2 focus:ring-orange-300"
                   />
-                  <button className="w-full sm:w-auto bg-orange-500 text-white px-6 py-2 rounded-lg hover:bg-orange-600 transition-colors">
+                  <button className="w-full sm:w-auto bg-orange-500 text-white px-6 py-2 rounded-none hover:bg-orange-600 transition-colors">
                     Subscribe
                   </button>
                 </div>
