@@ -1,8 +1,9 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import { LineChart, Line } from 'recharts';
-import { PieChart, Pie, Cell } from 'recharts';
-import { ArrowUpIcon, ArrowDownIcon } from 'lucide-react';
+import { ArrowUpIcon } from 'lucide-react';
+import { getMenuInsights } from "./restuarantService";
+import { useEffect } from "react";
 
 function analytics() {
     const topSellingItems = [
@@ -32,6 +33,17 @@ function analytics() {
         { time: '18-20', orders: 95 },
         { time: '20-22', orders: 65 }
     ];
+
+    const getMenuAnalytics = async() => {
+        const response = await getMenuInsights();
+        if (response) {
+            console.log('response from ai:', response);
+        }
+    };
+
+    useEffect(() => {
+        getMenuAnalytics();
+    },[]);
 
     return (
         <div className="p-6 space-y-6 bg-orange-50 h-full flex flex-col justify-center">
