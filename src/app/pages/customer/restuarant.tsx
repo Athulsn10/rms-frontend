@@ -3,40 +3,57 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import toast, { Toaster } from 'react-hot-toast';
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { Textarea } from "@/components/ui/textarea";
 import { getRestuarantById, placeOrder, handleImageSearch } from "./customerService";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { AlertCircle, Circle, CircleAlert, CircleCheck, Upload, Loader2, Minus, Plus, Search, ShoppingCart, Triangle, TriangleAlert, Utensils, UtensilsCrossed, Flame } from "lucide-react";
+import { AlertCircle, Circle, CircleAlert, CircleCheck, Upload, Loader2, Minus, Plus, Search, ShoppingCart, Triangle, TriangleAlert, Utensils, UtensilsCrossed, Flame, ScanQrCode } from "lucide-react";
+
 
 function restuarant() {
-  const [remarks, setRemarks] = useState('');
-  const [selectedFile, setSelectedFile] = useState(null);
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [preview, setPreview] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [result, setResult] = useState<any>(null);
+  const [remarks, setRemarks] = useState('');
   const [menuList, setMenuList] = useState([]);
   const [hasMenu, setHasMenu] = useState(false);
+  const [result, setResult] = useState<any>(null);
   const [totalAmount, setTotalAmount] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [cartItems, setCartItems] = useState<any>([]);
   const [fetchingData, setFetchingData] = useState(false);
+  const [selectedFile, setSelectedFile] = useState(null);
   const [isEditModalOpen, setIsRemarksModalOpen] = useState(false);
   const base_url = import.meta.env.VITE_BASE_URL;
+  const idFromParams = searchParams.get('id');
 
   const fetchData = async () => {
     setFetchingData(true);
-    const restuatantId = localStorage.getItem('restaurantOrder');
-    if (restuatantId) {
-      const parsedValue = JSON.parse(restuatantId);
-      const response = await getRestuarantById(parsedValue.restaurantId);
+    if (idFromParams) {
+      localStorage.removeItem('restaurantOrder');
+      const response = await getRestuarantById(idFromParams);
       if (response && response.length > 0) {
         setMenuList(response);
         setHasMenu(true);
         setFetchingData(false);
       } else {
         setFetchingData(false);
+      }
+    } else {
+      const restuatantId = localStorage.getItem('restaurantOrder');
+      if (restuatantId) {
+        const parsedValue = JSON.parse(restuatantId);
+        const response = await getRestuarantById(parsedValue.restaurantId);
+        if (response && response.length > 0) {
+          setMenuList(response);
+          setHasMenu(true);
+          setFetchingData(false);
+        } else {
+          setFetchingData(false);
+        }
       }
     }
   };
@@ -130,16 +147,30 @@ function restuarant() {
 
   const handleSubmit = async () => {
     setIsLoading(true);
+    let restaurantId;
     const resturant = localStorage.getItem('restaurantOrder');
-    if (!resturant || !selectedFile) {
+
+    if (!selectedFile) {
       toast.error('Something went wrong!', {
         icon: <CircleAlert color="#fc3419" />,
       });
       setIsLoading(false);
       return;
     }
-    const parsedRestuarant = JSON.parse(resturant);
-    const restaurantId = parsedRestuarant.restaurantId;
+
+    if (resturant) {
+      const parsedRestuarant = JSON.parse(resturant);
+      restaurantId = parsedRestuarant.restaurantId;
+    } else if (idFromParams) {
+      restaurantId = idFromParams;
+    } else {
+      toast.error('Something went wrong!', {
+        icon: <CircleAlert color="#fc3419" />,
+      });
+      setIsLoading(false);
+      return;
+    }
+
     const formData = new FormData();
     formData.append('restaurantId', restaurantId);
     formData.append('image', selectedFile);
@@ -285,28 +316,32 @@ function restuarant() {
                                   ))}
                                 </div>
                               </div>
-                              <div className="flex items-center gap-3 justify-end">
-                                <Button
-                                  variant="outline"
-                                  size="icon"
-                                  className="h-8 w-8 bg-orange-100 rounded-none hover:bg-orange-200"
-                                  onClick={() => updateQuantity(result, -1)}
-                                  disabled={!getQuantity(result._id)}
-                                >
-                                  <Minus className="h-4 w-4" />
-                                </Button>
-                                <span className="w-8 text-center font-medium">
-                                  {getQuantity(result._id)}
-                                </span>
-                                <Button
-                                  variant="outline"
-                                  size="icon"
-                                  className="h-8 w-8 bg-orange-100 rounded-none hover:bg-orange-200"
-                                  onClick={() => updateQuantity(result, 1)}
-                                >
-                                  <Plus className="h-4 w-4" />
-                                </Button>
-                              </div>
+                             { !idFromParams && 
+                             <>
+                                <div className="flex items-center gap-3 justify-end">
+                                  <Button
+                                    variant="outline"
+                                    size="icon"
+                                    className="h-8 w-8 bg-orange-100 rounded-none hover:bg-orange-200"
+                                    onClick={() => updateQuantity(result, -1)}
+                                    disabled={!getQuantity(result._id)}
+                                  >
+                                    <Minus className="h-4 w-4" />
+                                  </Button>
+                                  <span className="w-8 text-center font-medium">
+                                    {getQuantity(result._id)}
+                                  </span>
+                                  <Button
+                                    variant="outline"
+                                    size="icon"
+                                    className="h-8 w-8 bg-orange-100 rounded-none hover:bg-orange-200"
+                                    onClick={() => updateQuantity(result, 1)}
+                                  >
+                                    <Plus className="h-4 w-4" />
+                                  </Button>
+                                </div>
+                             </>
+                             }
                             </div>
                           </div>
                         )}
@@ -391,6 +426,7 @@ function restuarant() {
                         <Badge variant="outline" className={`${item.status === 'AVAILABLE' ? "bg-green-200" : "bg-red-200"} `}>
                           {item.status}
                         </Badge>
+                       { !idFromParams && 
                         <div className="flex items-center gap-3">
                           <Button
                             variant="outline"
@@ -413,6 +449,7 @@ function restuarant() {
                             <Plus className="h-4 w-4" />
                           </Button>
                         </div>
+                       }
                       </CardFooter>
                     </Card>
                   ))}
@@ -446,6 +483,20 @@ function restuarant() {
                     </div>
                   </div>
                 )}
+
+                {idFromParams && 
+                   (<div className="fixed bottom-16 md:bottom-0 left-0 right-0 bg-white border-t shadow-lg p-3 sm:p-4 flex flex-col sm:flex-row justify-end items-center sm:bottom-10 space-y-3 sm:space-y-0">
+                    <div className="flex gap-2 sm:gap-5 w-full sm:w-auto items-center">
+                    <p className="ms-10 font-semibold">Scan the qr code to place orders!</p>
+                      <Button
+                        onClick={() => navigate('/qrscanner')}
+                        className="flex-1 sm:flex-none bg-orange-600 hover:bg-orange-700 text-white px-4 sm:px-8 py-2 sm:py-3 rounded-none text-sm sm:text-base"
+                      >
+                        Scan Qr <ScanQrCode color="#ffff" className="ml-2" />
+                      </Button>
+                    </div>
+                  </div>)
+                }
               </>
               )
             }
