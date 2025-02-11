@@ -4,6 +4,7 @@ import toast, { Toaster } from 'react-hot-toast';
 
 
 interface cardProps {
+    id: string,
     title: string;
     rating: string;
     category: string;
@@ -11,14 +12,14 @@ interface cardProps {
     imgUrl?: string;
 }
 
-const RestaurantCard: React.FC<cardProps> = ({ title, rating, category, area, imgUrl }) => {
+const RestaurantCard: React.FC<cardProps> = ({ id, title, rating, category, area, imgUrl }) => {
     const navigate = useNavigate();
 
     const handleNavigate = (e: React.MouseEvent<HTMLDivElement>) => {
         e.preventDefault();
         const user = localStorage.getItem('user');
         if (user) {
-            navigate(`/qrscanner`)
+            navigate(`/restuarant?id=${id}`)
         } else {
             toast.error('Login To Continue!', {
                 icon: <CircleAlert color="#fc3419" />,
