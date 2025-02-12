@@ -174,7 +174,7 @@ export const MultiSelect = React.forwardRef<HTMLButtonElement, MultiSelectProps>
         modal={modalPopover}
       >
         <div className="flex justify-between items-center w-full h-5 pointer-events-auto">
-          <div className="flex flex-wrap items-center md:max-h-none max-h-5 mb-2">
+          <div className="flex flex-wrap items-center md:max-h-none max-h-5 mb-2 mt-5">
             {selectedValues.slice(0, maxCount).map((value) => {
               const option = allOptions.find((o) => o.value === value);
               return (
@@ -236,7 +236,7 @@ export const MultiSelect = React.forwardRef<HTMLButtonElement, MultiSelectProps>
             {...props}
             onClick={handleTogglePopover}
             className={cn(
-              "flex w-full p-1 rounded-md border min-h-10 h-auto items-center justify-between bg-inherit hover:bg-inherit [&_svg]:pointer-events-auto",
+              "flex w-full p-1 mt-4 rounded-md border min-h-10 h-auto items-center justify-between bg-inherit hover:bg-inherit [&_svg]:pointer-events-auto",
               className
             )}
           >
