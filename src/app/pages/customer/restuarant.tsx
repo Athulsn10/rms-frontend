@@ -395,7 +395,7 @@ function restuarant() {
                           <div className="flex items-center justify-end bg-orange-100 rounded-full overflow-hidden transition-all duration-300">
                             <div className="flex items-center">
                               <p className="max-w-0 overflow-hidden whitespace-nowrap transition-all duration-300 group-hover:max-w-xs group-hover:pl-2">
-                                {item.calories}
+                                {item.calories} Calories
                               </p>
                               <div className="p-2">
                                 <Flame className="w-5 h-5 text-yellow-600" />
