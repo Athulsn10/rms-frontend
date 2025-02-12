@@ -27,7 +27,6 @@ function menu() {
   const [aiLoading, setAiLoading] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [searchValue, setSearchValue] = useState('');
-  const [dialogOpen, setDialogOpen] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
   const [menuList, setMenuList] = useState<any[]>([]);
   const [multiSelectKey, setMultiSelectKey] = useState(0);
@@ -356,11 +355,11 @@ function menu() {
     setMultiSelectKey(multiSelectKey + 1);
   }, [selectedIngredients]);
 
-  useEffect(() => {
-    if (!dialogOpen) {
-      resetForm();
-    }
-  }, [dialogOpen]);
+  // useEffect(() => {
+  //   if (!isFormVisible) {
+  //     resetForm();
+  //   }
+  // }, [isFormVisible]);
 
   return (
     <>
