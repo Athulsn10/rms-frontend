@@ -21,9 +21,9 @@ export const getRestuarents = async () => {
     }
 };
 
-export const getAllCustomers = async () => {
+export const getStatistics = async () => {
     try {
-        const response = await http.get(`/customer`);
+        const response = await http.get(`/misc/dashboard/public/statistics`);
         return response.status >= 200 && response.status <= 300 ? response.data.data : false;
     } catch (error: any) {
         return error.response?.data?.message
