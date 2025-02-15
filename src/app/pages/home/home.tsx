@@ -1,29 +1,30 @@
 import { useEffect, useState } from 'react';
 import RestaurantCard from '@/components/restuarantCard/restuarantCard'
-import { getRestuarents, getRestuarentsByCity } from './homeService.js';
-import { Facebook, Instagram, Twitter, Linkedin, Utensils, Star, MapPin, Coffee } from 'lucide-react';
+import { getAllCustomers, getRestuarents, getRestuarentsByCity } from './homeService.js';
+import { Facebook, Instagram, Twitter, Linkedin, Utensils, Star, MapPin, Donut } from 'lucide-react';
 
 interface Restaurant {
   _id: string,
   name: string,
   rating: string,
   tableCount: string,
-  area: string,
+  address: { city: string },
   images: string
 }
 
+interface RestaurantAddress {
+  address: {
+    city: string;
+  };
+}
+
 function home() {
-  const [location, setLocation] = useState('')
+  const [location, setLocation] = useState('');
+  const [orderslength, setOrderslength] = useState(0);
   const [restaurantList, setRestaurantList] = useState([]);
+  const [customerslength, setCustomerslength] = useState(0);
   const [allRestaurantList, setallRestaurantList] = useState([]);
   const base_url = import.meta.env.VITE_BASE_URL;
-
-  const cards = [
-    { value: '500+', label: 'Restaurants', icon: <Utensils className="text-blue-600" size={36} /> },
-    { value: '12K+', label: 'Happy Customers', icon: <Star className="text-yellow-500" size={36} /> },
-    { value: '25', label: 'Cities Covered', icon: <MapPin className="text-green-600" size={36} /> },
-    { value: '24/7', label: 'Customer Support', icon: <Coffee className="text-purple-600" size={36} /> }
-  ];
 
   const fetchRestuarants = async () => {
     const city = localStorage.getItem('city');
@@ -40,14 +41,35 @@ function home() {
     }
   };
 
+  const fetchOrdersAndCustomers = async () => {
+    const response = await getAllCustomers();
+    if (response){
+      setOrderslength(response.length);
+    }
+  };
+
+  const getUniqueCitiesCount = (restaurants: RestaurantAddress[]) => {
+    const uniqueCities = new Set(
+      restaurants.map(restaurant => restaurant.address.city)
+    );
+    return uniqueCities.size;
+  };
+
+  const cards = [
+    { value: `${allRestaurantList.length}`, label: 'Restaurants', icon: <Utensils className="text-blue-600" size={36} /> },
+    { value: `${customerslength}`, label: 'Happy Customers', icon: <Star className="text-yellow-500" size={36} /> },
+    { value: `${getUniqueCitiesCount(allRestaurantList)}`, label: 'Cities Covered', icon: <MapPin className="text-green-600" size={36} /> },
+    { value: `${orderslength}`, label: 'Orders placed', icon: <Donut className="text-purple-600" size={36} /> }
+  ];
+
   useEffect(() => {
     fetchRestuarants();
+    fetchOrdersAndCustomers();
   }, []);
 
   return (
     <>
       <div className="min-h-screen bg-gray-50">
-        {/* Hero Section */}
         <div className='px-4 sm:px-6 lg:px-8 py-4 sm:py-6'>
           <div className='w-full bg-white rounded-xl shadow-sm'>
             <div className='relative'>
@@ -82,10 +104,10 @@ function home() {
 
         {/* Restaurant Lists */}
         <div className="space-y-8">
-          {/* Local Restaurants */}
+          {location &&
           <div>
             <h2 className="px-4 sm:px-6 lg:px-8 text-lg sm:text-xl font-bold">
-              Top restaurant chains in {location ? location : "tavalo"}
+              Top restaurant chains in {location }
             </h2>
             <div className='mt-4 px-4 sm:px-6 lg:px-8 overflow-x-auto custom-scroll-bar'>
               <div className='flex space-x-4 min-w-full pb-4 '>
@@ -96,7 +118,7 @@ function home() {
                       title={restaurant.name}
                       rating={restaurant.rating}
                       category={restaurant.tableCount}
-                      area={restaurant.area}
+                      area={restaurant.address.city}
                       imgUrl={restaurant.images ? `${base_url}files/restaurants/${restaurant.images}` : 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQQ_VOrKf8cjdbXzZHa-DDUtU0luArTacQhJg&s'}
                     />
                   </div>
@@ -104,6 +126,7 @@ function home() {
               </div>
             </div>
           </div>
+          }
 
           {/* All Restaurants */}
           <div>
@@ -119,7 +142,7 @@ function home() {
                       title={restaurant.name}
                       rating={restaurant.rating}
                       category={restaurant.tableCount}
-                      area={restaurant.area}
+                      area={restaurant.address.city}
                       imgUrl={restaurant.images ? `${base_url}files/restaurants/${restaurant.images}` : 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQQ_VOrKf8cjdbXzZHa-DDUtU0luArTacQhJg&s'}
                     />
                   </div>
