@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import RestaurantCard from '@/components/restuarantCard/restuarantCard'
-import { getAllCustomers, getRestuarents, getRestuarentsByCity } from './homeService.js';
+import { getAllCustomers, getRestuarents, getRestuarentsByCity, getStatistics } from './homeService.js';
 import { Facebook, Instagram, Twitter, Linkedin, Utensils, Star, MapPin, Donut } from 'lucide-react';
 
 interface Restaurant {
@@ -16,13 +16,26 @@ interface RestaurantAddress {
   address: {
     city: string;
   };
+};
+
+interface Statistics {
+  totalCustomers: number;
+  totalOrders: number;
+  totalRestaurants: number;
+  cities: number;
 }
+
 
 function home() {
   const [location, setLocation] = useState('');
-  const [orderslength, setOrderslength] = useState(0);
+  const [statistics, setStatistics] = useState<Statistics>({
+    totalCustomers: 0,
+    totalOrders: 0,
+    totalRestaurants: 0,
+    cities: 0
+  });
+
   const [restaurantList, setRestaurantList] = useState([]);
-  const [customerslength, setCustomerslength] = useState(0);
   const [allRestaurantList, setallRestaurantList] = useState([]);
   const base_url = import.meta.env.VITE_BASE_URL;
 
@@ -42,24 +55,18 @@ function home() {
   };
 
   const fetchOrdersAndCustomers = async () => {
-    const response = await getAllCustomers();
+    const response = await getStatistics();
     if (response){
-      setOrderslength(response.length);
+      console.log('response:',response)
+      setStatistics(response);
     }
   };
 
-  const getUniqueCitiesCount = (restaurants: RestaurantAddress[]) => {
-    const uniqueCities = new Set(
-      restaurants.map(restaurant => restaurant.address.city)
-    );
-    return uniqueCities.size;
-  };
-
   const cards = [
-    { value: `${allRestaurantList.length}`, label: 'Restaurants', icon: <Utensils className="text-blue-600" size={36} /> },
-    { value: `${customerslength}`, label: 'Happy Customers', icon: <Star className="text-yellow-500" size={36} /> },
-    { value: `${getUniqueCitiesCount(allRestaurantList)}`, label: 'Cities Covered', icon: <MapPin className="text-green-600" size={36} /> },
-    { value: `${orderslength}`, label: 'Orders placed', icon: <Donut className="text-purple-600" size={36} /> }
+    { value: `${statistics.totalRestaurants}`, label: 'Restaurants', icon: <Utensils className="text-blue-600" size={36} /> },
+    { value: `${statistics.totalCustomers}`, label: 'Happy Customers', icon: <Star className="text-yellow-500" size={36} /> },
+    { value: `${statistics.cities}`, label: 'Cities Covered', icon: <MapPin className="text-green-600" size={36} /> },
+    { value: `${statistics.totalOrders}`, label: 'Orders placed', icon: <Donut className="text-purple-600" size={36} /> }
   ];
 
   useEffect(() => {
