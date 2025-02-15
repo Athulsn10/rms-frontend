@@ -139,8 +139,26 @@ export const handleBillPdfDownload = async (path:string) => {
 export const getMenuInsights = async () => {
     try {
         const response = await http.get(`/menus/insights/trending`);
-        return response.data ? response.data : false;
+        return response.data.data ? response.data.data : false;
     } catch (error: any) {
         return error.response?.data?.message;
     }
-}
+};
+
+export const getStatistics = async () => {
+    try {
+        const response = await http.get(`/misc/dashboard/statistics`);
+        return response.data.data ? response.data.data : false;
+    } catch (error: any) {
+        return error.response?.data?.message;
+    }
+};
+
+export const getChartData = async () => {
+    try {
+        const response = await http.get(`/misc/dashboard/charts`);
+        return response.data.data ? response.data.data : false;
+    } catch (error: any) {
+        return error.response?.data?.message;
+    }
+};
