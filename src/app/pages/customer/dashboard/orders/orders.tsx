@@ -3,11 +3,11 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import toast, { Toaster } from 'react-hot-toast';
 import { Textarea } from "@/components/ui/textarea";
-import { CircleAlert, CircleCheck, Clock, Download, Edit2, Loader2, Minus, Plus, Trash2, XCircle } from 'lucide-react';
-import { getAllOrders, updateOrder } from "../../customerService";
+import { cancelOrder, getAllOrders, updateOrder } from "../../customerService";
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { handleBillPdfDownload, handleFetchBillPath } from "@/app/pages/restuarant/dashboard/restuarantService";
+import { CircleAlert, CircleCheck, Clock, Download, Edit2, Loader2, Minus, Plus, Trash2, XCircle } from 'lucide-react';
 
 // Menu item interface
 interface MenuItem {
@@ -56,17 +56,28 @@ function Orders() {
 
     const handleEdit = (order: Order) => {
         const orderCopy = JSON.parse(JSON.stringify(order));
+        console.log('orderCopy:',orderCopy)
         setSelectedOrder(orderCopy);
         setOriginalOrder(orderCopy);
         setIsEditModalOpen(true);
     };
 
-    const handleCancel = (orderId: string) => {
-        setOrders(prevOrders =>
-            prevOrders.map(order =>
-                order._id === orderId ? { ...order, status: 'Cancelled' } : order
-            )
-        );
+    const handleCancel = async (orderId: string) => {
+        const response = await cancelOrder(orderId);
+        if (response) {
+            toast.success('Order Cancelled!', {
+                icon: <CircleCheck color="#1ce867" />,
+            });
+            setOrders(prevOrders =>
+                prevOrders.map(order =>
+                    order._id === orderId ? { ...order, status: 'Cancelled' } : order
+                )
+            );
+        } else {
+            toast.error('Cancelation Failed!', {
+                icon: <CircleAlert color="#fc3419" />,
+            });
+        }
     };
 
     const handleQuantityChange = (itemIndex: number, change: number) => {
@@ -289,10 +300,10 @@ function Orders() {
 
                                 <div className="space-y-4">
                                     {selectedOrder?.order.map((item: any, index: number) => (
-                                        <div key={item.menuId._id} className="flex items-center justify-between p-2 border rounded">
+                                        <div key={item.menuId?._id} className="flex items-center justify-between p-2 border rounded">
                                             <div>
-                                                <p className="font-medium">{item.menuId.name}</p>
-                                                <p className="text-sm text-gray-600">₹{item.menuId.price} each</p>
+                                                <p className="font-medium">{item.menuId?.name}</p>
+                                                <p className="text-sm text-gray-600">₹{item.menuId?.price} each</p>
                                             </div>
 
                                             <div className="flex items-center gap-2">
