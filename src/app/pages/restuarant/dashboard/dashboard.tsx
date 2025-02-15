@@ -34,7 +34,7 @@ const items = [
         icon: QrCode
     },
     {
-        title:"Analytics",
+        title:"AI Analytics",
         key:'analytics',
         icon: ChartPie
     },
