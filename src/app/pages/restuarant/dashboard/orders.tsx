@@ -129,7 +129,7 @@ function Orders() {
                     {/* view */}
                     <Dialog>
                       <DialogTrigger asChild>
-                        <Button disabled={order.status === 'Cancelled'} className="hover:bg-orange-100 rounded-none bg-transparent border-orange-400 hover:border-swiggyOrange border-2 text-swiggyOrange disabled:pointer-events-none">
+                        <Button className="hover:bg-orange-100 rounded-none bg-transparent border-orange-400 hover:border-swiggyOrange border-2 text-swiggyOrange disabled:pointer-events-none">
                           <Eye className="h-4 w-4" />View Order
                         </Button>
                       </DialogTrigger>
