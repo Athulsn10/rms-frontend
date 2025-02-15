@@ -16,7 +16,9 @@ export const updateUserProfile = async (formData:any) => {
     try {
         const customerId = localStorage.getItem('id');
         const response = await http.patch(`/customer/${customerId}`,formData);
-        return response.data.data.acknowledged;
+        localStorage.setItem('city', response.data.data.address.city);
+        localStorage.setItem('user', response.data.data.name);
+        return response.status >= 200 && response.status <= 300 ? true : false;
     } catch (error: any) {
         return error.response?.data?.message
     }
@@ -70,5 +72,14 @@ export const handleImageSearch = async (formData: Object) => {
         return response.data.data ?  response.data.data : false;
     } catch (error) {
         return false;
+    }
+};
+
+export const cancelOrder = async (itemId: string) => {
+    try {
+        const response  = await http.patch(`/order/cancel/${itemId}`);
+        return response.data.data;
+    } catch (error: any) {
+        return error.response?.data?.message
     }
 };
