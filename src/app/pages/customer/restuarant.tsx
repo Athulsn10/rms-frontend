@@ -2,14 +2,16 @@ import { useEffect, useState } from "react"
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import toast, { Toaster } from 'react-hot-toast';
-import { useNavigate, useSearchParams } from "react-router-dom";
+import toast, { Toaster } from 'react-hot-toast';;
 import { Textarea } from "@/components/ui/textarea";
-import { getRestuarantById, placeOrder, handleImageSearch } from "./customerService";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { getRestuarantById, placeOrder, handleImageSearch } from "./customerService";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { AlertCircle, Circle, CircleAlert, CircleCheck, Upload, Loader2, Minus, Plus, Search, ShoppingCart, Triangle, TriangleAlert, Utensils, UtensilsCrossed, Flame, ScanQrCode } from "lucide-react";
+
 
 
 function restuarant() {
@@ -19,13 +21,15 @@ function restuarant() {
   const [remarks, setRemarks] = useState('');
   const [menuList, setMenuList] = useState([]);
   const [hasMenu, setHasMenu] = useState(false);
-  const [result, setResult] = useState<any>(null);
+  const [results, setResults] = useState<any>([]);
+  const [searchItem, setSearchitem] = useState('');
   const [totalAmount, setTotalAmount] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [cartItems, setCartItems] = useState<any>([]);
-  const [fetchingData, setFetchingData] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
+  const [fetchingData, setFetchingData] = useState(false);
+  const [originalMenuList, setOriginalMenuList] = useState([]);
   const [isEditModalOpen, setIsRemarksModalOpen] = useState(false);
   const base_url = import.meta.env.VITE_BASE_URL;
   const idFromParams = searchParams.get('id');
@@ -37,6 +41,7 @@ function restuarant() {
       const response = await getRestuarantById(idFromParams);
       if (response && response.length > 0) {
         setMenuList(response);
+        setOriginalMenuList(response);
         setHasMenu(true);
         setFetchingData(false);
       } else {
@@ -119,6 +124,7 @@ function restuarant() {
           icon: <CircleCheck color="#1ce867" />,
         });
         setRemarks('');
+        setCartItems([]);
       } else {
         setIsRemarksModalOpen(false);
         toast.error('Order not palced due a error!', {
@@ -176,7 +182,7 @@ function restuarant() {
     formData.append('image', selectedFile);
     const response = await handleImageSearch(formData);
     if (response) {
-      setResult(response[0]);
+      setResults(response);
       setIsLoading(false);
     } else {
       toast.error('Something went wrong!', {
@@ -184,6 +190,19 @@ function restuarant() {
       });
       setIsLoading(false);
     }
+  };
+
+  const handleMenuSearch = () => {
+    if (!searchItem) {
+      setMenuList(originalMenuList);
+      return;
+    }
+  
+    const filteredMenu = originalMenuList.filter((menu: any) =>
+      menu.name.toLowerCase().includes(searchItem.toLowerCase())
+    );
+  
+    setMenuList(filteredMenu);
   };
 
   useEffect(() => {
@@ -233,9 +252,9 @@ function restuarant() {
                     <div className="flex items-center w-full md:w-auto justify-center">
                       <div className="relative w-full md:w-[700px]">
                         <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
-                        <Input className="font-medium w-full py-5 rounded-none" placeholder="Search Menu Item" />
+                        <Input onChange={(e) => {setSearchitem(e.target.value)}} onKeyDown={(e) => { if (e.key === "Enter") { handleMenuSearch() }}} className="font-medium w-full py-5 rounded-none" placeholder="Search Menu Item" />
                       </div>
-                      <Button className="flex ml-2 md:ml-4 items-center bg-orange-200 rounded-none hover:bg-orange-200 px-5 py-5">
+                      <Button onClick={() => handleMenuSearch()} className="flex ml-2 md:ml-4 items-center bg-orange-200 rounded-none hover:bg-orange-200 px-5 py-5">
                         <Search size={28} className="text-orange-500" />
                         <p className="font-bold text-orange-500 text-xl hidden md:inline">Search</p>
                       </Button>
@@ -266,7 +285,7 @@ function restuarant() {
                             ) : (
                               <div className="absolute inset-0 flex flex-col items-center justify-center text-slate-500">
                                 <Upload size={32} />
-                                <p className="mt-2 text-sm">Click or drag image to upload</p>
+                                <p className="mt-2 text-sm text-center">Click or drag image to upload and<br/>get a similiar item from the menu</p>
                               </div>
                             )}
                             <input
@@ -286,70 +305,98 @@ function restuarant() {
                         </div>
 
                         {/* Results Section */}
-                        {result && (
-                          <div className="overflow-hidden">
-                            <div className="p-6 space-y-4">
-                              <div className="flex items-center justify-between">
-                                <h3 className="text-xl font-semibold">{result.name}</h3>
-                                <div className={`${result.type === "VEGETARIAN" ? "bg-green-600 text-white hover:bg-green-600 p-2 rounded-sm" : "bg-red-600 hover:bg-red-600 text-white p-2 rounded-sm"}`}>
-                                  {result.type === "VEGETARIAN" ? <Circle /> : <Triangle />}
-                                </div>
-                              </div>
+                        {results.length > 0 && 
+                          (<ScrollArea className="h-[250px] w-full rounded-md border">
+                            <div className="space-y-6 p-4">
+                              {results.map((result: any) => (
+                                <div key={result._id} className="rounded-lg border border-slate-200 bg-white shadow-sm transition-all hover:shadow-md overflow-hidden">
+                                  <div className="flex flex-col md:flex-row w-full">
+                                    <div className="relative w-full md:w-72 h-48 md:h-auto">
+                                      <img
+                                        src={`${base_url}files/menus/${result.images}`}
+                                        alt={result.name}
+                                        className="w-full h-full object-cover"/>
+                                    </div>
 
-                              <div className="flex items-center gap-2 text-sm text-slate-600">
-                                <Badge variant="outline" className={`${result.status === 'AVAILABLE' ? "bg-green-200" : "bg-red-200"} `}>
-                                  {result.status}
-                                </Badge>
-                                <span className="font-medium text-lg">₹{result.price}</span>
-                              </div>
+                                    {/* Content section */}
+                                    <div className="flex-1 p-4 md:p-6">
+                                      <div className="space-y-4">
+                                        {/* Header section */}
+                                        <div className="flex items-start justify-between">
+                                          <div className="space-y-1">
+                                            <h3 className="text-lg md:text-xl font-semibold text-slate-900">{result.name}</h3>
+                                            <p className="text-sm text-slate-500">{result.calories} calories</p>
+                                          </div>
+                                          <div
+                                            className={`p-2 rounded-full ${result.type === "VEGETARIAN"
+                                                ? "bg-green-100 text-green-600"
+                                                : "bg-red-100 text-red-600"
+                                              }`}>
+                                            {result.type === "VEGETARIAN" ? <Circle className="h-5 w-5" /> : <Triangle className="h-5 w-5" />}
+                                          </div>
+                                        </div>
 
-                              <div className="space-y-2">
-                                <h4 className="font-medium text-slate-700">Ingredients:</h4>
-                                <div className="flex flex-wrap gap-2">
-                                  {result.ingredients.map((ingredient: any, idx: number) => (
-                                    <span
-                                      key={idx}
-                                      className="px-3 py-1 rounded-full text-sm bg-slate-100 text-slate-700"
-                                    >
-                                      {ingredient}
-                                    </span>
-                                  ))}
+                                        {/* Price and controls section */}
+                                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                                          <div className="flex items-center gap-2">
+                                            <Badge
+                                              variant="outline"
+                                              className={`${result.status === 'AVAILABLE'
+                                                  ? "bg-green-50 text-green-700 border-green-200"
+                                                  : "bg-red-50 text-red-700 border-red-200"
+                                                }`}>
+                                              {result.status}
+                                            </Badge>
+                                            <span className="font-medium text-lg text-slate-900">₹{result.price}</span>
+                                          </div>
+
+                                          {!idFromParams && (
+                                            <div className="flex items-center gap-2">
+                                              <Button
+                                                variant="outline"
+                                                size="icon"
+                                                className="h-8 w-8 bg-orange-50 border-orange-200 hover:bg-orange-100"
+                                                onClick={() => updateQuantity(result, -1)}
+                                                disabled={!getQuantity(result._id)}>
+                                                <Minus className="h-4 w-4" />
+                                              </Button>
+                                              <span className="w-8 text-center font-medium">
+                                                {getQuantity(result._id)}
+                                              </span>
+                                              <Button
+                                                variant="outline"
+                                                size="icon"
+                                                className="h-8 w-8 bg-orange-50 border-orange-200 hover:bg-orange-100"
+                                                onClick={() => updateQuantity(result, 1)}>
+                                                <Plus className="h-4 w-4" />
+                                              </Button>
+                                            </div>
+                                          )}
+                                        </div>
+
+                                        {/* Ingredients section */}
+                                        <div className="space-y-2">
+                                          <h4 className="font-medium text-slate-700">Ingredients:</h4>
+                                          <div className="flex flex-wrap gap-2">
+                                            {result.ingredients.map((ingredient: any, idx: number) => (
+                                              <span key={idx} className="px-3 py-1 rounded-full text-sm bg-slate-50 text-slate-600 border border-slate-200">
+                                                {ingredient.replace(/_/g, ' ')}
+                                              </span>
+                                            ))}
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
                                 </div>
-                              </div>
-                             { !idFromParams && 
-                             <>
-                                <div className="flex items-center gap-3 justify-end">
-                                  <Button
-                                    variant="outline"
-                                    size="icon"
-                                    className="h-8 w-8 bg-orange-100 rounded-none hover:bg-orange-200"
-                                    onClick={() => updateQuantity(result, -1)}
-                                    disabled={!getQuantity(result._id)}
-                                  >
-                                    <Minus className="h-4 w-4" />
-                                  </Button>
-                                  <span className="w-8 text-center font-medium">
-                                    {getQuantity(result._id)}
-                                  </span>
-                                  <Button
-                                    variant="outline"
-                                    size="icon"
-                                    className="h-8 w-8 bg-orange-100 rounded-none hover:bg-orange-200"
-                                    onClick={() => updateQuantity(result, 1)}
-                                  >
-                                    <Plus className="h-4 w-4" />
-                                  </Button>
-                                </div>
-                             </>
-                             }
+                              ))}
                             </div>
-                          </div>
-                        )}
+                          </ScrollArea>)}
                       </div>
                     </DialogContent>
                   </Dialog>
                 </div>
-                <div className={`grid grid-cols-1 md:grid-cols-4 lg:grid-cols-4 gap-6 p-6 ${cartItems.length > 0 ? 'mb-16' : ''}`}>
+                <div className={`grid grid-cols-1 md:grid-cols-4 lg:grid-cols-4 gap-6 p-6 ${cartItems.length  > 0  || idFromParams ? 'mb-16' : ''}`}>
                   {menuList.map((item: any) => (
                     <Card key={item._id} className="w-full">
                       <div className="relative h-48 w-full overflow-hidden">
