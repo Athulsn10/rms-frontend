@@ -24,6 +24,7 @@ function menu() {
   const [preview, setPreview] = useState<any>();
   const [hasMenu, setHasMenu] = useState(false);
   const [editItemId, setEditItemId] = useState("");
+  const [searchItem, setSearchitem] = useState('');
   const [aiLoading, setAiLoading] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [searchValue, setSearchValue] = useState('');
@@ -33,6 +34,7 @@ function menu() {
   const [fetchingData, setFetchingData] = useState(false);
   const [isFormVisible, setIsFormVisible] = useState(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const [originalMenuList, setOriginalMenuList] = useState([]);
   const [calories, setCalories] = useState<number | undefined>(undefined);
   const [selectedIngredients, setSelectedIngredients] = useState<string[]>([]);
   const [menu, setMenu] = useState<Menu>({
@@ -308,7 +310,8 @@ function menu() {
     try {
       const menuItems = await getMenus();
       if (menuItems.length > 0) {
-        setMenuList(menuItems);
+        setMenuList(menuItems.reverse());
+        setOriginalMenuList(menuItems);
         setHasMenu(true);
       } else {
         setHasMenu(false);
@@ -329,13 +332,6 @@ function menu() {
     }
   };
 
-  const handleSearch = () => {
-    const filteredMenus = menuList.filter(item =>
-      item.name.toLowerCase().includes(searchValue.toLowerCase())
-    );
-    setMenuList(filteredMenus);
-  };
-
   const handleCancel = () => {
     setIsFormVisible(false);
     resetForm();
@@ -345,6 +341,19 @@ function menu() {
     setIsFormVisible(true);
     setIsEditMode(false);
     resetForm();
+  };
+
+  const handleMenuSearch = () => {
+    if (!searchItem) {
+      setMenuList(originalMenuList);
+      return;
+    }
+  
+    const filteredMenu = originalMenuList.filter((menu: any) =>
+      menu.name.toLowerCase().includes(searchItem.toLowerCase())
+    );
+  
+    setMenuList(filteredMenu);
   };
 
   useEffect(() => {
@@ -588,9 +597,9 @@ function menu() {
                         <div className="flex items-center w-full md:w-auto justify-center">
                           <div className="relative w-full md:w-[700px]">
                             <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
-                            <Input onChange={(e) => setSearchValue(e.target.value)} className="font-medium w-full py-5 rounded-none" placeholder="Search Menu Item" />
+                            <Input onChange={(e) => {setSearchitem(e.target.value)}} onKeyDown={(e) => { if (e.key === "Enter") { handleMenuSearch() }}} className="font-medium w-full py-5 rounded-none" placeholder="Search Menu Item" />
                           </div>
-                          <Button onClick={handleSearch} className="flex ml-2 md:ml-4 items-center bg-orange-200 rounded-none hover:bg-orange-200 px-5 py-5">
+                          <Button onClick={() => handleMenuSearch()} className="flex ml-2 md:ml-4 items-center bg-orange-200 rounded-none hover:bg-orange-200 px-5 py-5">
                             <Search size={28} className="text-orange-500" />
                             <p className="font-bold text-orange-500 text-xl hidden md:inline">Search</p>
                           </Button>
