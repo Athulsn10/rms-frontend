@@ -19,7 +19,6 @@ export const handleLogIn = async (email: string, password: string,  navigate: (p
       localStorage.setItem('token', response.data.data.token);
       localStorage.setItem('user', response.data.data.name);
       localStorage.setItem('email', response.data.data.email);
-      localStorage.setItem('token', response.data.data.token);
       localStorage.setItem('id', response.data.data.id);
       
       if (response.data.data.address) {
@@ -31,6 +30,7 @@ export const handleLogIn = async (email: string, password: string,  navigate: (p
         navigate('/dashboard');
       } else {
         navigate('/');
+        window.location.reload();
       }
       
       return null;
