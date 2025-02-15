@@ -23,6 +23,7 @@ interface OrderProps {
     order: OrderItem[];
     totalAmount: number;
     remarks?: string;
+    status: string;
   };
 }
 
@@ -104,7 +105,7 @@ const OrderModal: React.FC<OrderProps> = ({ order }) => {
           </tbody>
         </table>
         <div className="flex justify-end mt-3">
-          <Button onClick={()=> handleBillDownload(order._id)} className="rounded-none w-full bg-orange-600 hover:bg-orange-400">
+          <Button disabled={order.status === 'Cancelled'} onClick={()=> handleBillDownload(order._id)} className="rounded-none w-full bg-orange-600 hover:bg-orange-400">
             {
               isLoading ? (
                 <Loader2 className="animate-spin" />
