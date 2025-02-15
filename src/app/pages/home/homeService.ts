@@ -9,7 +9,7 @@ export const getRestuarentsByCity = async (city: string) => {
     } catch (error: any) {
         return error.response?.data?.message
     }
-}
+};
 
 export const getRestuarents = async () => {
     try {
@@ -19,4 +19,13 @@ export const getRestuarents = async () => {
     } catch (error: any) {
         return error.response?.data?.message
     }
-}
+};
+
+export const getAllCustomers = async () => {
+    try {
+        const response = await http.get(`/customer`);
+        return response.status >= 200 && response.status <= 300 ? response.data.data : false;
+    } catch (error: any) {
+        return error.response?.data?.message
+    }
+};
