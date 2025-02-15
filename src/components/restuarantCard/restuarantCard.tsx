@@ -1,4 +1,4 @@
-import { Armchair, CircleAlert } from "lucide-react";
+import { Armchair, CircleAlert, MapPin } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import toast, { Toaster } from 'react-hot-toast';
 
@@ -53,11 +53,11 @@ const RestaurantCard: React.FC<cardProps> = ({ id, title, rating, category, area
                     </svg>
                     <p className="text-base font-medium">{rating || '0'}</p>
                 </div>
-                <p className="text-sm text-gray-600 flex items-center gap-2 mt-2">
+                <p className="text-sm text-gray-600 flex items-center gap-1 mt-2">
                     <Armchair size={20} />
                     {category}
                 </p>
-                <p className="text-sm text-gray-600">{area}</p>
+                <p className="text-sm text-gray-600 mt-1 flex items-center gap-1"><MapPin size={20} />{area}</p>
             </div>
             <Toaster />
         </div>
