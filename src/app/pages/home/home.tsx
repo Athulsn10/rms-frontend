@@ -12,12 +12,6 @@ interface Restaurant {
   images: string
 }
 
-interface RestaurantAddress {
-  address: {
-    city: string;
-  };
-};
-
 interface Statistics {
   totalCustomers: number;
   totalOrders: number;
