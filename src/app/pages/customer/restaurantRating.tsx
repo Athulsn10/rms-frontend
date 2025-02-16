@@ -284,7 +284,7 @@ const RestaurantRating: React.FC<RestuarantProps> = ({idFromParams}) => {
               </TabsContent>
     
               <TabsContent value="reviews" className="mt-4">
-                <ScrollArea className="h-[455px]">
+                <ScrollArea className="h-96">
                   {customerRatings.length > 0 ? (
                     <div className="space-y-4">
                       {customerRatings.map((review) => (
