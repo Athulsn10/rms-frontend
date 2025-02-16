@@ -27,6 +27,7 @@ export const handleLogIn = async (email: string, password: string,  navigate: (p
 
       if (response.data.data.gstin) {
         localStorage.setItem('restuarant', 'true');
+        localStorage.setItem('profile', response.data.data.images);
         navigate('/dashboard');
       } else {
         navigate('/');
