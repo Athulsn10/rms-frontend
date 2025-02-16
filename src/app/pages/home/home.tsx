@@ -108,7 +108,7 @@ function home() {
           {location &&
           <div>
             <h2 className="px-4 sm:px-6 lg:px-8 text-lg sm:text-xl font-bold">
-              Top restaurant chains in {location }
+              Restaurant chains in {location }
             </h2>
             <div className='mt-4 px-4 sm:px-6 lg:px-8 overflow-x-auto custom-scroll-bar'>
               <div className='flex space-x-4 min-w-full pb-4 '>
