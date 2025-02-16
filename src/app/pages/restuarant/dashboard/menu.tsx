@@ -8,11 +8,13 @@ import { useRef, useState, useEffect } from "react";
 import { MultiSelect } from "@/components/ui/multiselect";
 import { Card, CardContent } from "@/components/ui/card";
 import { createMenu, deleteMenu, editMenu, getMenus, imageUpload } from './restuarantService';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Circle, CircleAlert, CircleCheck, CircleX, Flame, ImageIcon, IndianRupee, Loader2, Pencil, Plus, Search, ShoppingBasket, Soup, Trash2, Triangle, Vegan, X } from "lucide-react";
 
 interface Menu {
   dishName: string;
   image: File | null;
+  status: string;
   isVeg: boolean | string;
   ingredients: string[];
   price: number | undefined;
@@ -27,7 +29,6 @@ function menu() {
   const [searchItem, setSearchitem] = useState('');
   const [aiLoading, setAiLoading] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [searchValue, setSearchValue] = useState('');
   const [isEditMode, setIsEditMode] = useState(false);
   const [menuList, setMenuList] = useState<any[]>([]);
   const [multiSelectKey, setMultiSelectKey] = useState(0);
@@ -41,6 +42,7 @@ function menu() {
     dishName: '',
     image: null,
     isVeg: true,
+    status: '',
     ingredients: [],
     price: undefined,
     calories: undefined
@@ -94,7 +96,16 @@ function menu() {
       placeholder: 'Enter Total Calories',
       icon: Flame,
       required: true,
-      validation: (value: string) => !value ? 'Dish Calories is required' : ''
+      validation: (value: string) => !value ? 'Dish calories is required' : ''
+    },
+    {
+      id: 'status',
+      label: 'Dish Availability',
+      type: 'select',
+      placeholder: 'Choose Status',
+      icon: Flame,
+      required: true,
+      validation: (value: string) => !value ? 'Please choose a option' : ''
     },
     {
       id: 'ingredients',
@@ -167,7 +178,7 @@ function menu() {
       };
       reader.readAsDataURL(file);
     }
-  }
+  };
 
   const handleInputChange = (id: string, value: string | number) => {
     if (id === 'calories') {
@@ -211,7 +222,7 @@ function menu() {
 
         formData.append('type', isVeg ? 'VEGETARIAN' : 'NONE_VEGETARIAN');
         formData.append('price', menu.price?.toString() || '');
-        formData.append('status', 'AVAILABLE');
+        formData.append('status', menu.status);
         formData.append('calories', calories?.toString() || '');
 
         selectedIngredients.forEach((ingredient) => {
@@ -292,13 +303,14 @@ function menu() {
       setMenu({
         dishName: selectedItem.name,
         image: null,
+        status: selectedItem.status,
         isVeg: selectedItem.type === 'VEGETARIAN',
         ingredients: selectedItem.ingredients,
         price: selectedItem.price,
         calories: selectedItem.calories
       });
       setIsVeg(selectedItem.type === 'VEGETARIAN');
-      setPreview(`${base_url}files/menus/${selectedItem.images}`)
+      setPreview(`${base_url}files/menus/${selectedItem.images}`);
       setSelectedIngredients(selectedItem.ingredients);
       setCalories(selectedItem.calories);
       setIsFormVisible(true);
@@ -410,7 +422,7 @@ function menu() {
                         key={index}
                         className={`
                           space-y-1 
-                          ${field.id === "ingredients" ? "md:col-span-2" : ""}
+                          ${field.id === "ingredients" || field.id === "status" ? "md:col-span-2" : ""}
                           ${field.type === "file" ? "md:col-span-2" : ""}
                         `}
                       >
@@ -435,6 +447,25 @@ function menu() {
                               animation={2}
                               maxCount={5}
                             />
+                            <div style={{ height: '6px', marginTop: '2px', display: 'flex', justifyContent: 'end', width: '100%' }}>
+                              {errors[field.id] && (
+                                <p className="text-red-500 text-xs">{errors[field.id]}</p>
+                              )}
+                            </div>
+                          </div>
+                        )}
+
+                        {field.id === "status" && (
+                          <div>
+                            <Select value={(menu as any)[field.id]} onValueChange={(value) => handleInputChange(field.id, value)}>
+                              <SelectTrigger className="w-full">
+                                <SelectValue placeholder="Select status" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="AVAILABLE">AVAILABLE</SelectItem>
+                                <SelectItem value="UNAVAILABLE">NOT AVAILABLE</SelectItem>
+                              </SelectContent>
+                            </Select>
                             <div style={{ height: '6px', marginTop: '2px', display: 'flex', justifyContent: 'end', width: '100%' }}>
                               {errors[field.id] && (
                                 <p className="text-red-500 text-xs">{errors[field.id]}</p>
@@ -521,10 +552,15 @@ function menu() {
                                 </div>
                               )}
                             </Label>
+                            <div style={{ height: '6px', marginTop: '2px', display: 'flex', justifyContent: 'end', width: '100%' }}>
+                              {errors[field.id] && (
+                                <p className="text-red-500 text-xs">{errors[field.id]}</p>
+                              )}
+                            </div>
                           </div>
                         )}
 
-                        {field.type !== "toggle" && field.type !== "file" && field.id !== "ingredients" && (
+                        {field.type !== "toggle" && field.type !== "file"  && field.type !== "select" && field.id !== "ingredients" && (
                           <div className="relative">
                             {field.icon && (
                               <field.icon className="absolute left-3 top-1/2 -translate-y-[73%] h-4 w-4 text-gray-500" />
@@ -554,7 +590,7 @@ function menu() {
                   </div>
                 </div>
 
-                <div className="mt-6">
+                <div className="mt-4">
                   <Button
                     disabled={isLoading}
                     onClick={handleMenuSave}
