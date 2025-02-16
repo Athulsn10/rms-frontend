@@ -6,6 +6,7 @@ export const getUserDetail = async () => {
         const restuarantId = localStorage.getItem('id');
         const response = await http.get(`/restaurant/${restuarantId}`);
         localStorage.setItem('user', response.data.data.name);
+        localStorage.setItem('profile', response.data.data.images);
         return response.data.data;
     } catch (error: any) {
         return error.response?.data?.message
@@ -14,8 +15,15 @@ export const getUserDetail = async () => {
 
 export const updateUserProfile = async (formData: any) => {
     try {
+        const url = import.meta.env.VITE_BASE_URL;
         const restuarantId = localStorage.getItem('id');
-        const response = await http.patch(`/restaurant/${restuarantId}`, formData);
+        const token = localStorage.getItem('token');
+        const response:any = await axios.patch(`${url}restaurant/${restuarantId}`, formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+                ...(token && { 'Authorization': `Bearer ${token}` })
+            },
+        });
         return response.data.data.acknowledged;
     } catch (error: any) {
         return error.response?.data?.message
