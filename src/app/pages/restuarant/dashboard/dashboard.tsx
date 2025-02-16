@@ -47,11 +47,12 @@ const items = [
 
 function Dashboard() {
     const navigate = useNavigate()
-    const [activeTab, setActiveTab] = useState("menu")
     const userName = localStorage.getItem('user');
+    const base_url = import.meta.env.VITE_BASE_URL;
     const userEmail = localStorage.getItem('email');
+    const [activeTab, setActiveTab] = useState("menu");
+    const profileImage = localStorage.getItem('profile');
     const { setIsAuthenticated, setIsRestuarant } = useAppContext();
-
     const handleClick = (key: string, title: string) => {
         if (title === "Logout") {
             localStorage.clear();
@@ -97,7 +98,7 @@ function Dashboard() {
                             <SidebarMenuItem>
                                 <SidebarMenuButton className="py-6 px-0 p-0 items-center min-w-10">
                                     <Avatar className="rounded-lg w-8 h-8">
-                                        <AvatarImage src="https://github.com/shadcn.png" />
+                                        <AvatarImage src={`${base_url}files/restaurants/${profileImage}`} />
                                         <AvatarFallback>CN</AvatarFallback>
                                     </Avatar>
                                     <div>
