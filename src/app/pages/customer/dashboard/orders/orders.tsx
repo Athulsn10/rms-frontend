@@ -56,7 +56,6 @@ function Orders() {
 
     const handleEdit = (order: Order) => {
         const orderCopy = JSON.parse(JSON.stringify(order));
-        console.log('orderCopy:',orderCopy)
         setSelectedOrder(orderCopy);
         setOriginalOrder(orderCopy);
         setIsEditModalOpen(true);
