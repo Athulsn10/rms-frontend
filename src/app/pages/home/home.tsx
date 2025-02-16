@@ -132,7 +132,7 @@ function home() {
           {/* All Restaurants */}
           <div>
             <h2 className="px-4 sm:px-6 lg:px-8 text-lg sm:text-xl font-bold">
-              Top restaurant chains in Tavalo
+              Restaurant chains in Tavalo
             </h2>
             <div className='mt-4 px-4 sm:px-6 lg:px-8 overflow-x-auto'>
               <div className='flex space-x-4 min-w-full pb-4 custom-scroll-bar'>
