@@ -1,9 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import toast, { Toaster } from 'react-hot-toast';
 import { getUserDetail, updateUserProfile } from './restuarantService';
-import { User, MapPin, Building, Home, Phone, Loader2, CircleAlert, CircleCheck, ArrowRight, ArrowLeft, Check, BadgeIndianRupee, Utensils } from 'lucide-react';
+import { User, MapPin, Building, Home, Phone, Loader2, CircleAlert, CircleCheck, ArrowRight, ArrowLeft, Check, BadgeIndianRupee, Utensils, Camera, WalletCards } from 'lucide-react';
 
 
 interface AddressData {
@@ -19,18 +19,23 @@ interface FormData {
     name: string;
     phone: string,
     gstin: string,
+    upiId: string;
     tableCount: string,
     address: AddressData;
 }
 
 const Profile = () => {
+    const [preview, setPreview] = useState<any>();
+    const base_url = import.meta.env.VITE_BASE_URL;
     const [currentStep, setCurrentStep] = useState(0);
     const [isLoading, setIsLoading] = useState(false);
     const [fetchingData, setFetchingData] = useState(false);
+    const fileInputRef = useRef<HTMLInputElement | null>(null);
     const [formData, setFormData] = useState<FormData>({
         name: '',
         phone: '',
         gstin: '',
+        upiId:'',
         tableCount: '',
         address: {
             addressLine1: '',
@@ -92,9 +97,21 @@ const Profile = () => {
                     const pattern = /^22[A-Z]{5}\d{4}[A-Z]{1}\d{1}[A-Z]{1}\d{1}$/;
                     if (!pattern.test(value)) return 'Invalid GST IN';
                 }
-            }
+            },
+            {
+                id: 'upiId',
+                label: 'UPI Id',
+                type: 'text',
+                required: true,
+                placeholder: 'example@oksbi',
+                icon: WalletCards,
+                registrationType: ['restaurant'],
+                validation: (value: string) => {
+                  if (!value) return 'UPI Id is required';
+                }
+              }
         ],
-        // Step 3: Address Information
+        // Step 3: Adress info
         [
             {
                 id: 'address.addressLine1',
@@ -147,6 +164,19 @@ const Profile = () => {
                     if (!/^\d{6}$/.test(value)) return 'Invalid PIN code format';
                     return '';
                 }
+            }
+        ],
+        // Step 4: Profile picture
+        [
+            {
+                id: 'image',
+                label: 'Profile Photo',
+                type: 'file',
+                required: true,
+                placeholder: 'Upload Profile Photo',
+                icon: Camera,
+                registrationType: ['restaurant'],
+                validation: () => ''
             }
         ]
     ];
@@ -211,11 +241,39 @@ const Profile = () => {
         setCurrentStep(prev => prev - 1);
     };
 
+    const handleFileChange = async (e:any) => {
+        const file = e.target.files[0];
+        // await handleImageUpload(file);
+        if (file) {
+          const reader:any = new FileReader();
+        reader.onloadend = () => {
+            setPreview(reader.result);
+          };
+          reader.readAsDataURL(file);
+        }
+      };
+
     const handleSubmit = async (e: React.MouseEvent<HTMLDivElement>) => {
         e.preventDefault();
         setIsLoading(true);
         if (validateStep(currentStep)) {
-            const response = await updateUserProfile(formData);
+            const data = new FormData();
+            data.append('name', formData.name);
+            data.append('phone', formData.phone);
+            data.append('gstin', formData.gstin);
+            data.append('tableCount', formData.tableCount);
+            data.append('upiId', formData.upiId);
+            data.append('address[addressLine1]', formData.address.addressLine1);
+            data.append('address[addressLine2]', formData.address.addressLine2);
+            data.append('address[city]', formData.address.city);
+            data.append('address[state]', formData.address.state);
+            data.append('address[country]', formData.address.country);
+            data.append('address[pincode]', formData.address.pincode);
+
+            if (fileInputRef.current && fileInputRef.current.files?.[0]) {
+                data.append('image', fileInputRef.current.files[0]);
+            }
+            const response = await updateUserProfile(data);
             if (response) {
                 setIsLoading(false);
                 toast.success('Profile Updated', {
@@ -245,6 +303,7 @@ const Profile = () => {
             name: response.name || '',
             phone: response.phone?.toString() || '',
             gstin: response.gstin || '',
+            upiId: response.upiId || '',
             tableCount: response.tableCount || '',
             address: {
                 addressLine1: response.address?.addressLine1 || '',
@@ -255,8 +314,9 @@ const Profile = () => {
                 pincode: response.address?.pincode || '',
             }
         });
+        setPreview(`${base_url}files/restaurants/${response.images}`);
         setFetchingData(false);
-    }
+    };
 
     useEffect(() => {
         getCurrentUser()
@@ -306,8 +366,74 @@ const Profile = () => {
                         </div>
                         <div className="p-6 sm:p-8">
                             <form className="space-y-6">
-                                <div className={`${currentFields.some(field => field.id === "allergies") ? "" : "grid grid-cols-1 md:grid-cols-2"} gap-2 gap-x-6`}>
+                                <div className={`${currentFields.some(field => field.id === "image") ? "" : "grid grid-cols-1 md:grid-cols-2"} gap-2 gap-x-6`}>
                                     {currentFields.map((field, index) => {
+                                        if (field.id.toLowerCase() === "image") {
+                                            return (
+                                              <>
+                                                <p className='font-semibold'>Edit Profile Picture</p>
+                                                <div className="flex justify-center h-96 items-center">
+                                                  <Input
+                                                    type="file"
+                                                    ref={fileInputRef}
+                                                    onChange={handleFileChange}
+                                                    accept="image/*"
+                                                    className="hidden"
+                                                    id="menuItemImage"
+                                                  />
+                                                  <Label
+                                                    htmlFor="menuItemImage"
+                                                    className={`
+                                                        relative
+                                                        w-80 h-80
+                                                        flex items-center justify-center 
+                                                        rounded-full
+                                                        cursor-pointer
+                                                        transition-all duration-300
+                                                        overflow-hidden
+                                                        group
+                                                        ${preview ?
+                                                        'border-none shadow-lg' :
+                                                        'border-2 border-dashed border-gray-300 hover:border-orange-400 hover:bg-orange-50'
+                                                      }`}>
+                                                    {preview ? (
+                                                      <div className="w-full h-full relative">
+                                                        <img
+                                                          src={preview}
+                                                          alt="Preview"
+                                                          className="w-full h-full object-cover"
+                                                        />
+                                                        <div className="
+                                                                absolute inset-0 
+                                                                bg-black/0 group-hover:bg-black/40
+                                                                transition-all duration-300
+                                                                flex items-center justify-center
+                                                                opacity-0 group-hover:opacity-100">
+                                                          <Camera className="w-8 h-8 text-white" />
+                                                        </div>
+                                                      </div>
+                                                    ) : (
+                                                      <div className="flex flex-col items-center space-y-2 p-4">
+                                                        <div className="
+                                                                w-12 h-12 
+                                                                rounded-full 
+                                                                bg-orange-100 
+                                                                flex items-center justify-center
+                                                                group-hover:bg-orange-200
+                                                                transition-colors duration-300
+                                                              ">
+                                                          <Camera className="h-6 w-6 text-orange-600" />
+                                                        </div>
+                                                        <span className="text-sm text-gray-600 text-center">
+                                                          Upload Profile
+                                                        </span>
+                                                      </div>
+                                                    )}
+                                                  </Label>
+                                                </div>
+                                              </>
+                                            )
+                                          }
                                         return (
                                             <div key={index} className="space-y-2">
                                                 <Label htmlFor={field.id} className="text-sm font-medium block">
