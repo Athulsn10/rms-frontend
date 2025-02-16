@@ -51,7 +51,7 @@ const RestaurantCard: React.FC<cardProps> = ({ id, title, rating, category, area
                             </linearGradient>
                         </defs>
                     </svg>
-                    <p className="text-base font-medium">{rating || '0'}</p>
+                    <p className="text-base font-medium">{rating === "No ratings yet" ? '0' : rating}</p>
                 </div>
                 <p className="text-sm text-gray-600 flex items-center gap-1 mt-2">
                     <Armchair size={20} />
