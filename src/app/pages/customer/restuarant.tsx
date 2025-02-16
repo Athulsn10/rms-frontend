@@ -2,7 +2,8 @@ import { useEffect, useState } from "react"
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import toast, { Toaster } from 'react-hot-toast';;
+import toast, { Toaster } from 'react-hot-toast';
+import RestaurantRating from "./restaurantRating";
 import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useNavigate, useSearchParams } from "react-router-dom";
@@ -10,8 +11,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { getRestuarantById, placeOrder, handleImageSearch } from "./customerService";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { AlertCircle, Circle, CircleAlert, CircleCheck, Upload, Loader2, Minus, Plus, Search, ShoppingCart, Triangle, TriangleAlert, Utensils, UtensilsCrossed, Flame, ScanQrCode } from "lucide-react";
-
+import { AlertCircle, Circle, CircleAlert, CircleCheck, Upload, Loader2, Minus, Plus, Search, ShoppingCart, Triangle, TriangleAlert, Utensils, UtensilsCrossed, Flame, ScanQrCode, Star } from "lucide-react";
 
 
 function restuarant() {
@@ -258,6 +258,7 @@ function restuarant() {
                         <Search size={28} className="text-orange-500" />
                         <p className="font-bold text-orange-500 text-xl hidden md:inline">Search</p>
                       </Button>
+                      <RestaurantRating idFromParams={idFromParams} />
                     </div>
                   </div>
                   <Dialog open={dialogOpen} onOpenChange={() => setDialogOpen(false)}>
@@ -366,6 +367,7 @@ function restuarant() {
                                               <Button
                                                 variant="outline"
                                                 size="icon"
+                                                disabled={result.status === 'UNAVAILABLE'}
                                                 className="h-8 w-8 bg-orange-50 border-orange-200 hover:bg-orange-100"
                                                 onClick={() => updateQuantity(result, 1)}>
                                                 <Plus className="h-4 w-4" />
@@ -490,6 +492,7 @@ function restuarant() {
                           <Button
                             variant="outline"
                             size="icon"
+                            disabled={item.status === 'UNAVAILABLE'}
                             className="h-8 w-8 bg-orange-100 rounded-none hover:bg-orange-200"
                             onClick={() => updateQuantity(item, 1)}
                           >
