@@ -62,7 +62,6 @@ const Registration = () => {
     gstin: '',
     tableCount: '',
     upiId: ''
-
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
