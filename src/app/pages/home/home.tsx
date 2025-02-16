@@ -51,7 +51,6 @@ function home() {
   const fetchOrdersAndCustomers = async () => {
     const response = await getStatistics();
     if (response){
-      console.log('response:',response)
       setStatistics(response);
     }
   };
