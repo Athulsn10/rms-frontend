@@ -83,3 +83,43 @@ export const cancelOrder = async (itemId: string) => {
         return error.response?.data?.message
     }
 };
+
+export const rateRestuarant = async (rating: Object) => {
+    try {
+        const response  = await http.post(`/misc/rating`, rating);
+        return response.data.data;
+    } catch (error: any) {
+        console.error(error.response?.data?.message);
+        return false;
+    }
+};
+
+export const restaurantRating = async (restaurantId: string) => {
+    try {
+        const response  = await http.get(`/misc/rating/restaurants/${restaurantId}`);
+        return response.data.data;
+    } catch (error: any) {
+        console.error(error.response?.data?.message);
+        return false;
+    }
+};
+
+export const customerRating = async (customerId:string, restaurantId: string) => {
+    try {
+        const response  = await http.get(`/misc/rating/user/restaurants?restaurantId=${restaurantId}&userId=${customerId}`);
+        return response.data.data;
+    } catch (error: any) {
+        console.error(error.response?.data?.message);
+        return false;
+    }
+};
+
+export const editCustomerRating = async (reviewId: string, customerRating: object) => {
+    try {
+        const response  = await http.patch(`/misc/rating/${reviewId}`, customerRating );
+        return response.data.data;
+    } catch (error: any) {
+        console.error(error.response?.data?.message);
+        return false;
+    }
+};
