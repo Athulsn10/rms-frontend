@@ -236,7 +236,7 @@ export const MultiSelect = React.forwardRef<HTMLButtonElement, MultiSelectProps>
             {...props}
             onClick={handleTogglePopover}
             className={cn(
-              "flex w-full p-1 mt-4 rounded-md border min-h-10 h-auto items-center justify-between bg-inherit hover:bg-inherit [&_svg]:pointer-events-auto",
+              "flex w-full p-1 mt-4 rounded-none border min-h-10 h-auto items-center justify-between bg-inherit hover:bg-inherit [&_svg]:pointer-events-auto",
               className
             )}
           >
@@ -277,7 +277,7 @@ export const MultiSelect = React.forwardRef<HTMLButtonElement, MultiSelectProps>
                     >
                       <div
                         className={cn(
-                          "mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-primary pointer-events-auto",
+                          "mr-2 flex h-4 w-4 items-center justify-center rounded-none border border-primary pointer-events-auto",
                           isSelected
                             ? "bg-primary text-primary-foreground"
                             : "opacity-50 [&_svg]:invisible"
@@ -294,7 +294,7 @@ export const MultiSelect = React.forwardRef<HTMLButtonElement, MultiSelectProps>
             </CommandList>
           </Command>
         </PopoverContent>
-        <div className="h-6 flex items-center">
+        {/* <div className="h-6 flex items-center">
           {animation > 0 && selectedValues.length > 0 && (
             <WandSparkles
               className={cn(
@@ -304,7 +304,7 @@ export const MultiSelect = React.forwardRef<HTMLButtonElement, MultiSelectProps>
               onClick={() => setIsAnimating(!isAnimating)}
             />
           )}
-        </div>
+        </div> */}
       </Popover>
     );
   }
