@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
 import RestaurantCard from '@/components/restuarantCard/restuarantCard'
-import { getAllCustomers, getRestuarents, getRestuarentsByCity, getStatistics } from './homeService.js';
+import { getRestuarents, getRestuarentsByCity, getStatistics } from './homeService.js';
 import { Facebook, Instagram, Twitter, Linkedin, Utensils, Star, MapPin, Donut } from 'lucide-react';
 
 interface Restaurant {
   _id: string,
   name: string,
-  rating: string,
+  averageRating: string,
   tableCount: string,
   address: { city: string },
   images: string
@@ -117,7 +117,7 @@ function home() {
                     <RestaurantCard
                       id={restaurant._id}
                       title={restaurant.name}
-                      rating={restaurant.rating}
+                      rating={restaurant.averageRating}
                       category={restaurant.tableCount}
                       area={restaurant.address.city}
                       imgUrl={restaurant.images ? `${base_url}files/restaurants/${restaurant.images}` : 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQQ_VOrKf8cjdbXzZHa-DDUtU0luArTacQhJg&s'}
@@ -141,7 +141,7 @@ function home() {
                     <RestaurantCard
                       id={restaurant._id}
                       title={restaurant.name}
-                      rating={restaurant.rating}
+                      rating={restaurant.averageRating}
                       category={restaurant.tableCount}
                       area={restaurant.address.city}
                       imgUrl={restaurant.images ? `${base_url}files/restaurants/${restaurant.images}` : 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQQ_VOrKf8cjdbXzZHa-DDUtU0luArTacQhJg&s'}
