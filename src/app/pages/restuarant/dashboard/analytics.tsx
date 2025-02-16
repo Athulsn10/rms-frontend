@@ -160,7 +160,7 @@ function analytics() {
                                 </CardHeader>
                                 <CardContent className="p-2">
                                     <div className="text-2xl font-bold text-orange-800">{dashboardData.orders.totalOrdersThisDay}</div>
-                                    <p className="text-xs text-orange-600">Previous: {dashboardData.orders.totalOrdersPreviousDay}</p>
+                                    <p className="text-xs text-orange-600">Total Orders Yesterday: {dashboardData.orders.totalOrdersPreviousDay}</p>
                                 </CardContent>
                             </Card>
                             <Card className="border-none">
@@ -199,7 +199,7 @@ function analytics() {
                                 </CardHeader>
                                 <CardContent>
                                     <div className="text-2xl font-bold text-orange-800">₹{dashboardData.revenue.totalRevenueThisMonth}</div>
-                                    <p className="text-xs text-orange-600">Total revenue last month ₹{dashboardData.revenue.totalRevenuePreviousMonth}</p>
+                                    <p className="text-xs text-orange-600">Total Revenue Last Month ₹{dashboardData.revenue.totalRevenuePreviousMonth}</p>
                                 </CardContent>
                             </Card>
                         </>
