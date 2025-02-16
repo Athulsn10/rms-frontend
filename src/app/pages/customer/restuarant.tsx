@@ -182,7 +182,13 @@ function restuarant() {
     formData.append('image', selectedFile);
     const response = await handleImageSearch(formData);
     if (response) {
-      setResults(response);
+      if (response.length > 0) {
+        setResults(response);
+      } else {
+        toast.success('No similar items found!', {
+          icon: <TriangleAlert color="#FFFF00" />,
+        });
+      }
       setIsLoading(false);
     } else {
       toast.error('Something went wrong!', {
@@ -269,7 +275,7 @@ function restuarant() {
                       {isLoading && (
                         <div className="absolute inset-0 flex items-center justify-center z-20">
                           <div className="inline-block transition-all duration-300">
-                            <img style={{ height: '60px' }} src="/ai-loading-2.gif" />
+                            <img style={{ height: '60px' }} src="/ai-loading-3.gif" />
                           </div>
                         </div>
                       )}
