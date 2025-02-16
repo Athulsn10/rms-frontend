@@ -2,12 +2,13 @@ import Menu from "./menu";
 import Orders from "./orders";
 import Profile from "./profile";
 import { useState } from "react";
-import QRGenerator from "./QrGenerator";
 import Analytics from "./analytics";
+import QRGenerator from "./QrGenerator";
 import { useNavigate } from "react-router-dom";
+import CustomerRatings from './customerRatings';
 import { useAppContext } from "@/app/context/provider";
-import { User, ShoppingBag, LogOut, SquareMenu, QrCode, ChartPie } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { User, ShoppingBag, LogOut, SquareMenu, QrCode, ChartPie, Star } from "lucide-react";
 import { SidebarFooter, SidebarHeader, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "@/components/ui/sidebar";
 
@@ -39,11 +40,16 @@ const items = [
         icon: ChartPie
     },
     {
+        title:"Customer Reviews",
+        key:'customerRatings',
+        icon: Star
+    },
+    {
         title: "Logout",
         key: "logout",
         icon: LogOut,
     },
-]
+];
 
 function Dashboard() {
     const navigate = useNavigate()
@@ -53,6 +59,7 @@ function Dashboard() {
     const [activeTab, setActiveTab] = useState("menu");
     const profileImage = localStorage.getItem('profile');
     const { setIsAuthenticated, setIsRestuarant } = useAppContext();
+    
     const handleClick = (key: string, title: string) => {
         if (title === "Logout") {
             localStorage.clear();
@@ -64,7 +71,7 @@ function Dashboard() {
             activeTab === key;
         }
         setActiveTab(key)
-    }
+    };
 
     return (
         <div className="flex">
@@ -118,6 +125,7 @@ function Dashboard() {
                     {activeTab === "orders" && <Orders />}
                     {activeTab === "qr" && <QRGenerator />}
                     {activeTab === "analytics" && <Analytics />}
+                    {activeTab === "customerRatings" && <CustomerRatings/>}
                 </main>
             </SidebarProvider>
         </div>
