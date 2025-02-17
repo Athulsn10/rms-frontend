@@ -41,9 +41,11 @@ const Navbar = () => {
                             <div onClick={() => pushToPath("")} className="flex-shrink-0 cursor-pointer">
                                 <BrandLogo />
                             </div>
-                            <div className="hidden md:flex items-center">
-                                <p className='flex items-center gap-2'><MapPin className="w-5 h-5" />{location}</p>
-                            </div>
+                            {location &&
+                                <div className="hidden md:flex items-center">
+                                    <p className='flex items-center gap-2'><MapPin className="w-5 h-5" />{location}</p>
+                                </div>
+                            }
                         </div>
                         <div className="hidden md:flex items-center gap-8">
                             {userName && (
@@ -56,7 +58,7 @@ const Navbar = () => {
                                 <Search className="w-5 h-5" />
                                 <span>Search</span>
                             </div>
-                            <div className="flex items-center gap-2 cursor-pointer hover:text-swiggyOrange">
+                            <div onClick={() => pushToPath("help")} className="flex items-center gap-2 cursor-pointer hover:text-swiggyOrange">
                                 <LifeBuoy className="w-5 h-5" />
                                 <span>Help</span>
                             </div>
@@ -108,7 +110,7 @@ const Navbar = () => {
                                 <Search className="w-5 h-5" />
                                 <span>Search</span>
                             </div>
-                            <div className="flex items-center gap-2 cursor-pointer hover:text-swiggyOrange">
+                            <div onClick={() => pushToPath("help")} className="flex items-center gap-2 cursor-pointer hover:text-swiggyOrange">
                                 <LifeBuoy className="w-5 h-5" />
                                 <span>Help</span>
                             </div>
