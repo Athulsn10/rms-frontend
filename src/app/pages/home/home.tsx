@@ -50,7 +50,7 @@ function home() {
 
   const fetchOrdersAndCustomers = async () => {
     const response = await getStatistics();
-    if (response){
+    if (response) {
       setStatistics(response);
     }
   };
@@ -104,28 +104,28 @@ function home() {
 
         {/* Restaurant Lists */}
         <div className="space-y-8">
-          {location &&
-          <div>
-            <h2 className="px-4 sm:px-6 lg:px-8 text-lg sm:text-xl font-bold">
-              Restaurant chains in {location }
-            </h2>
-            <div className='mt-4 px-4 sm:px-6 lg:px-8 overflow-x-auto custom-scroll-bar'>
-              <div className='flex space-x-4 min-w-full pb-4 '>
-                {restaurantList.map((restaurant: Restaurant) => (
-                  <div key={restaurant._id} className="flex-none w-72 sm:w-80">
-                    <RestaurantCard
-                      id={restaurant._id}
-                      title={restaurant.name}
-                      rating={restaurant.averageRating}
-                      category={restaurant.tableCount}
-                      area={restaurant.address.city}
-                      imgUrl={restaurant.images ? `${base_url}files/restaurants/${restaurant.images}` : 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQQ_VOrKf8cjdbXzZHa-DDUtU0luArTacQhJg&s'}
-                    />
-                  </div>
-                ))}
+          {location && restaurantList.length > 0 &&
+            (<div>
+              <h2 className="px-4 sm:px-6 lg:px-8 text-lg sm:text-xl font-bold">
+                Restaurant chains in {location}
+              </h2>
+              <div className='mt-4 px-4 sm:px-6 lg:px-8 overflow-x-auto custom-scroll-bar'>
+                <div className='flex space-x-4 min-w-full pb-4 '>
+                  {restaurantList.map((restaurant: Restaurant) => (
+                    <div key={restaurant._id} className="flex-none w-72 sm:w-80">
+                      <RestaurantCard
+                        id={restaurant._id}
+                        title={restaurant.name}
+                        rating={restaurant.averageRating}
+                        category={restaurant.tableCount}
+                        area={restaurant.address.city}
+                        imgUrl={restaurant.images ? `${base_url}files/restaurants/${restaurant.images}` : 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQQ_VOrKf8cjdbXzZHa-DDUtU0luArTacQhJg&s'}
+                      />
+                    </div>
+                  ))}
+                </div>
               </div>
-            </div>
-          </div>
+            </div>)
           }
 
           {/* All Restaurants */}
