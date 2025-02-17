@@ -338,8 +338,8 @@ const Registration = () => {
         icon: <CircleAlert color="#fc3419" />,
       });
     } else {
-      toast(message, {
-        icon: <CircleAlert color="#fc3419" />,
+      toast.success(message, {
+        icon: <CircleAlert color="#1ce867" />,
       });
     }
   };
