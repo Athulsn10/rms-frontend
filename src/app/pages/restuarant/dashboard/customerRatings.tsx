@@ -21,7 +21,7 @@ function customerRatings() {
         if (restaurantId) {
             const response = await restaurantRating(restaurantId);
             if (response) {
-                setCustomerRatings(response);
+                setCustomerRatings(response.reverse());
                 setIsLoading(false);
             } else {
                 setIsLoading(false);
