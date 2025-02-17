@@ -1,17 +1,17 @@
-import { CircleAlert, CircleCheck, Star, Edit2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import toast, { Toaster } from 'react-hot-toast';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
+import toast, { Toaster } from 'react-hot-toast';
 import { Textarea } from '@/components/ui/textarea';
-import { Card, CardContent } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Card, CardContent } from '@/components/ui/card';
+import { CircleAlert, CircleCheck, Star, Edit2 } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { customerRating, editCustomerRating, rateRestuarant, restaurantRating } from './customerService';
 
 interface RestuarantProps {
     idFromParams: string | null
-}
+};
 
 interface Rating {
   _id: string;
@@ -19,15 +19,17 @@ interface Rating {
   comment: string;
   userId: { name: string };
   updatedAt: string;
-}
+};
 
 const RestaurantRating: React.FC<RestuarantProps> = ({idFromParams}) => {
+  
   const [rating, setRating] = useState(0);
+  const [isEditing, setIsEditing] = useState(false);
   const [hoverRating, setHoverRating] = useState(0);
   const [description, setDescription] = useState('');
   const [customerRatings, setCustomerRatings] = useState<Rating[]>([]);
   const [currentCustomerRating, setCurrentCustomerRating] = useState<Rating | null>(null);
-  const [isEditing, setIsEditing] = useState(false);
+ 
 
   const handleStarClick = (selectedRating: number) => {
     setRating(selectedRating);
@@ -48,8 +50,23 @@ const RestaurantRating: React.FC<RestuarantProps> = ({idFromParams}) => {
   };
 
   const handleReviewSubmit = async () => {
+    let id;
+    const resturant = localStorage.getItem('restaurantOrder');
+
+    if (resturant) {
+      const parsedRestuarant = JSON.parse(resturant);
+      id = parsedRestuarant.restaurantId;
+    } else if (idFromParams) {
+      id = String(idFromParams);
+    } else {
+      toast.error('Something went wrong!', {
+        icon: <CircleAlert color="#fc3419" />,
+      });
+      return;
+    };
+
     const ratingObject = {
-        restaurantId: String(idFromParams),
+        restaurantId: id,
         rating: String(rating),
         comment: description
     };
@@ -101,7 +118,7 @@ const RestaurantRating: React.FC<RestuarantProps> = ({idFromParams}) => {
 
     const response = await restaurantRating(id);
     if (response) {
-      setCustomerRatings(response);
+      setCustomerRatings(response.reverse());
     } else {
       toast.error('Failed to fetch reviews. Please try again!', {
         icon: <CircleAlert color="#fc3419" />,
