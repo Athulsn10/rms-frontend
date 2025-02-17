@@ -10,7 +10,7 @@ const Protected = ({ children }: ProtectedProps) => {
   const { isAuthenticated, isRestuarant } = useAppContext();
   const location = useLocation();
 
-  const unAuthorisedRoutes = ['/profile', '/', '/qrscanner', '/search', '/authentication', '/register','/restuarant'];
+  const unAuthorisedRoutes = ['/profile', '/', '/qrscanner', '/search', '/help', '/authentication', '/register','/restuarant'];
 
   // useEffect(() => {
   //   if (isRestuarant && !unAuthorisedRoutes.includes(location.pathname) && location.pathname !== '/dashboard') {
