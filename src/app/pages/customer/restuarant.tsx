@@ -404,7 +404,7 @@ function restuarant() {
                     </DialogContent>
                   </Dialog>
                 </div>
-                {menuList && <div className={`grid grid-cols-1 md:grid-cols-4 lg:grid-cols-4 gap-6 p-6 ${cartItems.length  > 0  || idFromParams ? 'mb-16' : ''}`}>
+                {menuList.length > 0 && <div className={`grid grid-cols-1 md:grid-cols-4 lg:grid-cols-4 gap-6 p-6 ${cartItems.length  > 0  || idFromParams ? 'mb-16' : ''}`}>
                   {menuList.map((item: any) => (
                     <Card key={item._id} className="w-full">
                       <div className="relative h-48 w-full overflow-hidden">
