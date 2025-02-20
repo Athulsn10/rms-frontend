@@ -1,7 +1,6 @@
-import { Armchair, CircleAlert, MapPin } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import toast, { Toaster } from 'react-hot-toast';
-
+import { Armchair, CircleAlert, MapPin } from "lucide-react";
 
 interface cardProps {
     id: string,
