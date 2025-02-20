@@ -1,12 +1,10 @@
 import { useState, useEffect } from 'react';
 import Login from '@/app/auth/login/login';
 import BrandLogo from '@/assets/brandlogo';
-import { Input } from "@/components/ui/input"
 import { useNavigate } from "react-router-dom";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { Search, LifeBuoy, User, ChevronDown, Menu, X, MapPin, ScanQrCode } from 'lucide-react';
+import { Search, LifeBuoy, User, Menu, X, MapPin, ScanQrCode } from 'lucide-react';
 
 const Navbar = () => {
     const navigate = useNavigate();
