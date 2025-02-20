@@ -1,9 +1,8 @@
 import { X } from 'lucide-react';
 import { Html5Qrcode } from 'html5-qrcode';
-import React, { useEffect, useState } from 'react';
 import BrandLogo from '@/assets/brandlogo';
 import { useNavigate } from "react-router-dom";
-
+import React, { useEffect, useState } from 'react';
 interface QRScannerConfig {
     fps: number;
     qrbox: {
