@@ -16,11 +16,11 @@ interface Restaurant {
 
 function RestaurantSearch() {
     const base_url = import.meta.env.VITE_BASE_URL;
-    const [allRestaurantList, setAllRestaurantList] = useState<Restaurant[]>([]);
-    const [searchQuery, setSearchQuery] = useState('');
-    const [searchResults, setSearchResults] = useState<Restaurant[]>([]);
     const [isLoading, setIsLoading] = useState(false);
+    const [searchQuery, setSearchQuery] = useState('');
     const [hasSearched, setHasSearched] = useState(false);
+    const [searchResults, setSearchResults] = useState<Restaurant[]>([]);
+    const [allRestaurantList, setAllRestaurantList] = useState<Restaurant[]>([]);
 
     const fetchRestuarants = async () => {
         try {
