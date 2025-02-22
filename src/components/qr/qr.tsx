@@ -11,12 +11,12 @@ interface QRScannerConfig {
     };
     aspectRatio: number;
     showTorchButtonIfSupported: boolean;
-}
+};
 
 interface ScannerProps {
     onResult?: (result: string) => void;
     className?: string;
-}
+};
 
 const QRScanner: React.FC<ScannerProps> = ({ onResult, className = '' }) => {
     const navigate = useNavigate();
