@@ -7,7 +7,7 @@ import { cancelOrder, getAllOrders, updateOrder } from "../../customerService";
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { handleBillPdfDownload, handleFetchBillPath } from "@/app/pages/restuarant/dashboard/restuarantService";
-import { CircleAlert, CircleCheck, Clock, Download, Edit2, Loader2, Minus, Plus, Trash2, XCircle } from 'lucide-react';
+import { CircleAlert, CircleCheck, Clock, Download, Edit2, Loader2, Minus, Plus, Trash2, UtensilsCrossed, XCircle } from 'lucide-react';
 
 // Menu item interface
 interface MenuItem {
@@ -209,7 +209,7 @@ function Orders() {
                         <Loader2 className="w-9 h-9 animate-spin" />
                     </div>) :
                     (<>
-                        <div className="grid gap-4">
+                        {orders.length > 0 ? (<div className="grid gap-4">
                             {orders.map((order) => (
                                 <Card className="w-full transform transition-all duration-200 hover:shadow-lg border-none">
                                     <CardHeader className="pb-4">
@@ -220,7 +220,7 @@ function Orders() {
                                                         <p>Order #{order._id.slice(-6)}</p>
                                                         <div>
                                                             {
-                                                                isLoadingId === order._id  ? (
+                                                                isLoadingId === order._id ? (
                                                                     <Loader2 className="animate-spin" />
                                                                 ) : (
                                                                     <Download size={20} />
@@ -239,15 +239,15 @@ function Orders() {
                                                     </span>
                                                 </div>
                                             </div>
-                                           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                                            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                                                 <Badge className={`${getStatusColor(order.status)} px-4 py-1 text-sm font-medium rounded-full`}>
                                                     {order.status}
                                                 </Badge>
                                                 <span className={`inline-flex items-center px-4 py-1 rounded-full text-sm font-medium ${order.isPaid ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"} `}>
                                                     {order.isPaid ? "Paid" : "Not Paid"}
                                                 </span>
-                                           </div>
-                                            
+                                            </div>
+
                                         </div>
                                     </CardHeader>
 
@@ -290,7 +290,21 @@ function Orders() {
                                     </CardContent>
                                 </Card>
                             ))}
-                        </div>
+                        </div>) : (
+                            <div className="flex items-center justify-center h-full">
+                                <Card className="w-full max-w-3xl mx-auto border-none">
+                                    <CardContent className="flex flex-col items-center justify-center py-16">
+                                        <div className="bg-orange-100 p-4 rounded-full mb-4">
+                                            <UtensilsCrossed className="h-12 w-12 text-orange-400" />
+                                        </div>
+                                        <h2 className="text-xl font-semibold text-gray-900 mb-2">No Orders Yet</h2>
+                                        <p className="text-gray-500 text-center mb-6 max-w-md">
+                                            You currently don't have any orders. Orders will appear here when orders are placed.
+                                        </p>
+                                    </CardContent>
+                                </Card>
+                            </div>
+                        )}
                         <Dialog open={isEditModalOpen} onOpenChange={handleModalClose}>
                             <DialogContent className="max-w-md">
                                 <DialogHeader>
@@ -338,7 +352,7 @@ function Orders() {
                             </DialogContent>
                         </Dialog>
                         <Toaster />
-                    </>)}
+                    </>)} 
             </div>
         </>
     );
