@@ -8,7 +8,7 @@ import { handleCustomerRegister, handleRestuarantRegister } from '../authService
 import toast, { Toaster } from 'react-hot-toast';
 import { useSearchParams } from 'react-router-dom';
 import { MultiSelect } from "@/components/ui/multiselect";
-import { Mail, Lock, User, MapPin, Building, Home, NutOff, Phone, Cake, BadgeIndianRupee, ArrowRight, ArrowLeft, CircleAlert, Loader2, Utensils, WalletCards, Camera, ImageIcon, X } from 'lucide-react';
+import { Mail, Lock, User, MapPin, Building, Home, NutOff, Phone, BadgeIndianRupee, ArrowRight, ArrowLeft, CircleAlert, Loader2, Utensils, WalletCards, Camera, ImageIcon, X, CircleCheck } from 'lucide-react';
 
 
 interface AddressData {
@@ -25,7 +25,6 @@ interface FormData {
   email: string;
   password: string;
   phone: string,
-  dob: string,
   address: AddressData;
   allergies: string[];
   gstin: string;
@@ -49,7 +48,6 @@ const Registration = () => {
     email: '',
     password: '',
     phone: '',
-    dob: '',
     address: {
       addressLine1: '',
       addressLine2: '',
@@ -189,18 +187,6 @@ const Registration = () => {
         }
       },
       {
-        id: 'dob',
-        label: 'Date Of Birth',
-        type: 'date',
-        required: true,
-        placeholder: '17-05-2002',
-        icon: Cake,
-        registrationType: ['customer'],
-        validation: (value: string) => {
-          if (!value) return 'Date of birth is required';
-        }
-      },
-      {
         id: 'gstin',
         label: 'GST IN',
         type: 'text',
@@ -332,17 +318,6 @@ const Registration = () => {
     ],
   ];
 
-  const notify = (message: string, type: string) => {
-    if (type) {
-      (toast as any)[type](message, {
-        icon: <CircleAlert color="#fc3419" />,
-      });
-    } else {
-      toast.success(message, {
-        icon: <CircleAlert color="#1ce867" />,
-      });
-    }
-  };
 
   const handleInputChange = (id: string, value: string) => {
     setFormData(prev => {
@@ -435,7 +410,6 @@ const Registration = () => {
     if (validateStep(currentStep) && registrationType) {
       if (registrationType === "restaurant") {
         delete (formData as Partial<typeof formData>).allergies;
-        delete (formData as Partial<typeof formData>).dob;
       } else {
         formData.allergies = selectedAllergies;
         delete (formData as Partial<typeof formData>).gstin;
@@ -471,12 +445,16 @@ const Registration = () => {
      
       if (response.status) {
         setIsLoading(false);
-        notify('Registration successfull, Please login', 'success');
+        toast.success('Registration success, Please login!', {
+          icon: <CircleCheck color="#1ce867" />,
+        });
         setTimeout(() => {
           navigate("/");
         }, 2000)
       } else {
-        notify(`${response.message}`, 'error');
+        toast.error(`${response.message}`, {
+          icon: <CircleAlert color="#fc3419" />,
+        });
         setIsLoading(false);
       }
     }
