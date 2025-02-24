@@ -406,7 +406,7 @@ function menu() {
                 </div>
 
                 {aiLoading && (
-                  <div className="absolute inset-0 z-50 flex items-center justify-center bg-white/50">
+                  <div className="absolute inset-0 z-50 md:ps-20 ps-5 flex items-center justify-center bg-white/50">
                     <img
                       src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/f0/Google_Bard_logo.svg/900px-Google_Bard_logo.svg.png"
                       alt="Loading"
